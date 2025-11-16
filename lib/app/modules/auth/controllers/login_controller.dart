@@ -1,13 +1,14 @@
 import 'package:ecocampus/app/data/repositories/authentication_repository.dart';
+import 'package:ecocampus/app/shared/utils/notification_helper.dart';
+import 'package:ecocampus/app/shared/utils/exception_handler.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class RegisterController extends GetxController {
+class LoginController extends GetxController {
   final _authRepo = AuthenticationRepository.instance;
   final formKey = GlobalKey<FormState>();
-  final fullNameC = TextEditingController();
   final emailC = TextEditingController();
-  final phoneC = TextEditingController();
   final passwordC = TextEditingController();
   final isLoading = false.obs;
   final isPasswordVisible = false.obs;
@@ -16,19 +17,24 @@ class RegisterController extends GetxController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  Future<void> registerUser() async {
+  Future<void> loginUser() async {
     if (!formKey.currentState!.validate()) {
       return;
     }
 
     try {
       isLoading(true);
-      String fullName = fullNameC.text.trim();
-      String email = emailC.text.trim();
-      String phone = phoneC.text.trim();
-      String password = passwordC.text.trim();
-      await _authRepo.createUser(email, password, fullName, phone);
-    } catch (_) {
+      await _authRepo.loginUser(emailC.text.trim(), passwordC.text.trim());
+    } catch (e) {
+      String errorMessage;
+
+      if (e is FirebaseAuthException) {
+        errorMessage = ExceptionHandler.handleAuthError(e);
+      } else {
+        errorMessage = 'Terjadi kesalahan. Coba lagi.';
+      }
+
+      NotificationHelper.showError("Login Gagal", errorMessage);
     } finally {
       isLoading(false);
     }
@@ -36,9 +42,7 @@ class RegisterController extends GetxController {
 
   @override
   void onClose() {
-    fullNameC.dispose();
     emailC.dispose();
-    phoneC.dispose();
     passwordC.dispose();
     super.onClose();
   }

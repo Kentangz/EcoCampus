@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ecocampus/app/modules/register/controllers/register_controller.dart';
+import 'package:ecocampus/app/modules/auth/controllers/login_controller.dart';
+import 'package:ecocampus/app/routes/app_pages.dart'; 
 
-class RegisterView extends GetView<RegisterController> {
-  const RegisterView({super.key});
+class LoginView extends GetView<LoginController> {
+  const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Daftar Akun Baru')),
+      appBar: AppBar(title: const Text('Login')),
       body: SingleChildScrollView(
         child: Form(
           key: controller.formKey,
@@ -18,21 +18,14 @@ class RegisterView extends GetView<RegisterController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: controller.fullNameC,
-                  decoration: const InputDecoration(
-                    labelText: 'Nama Lengkap',
-                    border: OutlineInputBorder(),
+                const SizedBox(height: 30),
+                Center(
+                  child: Text(
+                    'Selamat Datang Kembali!',
+                    style: Get.textTheme.headlineSmall,
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Nama Lengkap tidak boleh kosong';
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
 
                 TextFormField(
                   controller: controller.emailC,
@@ -53,27 +46,10 @@ class RegisterView extends GetView<RegisterController> {
                 ),
                 const SizedBox(height: 20),
 
-                TextFormField(
-                  controller: controller.phoneC,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Nomor Telepon',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Nomor Telepon tidak boleh kosong';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-
                 Obx(
                   () => TextFormField(
                     controller: controller.passwordC,
-                    obscureText:
-                        !controller.isPasswordVisible.value,
+                    obscureText: !controller.isPasswordVisible.value,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       border: const OutlineInputBorder(),
@@ -83,16 +59,12 @@ class RegisterView extends GetView<RegisterController> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                         ),
-                        onPressed: controller
-                            .togglePasswordVisibility,
+                        onPressed: controller.togglePasswordVisibility,
                       ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Password tidak boleh kosong';
-                      }
-                      if (value.length < 6) {
-                        return 'Password minimal 6 karakter';
                       }
                       return null;
                     },
@@ -107,7 +79,7 @@ class RegisterView extends GetView<RegisterController> {
                     ),
                     onPressed: controller.isLoading.value
                         ? null
-                        : controller.registerUser,
+                        : controller.loginUser,
                     child: controller.isLoading.value
                         ? const SizedBox(
                             width: 20,
@@ -116,7 +88,7 @@ class RegisterView extends GetView<RegisterController> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('DAFTAR SEKARANG'),
+                        : const Text('LOGIN'),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -124,10 +96,10 @@ class RegisterView extends GetView<RegisterController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Sudah punya akun?'),
+                    const Text('Belum punya akun?'),
                     TextButton(
-                      onPressed: () => Get.back(),
-                      child: const Text('Login di sini'),
+                      onPressed: () => Get.toNamed(Routes.REGISTER),
+                      child: const Text('Daftar di sini'),
                     ),
                   ],
                 ),

@@ -15,7 +15,6 @@ class AuthenticationRepository extends GetxController {
   void onReady() {
     _firebaseUser = Rx<User?>(_auth.currentUser);
     _firebaseUser.bindStream(_auth.authStateChanges());
-
     ever(_firebaseUser, _setInitialScreen);
   }
 
@@ -36,6 +35,7 @@ class AuthenticationRepository extends GetxController {
       }
     }
   }
+  
   Future<void> createUser(
     String email,
     String password,
@@ -55,42 +55,20 @@ class AuthenticationRepository extends GetxController {
       );
 
       await _db.collection("Users").doc(newUser.id).set(newUser.toJson());
-
-      Get.snackbar(
-        "Success",
-        "Your account has been created.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar(
-        "Error",
-        e.message ?? "An error occurred.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+    } on FirebaseAuthException {
+      rethrow;
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Something went wrong. Please try again.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      throw "Sesuatu salah. Coba lagi.";
     }
   }
 
   Future<void> loginUser(String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar(
-        "Error",
-        e.message ?? "Email/password salah.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+    } on FirebaseAuthException {
+      rethrow;
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Sesuatu salah. Coba lagi.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      throw "Sesuatu salah. Coba lagi.";
     }
   }
 
@@ -101,11 +79,7 @@ class AuthenticationRepository extends GetxController {
         return UserModel.fromSnapshot(snapshot);
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Gagal mengambil data user.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      throw "Gagal mengambil data user.";
     }
     return null;
   }
