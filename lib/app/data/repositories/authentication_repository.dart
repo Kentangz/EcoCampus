@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/data/models/user_model.dart';
 import 'package:ecocampus/app/routes/app_pages.dart';
@@ -31,7 +33,14 @@ class AuthenticationRepository extends GetxController {
       }
     }
     _lastRoute = route;
-    Get.offAllNamed(route);
+
+    if (WidgetsBinding.instance.schedulerPhase == SchedulerPhase.idle) {
+      Get.offAllNamed(route);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.offAllNamed(route);
+      });
+    }
   }
 
   Future<void> _setInitialScreen(User? user) async {
@@ -131,9 +140,9 @@ class AuthenticationRepository extends GetxController {
     try {
       String email = await _auth.verifyPasswordResetCode(code);
       return email;
-    } on FirebaseAuthException {
+    } on FirebaseAuthException catch (_) {
       rethrow;
-    } catch (e) {
+    } catch (_) {
       throw "Kode tidak valid atau kedaluwarsa.";
     }
   }
@@ -141,9 +150,9 @@ class AuthenticationRepository extends GetxController {
   Future<void> confirmPasswordReset(String code, String newPassword) async {
     try {
       await _auth.confirmPasswordReset(code: code, newPassword: newPassword);
-    } on FirebaseAuthException {
+    } on FirebaseAuthException catch (_) {
       rethrow;
-    } catch (e) {
+    } catch (_) {
       throw "Gagal mereset password. Coba lagi.";
     }
   }

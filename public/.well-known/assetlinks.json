@@ -1,8 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.example.ecocampus",
-    "sha256_cert_fingerprints": ["5D:3F:83:C5:8A:4B:CC:C7:A6:A7:B6:07:F0:83:E3:E1:03:EB:45:21:5C:01:23:DF:9A:70:33:E8:DB:4C:68:56"]
-  }
-}]
