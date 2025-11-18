@@ -32,6 +32,7 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+.firebase/
 
 # Symbolication related
 app.*.symbols
@@ -47,3 +48,4 @@ app.*.map.json
 
 .pubspec.lock
 .env
+firebase.json

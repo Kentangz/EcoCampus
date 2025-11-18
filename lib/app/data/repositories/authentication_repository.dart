@@ -9,6 +9,7 @@ class AuthenticationRepository extends GetxController {
 
   final _auth = FirebaseAuth.instance;
   final _db = FirebaseFirestore.instance;
+  String? _lastRoute;
   late Rx<User?> _firebaseUser;
 
   @override
@@ -18,24 +19,43 @@ class AuthenticationRepository extends GetxController {
     ever(_firebaseUser, _setInitialScreen);
   }
 
+  void _navigateTo(String route, {bool force = false}) {
+    final currentRoute = Get.currentRoute;
+    if (!force) {
+      if (_lastRoute == route) {
+        return;
+      }
+      if (currentRoute.isNotEmpty && currentRoute == route) {
+        _lastRoute = route;
+        return;
+      }
+    }
+    _lastRoute = route;
+    Get.offAllNamed(route);
+  }
+
   Future<void> _setInitialScreen(User? user) async {
     if (user == null) {
-      Get.offAllNamed(Routes.LOGIN);
+      _navigateTo(Routes.LOGIN);
     } else {
       final userModel = await getUserDetailsByUid(user.uid);
 
       if (userModel != null) {
         if (userModel.role == "admin") {
-          Get.offAllNamed(Routes.DASHBOARD_ADMIN);
+          _navigateTo(Routes.DASHBOARD_ADMIN);
         } else {
-          Get.offAllNamed(Routes.DASHBOARD_USER);
+          _navigateTo(Routes.DASHBOARD_USER);
         }
       } else {
-        Get.offAllNamed(Routes.LOGIN);
+        _navigateTo(Routes.LOGIN);
       }
     }
   }
-  
+
+  void navigateToLogin({bool force = false}) {
+    _navigateTo(Routes.LOGIN, force: force);
+  }
+
   Future<void> createUser(
     String email,
     String password,
@@ -86,5 +106,45 @@ class AuthenticationRepository extends GetxController {
 
   Future<void> logout() async {
     await _auth.signOut();
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    var acs = ActionCodeSettings(
+      url: 'https://ecocampus-app.site/resetPassword',
+      handleCodeInApp: true,
+      iOSBundleId: 'com.example.ecocampus',
+      androidPackageName: 'com.example.ecocampus',
+      androidInstallApp: true,
+      androidMinimumVersion: '12',
+    );
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email, actionCodeSettings: acs);
+    } on FirebaseAuthException {
+      rethrow;
+    } catch (e) {
+      throw "Sesuatu salah. Coba lagi.";
+    }
+  }
+
+  Future<String> verifyPasswordResetCode(String code) async {
+    try {
+      String email = await _auth.verifyPasswordResetCode(code);
+      return email;
+    } on FirebaseAuthException {
+      rethrow;
+    } catch (e) {
+      throw "Kode tidak valid atau kedaluwarsa.";
+    }
+  }
+
+  Future<void> confirmPasswordReset(String code, String newPassword) async {
+    try {
+      await _auth.confirmPasswordReset(code: code, newPassword: newPassword);
+    } on FirebaseAuthException {
+      rethrow;
+    } catch (e) {
+      throw "Gagal mereset password. Coba lagi.";
+    }
   }
 }
