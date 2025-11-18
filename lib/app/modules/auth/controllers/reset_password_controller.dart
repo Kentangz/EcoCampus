@@ -2,7 +2,6 @@ import 'package:ecocampus/app/data/repositories/authentication_repository.dart';
 import 'package:ecocampus/app/shared/utils/notification_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ecocampus/app/routes/app_pages.dart';
 
 class ResetPasswordController extends GetxController {
   final _authRepo = AuthenticationRepository.instance;
@@ -14,20 +13,40 @@ class ResetPasswordController extends GetxController {
 
   final emailC = TextEditingController();
   String? oobCode;
+  bool _isCodeVerified = false;
 
   @override
   void onInit() {
     super.onInit();
-    oobCode = Get.arguments as String?;
-    if (oobCode == null) {
-      NotificationHelper.showError(
-        "Link Tidak Valid",
-        "Link reset password tidak valid.",
-      );
-      Get.offAllNamed(Routes.LOGIN);
+    if (_isCodeVerified && emailC.text.isNotEmpty && oobCode != null) {
       return;
     }
-    _verifyCode(oobCode!);
+
+    final args = Get.arguments as String?;
+    if (args != null) {
+      oobCode = args;
+    }
+
+    if (oobCode == null) {
+      if (emailC.text.isEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          NotificationHelper.showError(
+            "Link Tidak Valid",
+            "Link reset password tidak valid.",
+          );
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _authRepo.navigateToLogin(force: true);
+          });
+        });
+      }
+      return;
+    }
+
+    if (!_isCodeVerified) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _verifyCode(oobCode!);
+      });
+    }
   }
 
   Future<void> _verifyCode(String code) async {
@@ -35,9 +54,12 @@ class ResetPasswordController extends GetxController {
       isLoading(true);
       String email = await _authRepo.verifyPasswordResetCode(code);
       emailC.text = email;
+      _isCodeVerified = true;
     } catch (e) {
       NotificationHelper.showError("Link Error", e.toString());
-      Get.offAllNamed(Routes.LOGIN);
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _authRepo.navigateToLogin(force: true);
+      });
     } finally {
       isLoading(false);
     }
@@ -49,6 +71,17 @@ class ResetPasswordController extends GetxController {
 
   Future<void> resetPassword() async {
     if (!formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (oobCode == null || !_isCodeVerified) {
+      NotificationHelper.showError(
+        "Link Tidak Valid",
+        "Link reset password tidak valid atau sudah digunakan.",
+      );
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _authRepo.navigateToLogin(force: true);
+      });
       return;
     }
 

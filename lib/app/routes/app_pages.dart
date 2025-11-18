@@ -1,8 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:ecocampus/app/modules/auth/bindings/auth_binding.dart';
-import 'package:ecocampus/app/modules/auth/controllers/forgot_password_controller.dart';
-import 'package:ecocampus/app/modules/auth/controllers/reset_password_controller.dart';
+import 'package:ecocampus/app/modules/auth/bindings/reset_password_binding.dart';
 import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
 import 'package:get/get.dart';
@@ -34,16 +33,12 @@ class AppPages {
     GetPage(
       name: _Paths.FORGOT_PASSWORD,
       page: () => const ForgotPasswordView(),
-      binding: BindingsBuilder(() {
-        Get.lazyPut<ForgotPasswordController>(() => ForgotPasswordController());
-      }),
+      binding: AuthBinding(),
     ),
     GetPage(
       name: _Paths.RESET_PASSWORD,
       page: () => const ResetPasswordView(),
-      binding: BindingsBuilder(() {
-        Get.lazyPut<ResetPasswordController>(() => ResetPasswordController());
-      }),
+      binding: ResetPasswordBinding(),
     ),
     GetPage(
       name: _Paths.DASHBOARD_ADMIN,
