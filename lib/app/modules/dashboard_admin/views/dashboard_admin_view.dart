@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/dashboard_admin_controller.dart';
-import 'dashboard_admin_controller.dart';
 
 class DashboardAdminView extends GetView<DashboardAdminController> {
   const DashboardAdminView({super.key});

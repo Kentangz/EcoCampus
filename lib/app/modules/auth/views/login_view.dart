@@ -21,7 +21,7 @@ class LoginView extends GetView<LoginController> {
                 const SizedBox(height: 30),
                 Center(
                   child: Text(
-                    'Selamat Datang Kembali!',
+                    'Selamat Datang di EcoCampus',
                     style: Get.textTheme.headlineSmall,
                   ),
                 ),
