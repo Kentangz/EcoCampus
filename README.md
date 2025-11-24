@@ -20,19 +20,22 @@ Memudahkan akses informasi acara tanpa harus mencari manual.
 
 Memperluas jaringan pertemanan dengan cara cepat dan modern.
 
-Membantu kampus menciptakan ekosistem digital yang positif dan produktif. 
+Membantu kampus menciptakan ekosistem digital yang positif dan produktif.
 
 ## Kelas-NIM-Nama-UsernameGithub
+
 1. D, Iswahyudi (2022-502)
 2. D, Mada Rabbani S. (2022-493)
 3. D, Naufal Akmal R. (2022-495)
 4. D, Bintangadjie S.B.M. (2022-496)
 5. D, Amma Rofi'unnajah M.H. (2022-506)
 
-## Link Figma 
+## Link Figma
+
 https://www.figma.com/design/tdaV5mlv8N7w6iO8mUnBEX/HMW?node-id=0-1&p=f&t=Sfl1fY3qnE8tS5iT-0
 
 ## Worksheet
+
 <p>
   <img src="assets/etc/WS1.jpg" width="300"> <img src="assets/etc/WS2.jpg" width="300"> <img src="assets/etc/WS3.jpg" width="300"> <img src="assets/etc/WS3.1.jpg" width="300">
   <img src="assets/etc/WS3.2.jpg" width="300"> <img src="assets/etc/WS3.3.jpg" width="300"> <img src="assets/etc/WS4.jpg" width="300"> <img src="assets/etc/WS4.1.jpg" width="300">
@@ -41,16 +44,19 @@ https://www.figma.com/design/tdaV5mlv8N7w6iO8mUnBEX/HMW?node-id=0-1&p=f&t=Sfl1fY
 </p>
 
 ## Low Fidelity Prototype
+
 <p>
-  <img src="assets/etc/lowfidelityHMWcopy.jpg" width="500">
+  <img src="LowFidelity/lowfidelityHMWcopy.jpg" width="500">
 </p>
 
 ## High Fidelity Prototype
+
 <p>
-  <img src="assets/etc/HF1.jpg" width="300" > <img src="assets/etc/HF2.jpg" width="300"> <img src="assets/etc/HF3.jpg" width="300">
+  <img src="HighFidelity/HF1.jpg" width="300" > <img src="HighFidelity/HF2.jpg" width="300"> <img src="HighFidelity/HF3.jpg" width="300">
 </p>
 
 ## Tabel Pembagian Tugas
+
 <p>
   <img src="assets/etc/TabelOrganization.png" width="1000">
 </p>
