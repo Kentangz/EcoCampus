@@ -40,6 +40,11 @@ Memperluas jaringan pertemanan dengan cara cepat dan modern.
 Membantu kampus menciptakan ekosistem digital yang positif dan produktif. 
 
 ## Kelas-NIM-Nama-UsernameGithub
+1. D, Iswahyudi (2022-502)
+2. D, Mada Rabbani S. (2022-493)
+3. D, Naufal Akmal R. (2022-495)
+4. D, Bintangadjie S.B.M. (2022-496)
+5. D, Amma Rofi'unnajah M.H. (2022-506)
 
 ## Link Figma 
 https://www.figma.com/design/tdaV5mlv8N7w6iO8mUnBEX/HMW?node-id=0-1&p=f&t=Sfl1fY3qnE8tS5iT-0
