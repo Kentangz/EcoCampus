@@ -49,7 +49,7 @@ Membantu kampus menciptakan ekosistem digital yang positif dan produktif.
 ## Worksheet
 
 ## Low Fidelity Prototype
-![Preview](assets/etc/lowfidelityHMW.jpg)
+![Preview](assets/etc/lowfidelityHMWcopy.jpg)
 
 ## Link Figma 
 https://www.figma.com/design/tdaV5mlv8N7w6iO8mUnBEX/HMW?node-id=0-1&p=f&t=Sfl1fY3qnE8tS5iT-0
