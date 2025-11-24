@@ -12,23 +12,6 @@ Menyediakan informasi kegiatan kampus seperti event, perlombaan, seminar, hingga
 
 Membantu pengguna mengembangkan jejaring dan keterampilan melalui aktivitas yang relevan.
 
-⭐ Fitur Utama
-
-User Profiles
-Setiap pengguna dapat membuat profil untuk menampilkan identitas singkat, minat, dan jaringan relasi.
-
-Event & Activities List
-Menampilkan daftar kegiatan kampus seperti event akademik, organisasi, volunteer, bursa minat bakat, dan lainnya.
-
-Join & Participate
-Pengguna dapat bergabung pada kegiatan sesuai minat secara langsung melalui aplikasi.
-
-Networking & Relasi
-Pengguna dapat terhubung dengan mahasiswa lain untuk membangun relasi, bertukar informasi, dan memperluas jaringan.
-
-Notifikasi Real-Time
-Sistem notifikasi untuk memberi tahu pengguna tentang event baru, aktivitas yang akan dimulai, update kegiatan, dan lainnya.
-
 🚀 Manfaat
 
 Meningkatkan partisipasi dan keterlibatan mahasiswa dalam kegiatan kampus.
@@ -46,10 +29,28 @@ Membantu kampus menciptakan ekosistem digital yang positif dan produktif.
 4. D, Bintangadjie S.B.M. (2022-496)
 5. D, Amma Rofi'unnajah M.H. (2022-506)
 
-## Worksheet
-
-## Low Fidelity Prototype
-![Preview](assets/etc/lowfidelityHMWcopy.jpg)
-
 ## Link Figma 
 https://www.figma.com/design/tdaV5mlv8N7w6iO8mUnBEX/HMW?node-id=0-1&p=f&t=Sfl1fY3qnE8tS5iT-0
+
+## Worksheet
+<p>
+  <img src="assets/etc/WS1.jpg" width="300"> <img src="assets/etc/WS2.jpg" width="300"> <img src="assets/etc/WS3.jpg" width="300"> <img src="assets/etc/WS3.1.jpg" width="300">
+  <img src="assets/etc/WS3.2.jpg" width="300"> <img src="assets/etc/WS3.3.jpg" width="300"> <img src="assets/etc/WS4.jpg" width="300"> <img src="assets/etc/WS4.1.jpg" width="300">
+  <img src="assets/etc/WS4.2.jpg" width="300"> <img src="assets/etc/WS4.3.jpg" width="300"> <img src="assets/etc/WS5.2.jpg" width="300"> <img src="assets/etc/WS5.1.jpg" width="300">
+  <img src="assets/etc/WS6.jpg" width="300"> <img src="assets/etc/WS6.1.jpg" width="300">
+</p>
+
+## Low Fidelity Prototype
+<p>
+  <img src="assets/etc/lowfidelityHMWcopy.jpg" width="500">
+</p>
+
+## High Fidelity Prototype
+<p>
+  <img src="assets/etc/HF1.jpg" width="300" > <img src="assets/etc/HF2.jpg" width="300"> <img src="assets/etc/HF3.jpg" width="300">
+</p>
+
+## Tabel Pembagian Tugas
+<p>
+  <img src="assets/etc/TabelOrganization.png" width="1000">
+</p>
