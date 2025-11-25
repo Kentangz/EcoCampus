@@ -1,6 +1,7 @@
+import 'package:ecocampus/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ecocampus/app/modules/dashboard_admin/controllers/dashboard_admin_controller.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/controllers/overview_admin_controller.dart';
 
 class AdminSidebar extends GetView<DashboardAdminController> {
   const AdminSidebar({super.key});
@@ -57,28 +58,38 @@ class AdminSidebar extends GetView<DashboardAdminController> {
                 _buildDrawerItem(
                   icon: Icons.dashboard_outlined,
                   text: 'Overview',
-                  onTap: () => Get.back(),
-                  isActive: true,
+                  onTap: () {
+                    if (Get.currentRoute == Routes.DASHBOARD_ADMIN) {
+                      Get.back();
+                    } else {
+                      Get.toNamed(Routes.DASHBOARD_ADMIN);
+                    }
+                  },
+                  isActive: Get.currentRoute == Routes.DASHBOARD_ADMIN,
                   primaryColor: primaryPurple,
                 ),
                 _buildDrawerItem(
                   icon: Icons.home,
                   text: 'Activity',
                   onTap: () {
-                    Get.back();
-                    // Get.toNamed('/Activity');
+                    if (Get.currentRoute == Routes.ADMIN_ACTIVITY) {
+                      Get.back();
+                    } else {
+                      Get.toNamed(Routes.ADMIN_ACTIVITY);
+                    }
                   },
+                  isActive: Get.currentRoute == Routes.ADMIN_ACTIVITY,
                   primaryColor: primaryPurple,
                 ),
-                const Divider(),
-                _buildDrawerItem(
-                  icon: Icons.notifications_outlined,
-                  text: 'Notifications',
-                  onTap: () {
-                    Get.back();
-                  },
-                  primaryColor: primaryPurple,
-                ),
+                // const Divider(),
+                // _buildDrawerItem(
+                //   icon: Icons.notifications_outlined,
+                //   text: 'Notifications',
+                //   onTap: () {
+                //     Get.back();
+                //   },
+                //   primaryColor: primaryPurple,
+                // ),
               ],
             ),
           ),
