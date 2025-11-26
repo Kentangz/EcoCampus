@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ecocampus/app/modules/dashboard_admin/controllers/overview_admin_controller.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/controllers/dashboard_admin_controller.dart';
 import 'package:ecocampus/app/shared/widgets/admin_sidebar.dart';
 
 class DashboardAdminView extends GetView<DashboardAdminController> {
@@ -27,7 +27,6 @@ class DashboardAdminView extends GetView<DashboardAdminController> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
 
-      // Panggil Widget Sidebar di sini
       drawer: const AdminSidebar(),
 
       body: SingleChildScrollView(
@@ -46,7 +45,6 @@ class DashboardAdminView extends GetView<DashboardAdminController> {
             ),
             const SizedBox(height: 15),
 
-            // Grid Summary Cards
             GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -99,7 +97,7 @@ class DashboardAdminView extends GetView<DashboardAdminController> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1), // FIXED: withValues
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 3),
@@ -112,7 +110,7 @@ class DashboardAdminView extends GetView<DashboardAdminController> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1), // FIXED: withValues
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 28, color: color),

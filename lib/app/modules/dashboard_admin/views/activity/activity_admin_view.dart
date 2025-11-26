@@ -2,7 +2,7 @@ import 'package:ecocampus/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/shared/widgets/admin_sidebar.dart';
-import 'package:ecocampus/app/modules/dashboard_admin/controllers/overview_admin_controller.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/controllers/dashboard_admin_controller.dart';
 
 class ActivityAdminView extends GetView<DashboardAdminController> {
   const ActivityAdminView({super.key});
@@ -99,7 +99,7 @@ class ActivityAdminView extends GetView<DashboardAdminController> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 5,
               offset: const Offset(0, 3),
@@ -112,7 +112,7 @@ class ActivityAdminView extends GetView<DashboardAdminController> {
             Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 40, color: color),

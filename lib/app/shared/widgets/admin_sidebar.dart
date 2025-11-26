@@ -1,7 +1,7 @@
 import 'package:ecocampus/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ecocampus/app/modules/dashboard_admin/controllers/overview_admin_controller.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/controllers/dashboard_admin_controller.dart';
 
 class AdminSidebar extends GetView<DashboardAdminController> {
   const AdminSidebar({super.key});

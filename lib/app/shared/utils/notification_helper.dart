@@ -63,6 +63,34 @@ class NotificationHelper {
     );
   }
 
+  static void showWarning(String title, String message) {
+    if (Get.isSnackbarOpen && _currentMessage == message) {
+      return;
+    }
+    if (Get.isSnackbarOpen) {
+      Get.closeCurrentSnackbar();
+    }
+    _currentMessage = message;
+
+    Get.snackbar(
+      title,
+      message,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.orangeAccent,
+      colorText: Colors.white,
+      borderRadius: 10,
+      margin: const EdgeInsets.all(10),
+      duration: const Duration(seconds: 5),
+      animationDuration: _animationDuration,
+
+      snackbarStatus: (status) {
+        if (status == SnackbarStatus.CLOSED) {
+          _currentMessage = null;
+        }
+      },
+    );
+  }
+
   static void showInfo(String title, String message) {
     if (Get.isSnackbarOpen && _currentMessage == message) {
       return;
