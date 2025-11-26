@@ -32,7 +32,7 @@ class ActivityListView extends GetView<ActivityAdminController> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF6C63FF),
-        onPressed: () => controller.navigateToAddActivity(category),
+        onPressed: () => controller.navigateToForm(category: category),
         child: const Icon(Icons.add, color: Colors.white),
       ),
       body: Column(
@@ -46,9 +46,7 @@ class ActivityListView extends GetView<ActivityAdminController> {
                   controller: controller.searchController,
                   hintText: "Cari nama kegiatan...",
                 ),
-
                 const SizedBox(height: 12),
-
                 _buildFilterAndSortBar(),
               ],
             ),
@@ -122,9 +120,7 @@ class ActivityListView extends GetView<ActivityAdminController> {
               ),
             ),
           ),
-
           const SizedBox(width: 10),
-
           Obx(
             () => Row(
               children: [
@@ -201,9 +197,22 @@ class ActivityListView extends GetView<ActivityAdminController> {
                   ),
                 ],
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () => controller.confirmDeleteActivity(activity),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.remove_red_eye_outlined,
+                      color: Colors.blue,
+                    ),
+                    onPressed: () =>
+                        controller.navigateToForm(activity: activity),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () => controller.confirmDeleteActivity(activity),
+                  ),
+                ],
               ),
             ),
           ),

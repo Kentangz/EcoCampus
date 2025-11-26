@@ -12,7 +12,7 @@ class ActivityRepository extends GetxController {
         .collection('Activities')
         .where('category', isEqualTo: category)
         .orderBy('createdAt', descending: true)
-        .snapshots()
+        .snapshots(includeMetadataChanges: true)
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => ActivityModel.fromSnapshot(doc))
@@ -28,11 +28,46 @@ class ActivityRepository extends GetxController {
     }
   }
 
+  Future<void> updateActivity(ActivityModel activity) async {
+    try {
+      await _db.collection('Activities').doc(activity.id).set(
+        activity.toJson(), 
+        SetOptions(merge: true),
+      );
+    } catch (e) {
+      throw "Gagal mengupdate data.";
+    }
+  }
+
   Future<void> deleteActivity(String id) async {
     try {
       await _db.collection('Activities').doc(id).delete();
     } catch (e) {
       throw "Gagal menghapus data dari database.";
+    }
+  }
+
+  String getNewId() {
+    return _db.collection('Activities').doc().id;
+  }
+
+  Future<void> setActivity(ActivityModel activity) async {
+    await _db
+        .collection('Activities')
+        .doc(activity.id)
+        .set(activity.toJson(), SetOptions(merge: true));
+  }
+
+
+  Future<ActivityModel?> getActivityById(String id) async {
+    try {
+      var doc = await _db.collection('Activities').doc(id).get();
+      if (doc.exists) {
+        return ActivityModel.fromSnapshot(doc);
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
   }
 }

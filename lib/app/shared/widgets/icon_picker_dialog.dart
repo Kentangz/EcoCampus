@@ -13,16 +13,13 @@ class IconPickerDialog extends StatefulWidget {
 }
 
 class _IconPickerDialogState extends State<IconPickerDialog> {
-  // Controller search lokal untuk dialog ini
   final TextEditingController _searchController = TextEditingController();
 
-  // List icon yang ditampilkan (bisa berubah saat di-search)
   List<MapEntry<String, IconData>> _filteredIcons = [];
 
   @override
   void initState() {
     super.initState();
-    // Awalnya tampilkan semua icon
     _filteredIcons = AppIcons.map.entries.toList();
   }
 
@@ -48,10 +45,9 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
       insetPadding: const EdgeInsets.all(20),
       child: Container(
         padding: const EdgeInsets.all(20),
-        height: 500, // Tinggi fix agar grid bisa discroll
+        height: 500,
         child: Column(
           children: [
-            // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -73,7 +69,6 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
             ),
             const SizedBox(height: 15),
 
-            // Search Bar (Reuse widget kamu)
             CustomSearchBar(
               controller: _searchController,
               hintText: "Cari ikon (misal: school)...",
@@ -83,7 +78,6 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
 
             const SizedBox(height: 15),
 
-            // Grid Icons
             Expanded(
               child: _filteredIcons.isEmpty
                   ? Center(
@@ -96,7 +90,7 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                       itemCount: _filteredIcons.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4, // 4 Ikon per baris
+                            crossAxisCount: 4,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
                           ),
@@ -104,7 +98,6 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                         final entry = _filteredIcons[index];
                         return InkWell(
                           onTap: () {
-                            // Panggil callback dan tutup dialog
                             widget.onIconSelected(entry.key);
                             Get.back();
                           },

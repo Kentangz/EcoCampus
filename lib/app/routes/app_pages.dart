@@ -5,7 +5,6 @@ import 'package:ecocampus/app/modules/auth/bindings/reset_password_binding.dart'
 import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_admin_view.dart';
-import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_form_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_list_view.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
@@ -66,11 +65,6 @@ class AppPages {
     GetPage(
       name: _Paths.ADMIN_ACTIVITY_LIST,
       page: () => const ActivityListView(),
-      binding: DashboardAdminBinding(),
-    ),
-    GetPage(
-      name: _Paths.ADMIN_ACTIVITY_FORM,
-      page: () => const ActivityFormView(),
       binding: DashboardAdminBinding(),
     ),
   ];

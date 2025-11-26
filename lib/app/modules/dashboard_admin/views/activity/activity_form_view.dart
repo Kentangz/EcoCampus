@@ -1,241 +1,470 @@
+import 'package:ecocampus/app/data/models/activity_model.dart';
 import 'package:ecocampus/app/shared/utils/app_icons.dart';
 import 'package:ecocampus/app/shared/widgets/icon_picker_dialog.dart';
+import 'package:ecocampus/app/shared/widgets/image_picker.dart';
 import 'package:ecocampus/app/shared/widgets/shake_widget.dart';
+import 'package:ecocampus/app/shared/widgets/smart_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/activity_admin_controller.dart';
 
 class ActivityFormView extends GetView<ActivityAdminController> {
-  const ActivityFormView({super.key});
+  final ActivityModel? existingActivity;
+  final String category;
+
+  const ActivityFormView({
+    super.key,
+    this.existingActivity,
+    required this.category,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final args = Get.arguments ?? {};
-    final String category = args['category'] ?? 'umum';
-
     final formKey = GlobalKey<FormState>();
     final shakeKey = GlobalKey<ShakeWidgetState>();
+    final isEditMode = existingActivity != null;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       backgroundColor: Colors.white,
-      insetPadding: const EdgeInsets.all(20),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Tambah Kegiatan',
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF6C63FF),
-                      ),
+      insetPadding: const EdgeInsets.all(15),
+      child: Container(
+        constraints: const BoxConstraints(maxHeight: 700),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isEditMode ? 'Edit Kegiatan' : 'Tambah Kegiatan',
+                    style: const TextStyle(
+                      fontFamily: 'Montserrat',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF6C63FF),
                     ),
-                    IconButton(
-                      onPressed: () => Get.back(),
-                      icon: const Icon(Icons.close, color: Colors.grey),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ),
-                const Divider(height: 30),
-
-                const Text(
-                  "Nama Kegiatan",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-
-                ShakeWidget(
-                  key: shakeKey,
-                  child: TextFormField(
-                    controller: controller.titleController,
-                    decoration: InputDecoration(
-                      hintText: "Contoh: Belajar Gitar",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nama kegiatan wajib diisi';
-                      }
-                      return null;
-                    },
                   ),
-                ),
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: const Icon(Icons.close, color: Colors.grey),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
 
-                const SizedBox(height: 20),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle("Informasi Dasar"),
+                      const SizedBox(height: 10),
 
-                const Text(
-                  "Pilih Ikon",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Obx(
-                  () => InkWell(
-                    onTap: () {
-                      Get.dialog(
-                        IconPickerDialog(
-                          onIconSelected: (iconName) {
-                            controller.selectedIcon.value = iconName;
-                          },
+                      ShakeWidget(
+                        key: shakeKey,
+                        child: TextFormField(
+                          controller: controller.titleController,
+                          decoration: _inputDecoration("Nama Kegiatan"),
+                          validator: (val) =>
+                              val!.isEmpty ? 'Wajib diisi' : null,
                         ),
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey),
-                      ),
-                      child: Row(
+                      const SizedBox(height: 15),
+
+                      Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF6C63FF,
-                              ).withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              AppIcons.getIcon(controller.selectedIcon.value),
-                              color: const Color(0xFF6C63FF),
-                            ),
-                          ),
-                          const SizedBox(width: 15),
-
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  controller.selectedIcon.value.toUpperCase(),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const Text(
-                                  "Ketuk untuk mengganti",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                            color: Colors.grey,
-                          ),
+                          Expanded(child: _buildIconPicker()),
+                          const SizedBox(width: 10),
+                          Expanded(child: _buildStatusSwitch()),
                         ],
                       ),
-                    ),
-                  ),
-                ),
+                      const SizedBox(height: 25),
 
-                const SizedBox(height: 20),
-
-                Obx(
-                  () => Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: SwitchListTile(
-                      title: const Text(
-                        "Status",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        controller.isActive.value ? "Aktif" : "Tidak Aktif",
-                        style: TextStyle(
-                          color: controller.isActive.value
-                              ? Colors.green
-                              : Colors.red,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                      _buildSectionTitle("Kontak"),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: controller.emailController,
+                        decoration: _inputDecoration(
+                          "Email",
+                          icon: Icons.email_outlined,
                         ),
                       ),
-                      value: controller.isActive.value,
-                      onChanged: (val) => controller.isActive.value = val,
-                      activeThumbColor: const Color(0xFF6C63FF),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 10,
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: controller.waController,
+                        decoration: _inputDecoration(
+                          "WhatsApp",
+                          icon: Icons.phone_outlined,
+                        ),
+                        keyboardType: TextInputType.phone,
                       ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: Obx(
-                    () => ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6C63FF),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: controller.igController,
+                        decoration: _inputDecoration(
+                          "Instagram (Username)",
+                          icon: Icons.camera_alt_outlined,
                         ),
                       ),
-                      onPressed: controller.isSubmitting.value
-                          ? null
-                          : () => controller.saveActivity(
-                              formKey: formKey,
-                              shakeKey: shakeKey,
-                              category: category,
-                            ),
-                      child: controller.isSubmitting.value
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 3,
+                      const SizedBox(height: 25),
+
+                      _buildSectionTitle("Detail & Foto Sampul"),
+                      const SizedBox(height: 10),
+
+                      TextFormField(
+                        controller: controller.descController,
+                        decoration: _inputDecoration(
+                          "Tentang Kami / Deskripsi",
+                        ),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 15),
+
+                      Obx(() => CustomImagePicker(
+                        label: "Foto Sampul (Hero Image)",
+                        initialImageUrl: controller.heroImageUrl.value.isNotEmpty 
+                            ? controller.heroImageUrl.value : null,
+                        onImagePicked: (file) {
+                          if (file != null) controller.heroImageUrl.value = file.path;
+                        },
+                      )),
+                      const SizedBox(height: 25),
+
+                      _buildSectionTitle("Aktivitas Rutin"),
+                      const SizedBox(height: 10),
+                      Obx(
+                        () => Column(
+                          children: [
+                            ...controller.routineForms.asMap().entries.map((
+                              entry,
+                            ) {
+                              final index = entry.key;
+                              final form = entry.value;
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 15),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Rutinitas #${index + 1}",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                            size: 20,
+                                          ),
+                                          onPressed: () =>
+                                              controller.removeRoutine(index),
+                                        ),
+                                      ],
+                                    ),
+                                    CustomImagePicker(
+                                      label: "Foto Rutinitas",
+                                      initialImageUrl:
+                                          form.imageUrl.value.isNotEmpty
+                                          ? form.imageUrl.value
+                                          : null,
+                                      onImagePicked: (file) {
+                                        if (file != null) {
+                                          form.imageUrl.value = file.path;
+                                        }
+                                      },
+                                    ),
+                                    const SizedBox(height: 10),
+                                    TextFormField(
+                                      controller: form.nameC,
+                                      decoration: _inputDecoration(
+                                        "Nama Aktivitas",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+
+                            OutlinedButton.icon(
+                              onPressed: controller.addRoutine,
+                              icon: const Icon(Icons.add),
+                              label: const Text("Tambah Rutinitas"),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF6C63FF),
+                                side: const BorderSide(
+                                  color: Color(0xFF6C63FF),
+                                ),
                               ),
-                            )
-                          : const Text(
-                              "SIMPAN",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
                             ),
-                    ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+
+                      _buildSectionTitle("Gallery"),
+                      const SizedBox(height: 10),
+
+                      Obx(
+                        () => controller.isUploadingGallery.value
+                            ? const Center(
+                                child: Column(
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(height: 8),
+                                    Text("Sedang mengupload..."),
+                                  ],
+                                ),
+                              )
+                            : InkWell(
+                                onTap: controller.pickGalleryImages,
+                                borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.grey.shade400,
+                                      style: BorderStyle.solid,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.add_photo_alternate_outlined,
+                                        size: 30,
+                                        color: Colors.grey[600],
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        "Tambah Foto (Bisa banyak sekaligus)",
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      Obx(
+                        () => controller.galleryUrls.isEmpty
+                            ? const SizedBox.shrink()
+                            : GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 8,
+                                    ),
+                                itemCount: controller.galleryUrls.length,
+                                itemBuilder: (context, index) {
+                                  return Stack(
+                                    children: [
+                                      SmartImage(
+                                        controller.galleryUrls[index],
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
+
+                                      Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: InkWell(
+                                          onTap: () => controller
+                                              .removeGalleryImage(index),
+                                          child: Container(
+                                            color: Colors.black54,
+                                            child: const Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
+
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: Obx(
+                  () => ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6C63FF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: controller.isSubmitting.value
+                        ? null
+                        : () => controller.saveActivity(
+                            formKey: formKey,
+                            shakeKey: shakeKey,
+                            category: category,
+                            existingActivity: existingActivity,
+                          ),
+                    child: controller.isSubmitting.value
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          )
+                        : const Text(
+                            "SIMPAN",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
+        ),
+        const Divider(),
+      ],
+    );
+  }
+
+  InputDecoration _inputDecoration(String label, {IconData? icon}) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: icon != null
+          ? Icon(icon, size: 20, color: Colors.grey)
+          : null,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      filled: true,
+      fillColor: Colors.grey[100],
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    );
+  }
+
+  Widget _buildIconPicker() {
+    return Obx(
+      () => InkWell(
+        onTap: () => Get.dialog(
+          IconPickerDialog(
+            onIconSelected: (val) => controller.selectedIcon.value = val,
+          ),
+        ),
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                AppIcons.getIcon(controller.selectedIcon.value),
+                color: const Color(0xFF6C63FF),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  controller.selectedIcon.value.toUpperCase(),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusSwitch() {
+    return Obx(
+      () => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              controller.isActive.value ? "Aktif" : "Nonaktif",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: controller.isActive.value ? Colors.green : Colors.red,
+              ),
+            ),
+            Switch(
+              value: controller.isActive.value,
+              onChanged: (val) => controller.isActive.value = val,
+              activeThumbColor: const Color(0xFF6C63FF),
+            ),
+          ],
         ),
       ),
     );
