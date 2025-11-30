@@ -40,6 +40,13 @@ dependencies:
   firebase_auth: ^6.1.2
   cloud_firestore: ^6.1.0
   app_links: ^6.4.1
+  image_picker: ^1.2.1
+  cloudinary_public: ^0.23.1
+  get_storage: ^2.1.1
+  connectivity_plus: ^7.0.0
+  http: ^1.6.0
+  crypto: ^3.0.7
+  simple_icons: ^14.6.1
 
 dev_dependencies:
   flutter_test:
