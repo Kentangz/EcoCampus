@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/dashboard_user/controllers/dashboard_user_controller.dart';
-import 'package:ecocampus/app/modules/project/views/project_view.dart';
-import 'package:ecocampus/app/modules/finance/views/finance_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/views/project_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/finance/views/finance_view.dart';
 
 class DashboardUserView extends GetView<DashboardUserController> {
   const DashboardUserView({super.key});
