@@ -62,6 +62,7 @@ class ActivityAdminView extends GetView<DashboardAdminController> {
                       );
                     },
                   ),
+
                   _buildCategoryCard(
                     'Akademik & Karir',
                     Icons.school_outlined,
@@ -72,6 +73,21 @@ class ActivityAdminView extends GetView<DashboardAdminController> {
                         arguments: {
                           'category': 'akademik_karir',
                           'title': 'Akademik & Karir',
+                        },
+                      );
+                    },
+                  ),
+
+                  _buildCategoryCard(
+                    'Info Magang & Startup',
+                    Icons.work_outline,
+                    const Color(0xFFE91E63),
+                    () {
+                      Get.toNamed(
+                        Routes.ADMIN_ACTIVITY_LIST,
+                        arguments: {
+                          'category': 'magang',
+                          'title': 'Info Magang & Startup',
                         },
                       );
                     },
@@ -93,6 +109,7 @@ class ActivityAdminView extends GetView<DashboardAdminController> {
   ) {
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -118,13 +135,16 @@ class ActivityAdminView extends GetView<DashboardAdminController> {
               child: Icon(icon, size: 40, color: color),
             ),
             const SizedBox(height: 15),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Montserrat',
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Montserrat',
+                ),
               ),
             ),
           ],

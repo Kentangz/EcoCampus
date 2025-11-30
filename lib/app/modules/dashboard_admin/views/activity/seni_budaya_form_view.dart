@@ -8,11 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/activity_admin_controller.dart';
 
-class ActivityFormView extends GetView<ActivityAdminController> {
+class SeniBudayaFormView extends GetView<ActivityAdminController> {
   final ActivityModel? existingActivity;
   final String category;
 
-  const ActivityFormView({
+  const SeniBudayaFormView({
     super.key,
     this.existingActivity,
     required this.category,
@@ -21,7 +21,6 @@ class ActivityFormView extends GetView<ActivityAdminController> {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
-    final shakeKey = GlobalKey<ShakeWidgetState>();
     final isEditMode = existingActivity != null;
 
     return Dialog(
@@ -55,10 +54,17 @@ class ActivityFormView extends GetView<ActivityAdminController> {
                 ],
               ),
             ),
-            const Divider(height: 1),
+            const Divider(
+              height: 1,
+              thickness: 1,
+              color: Colors.grey,
+              indent: 20,
+              endIndent: 20,
+            ),
 
             Expanded(
               child: SingleChildScrollView(
+                controller: controller.scrollController,
                 padding: const EdgeInsets.all(20),
                 child: Form(
                   key: formKey,
@@ -69,7 +75,7 @@ class ActivityFormView extends GetView<ActivityAdminController> {
                       const SizedBox(height: 10),
 
                       ShakeWidget(
-                        key: shakeKey,
+                        key: controller.titleShakeKey,
                         child: TextFormField(
                           controller: controller.titleController,
                           decoration: _inputDecoration("Nama Kegiatan"),
@@ -88,30 +94,54 @@ class ActivityFormView extends GetView<ActivityAdminController> {
                       ),
                       const SizedBox(height: 25),
 
-                      _buildSectionTitle("Kontak"),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: controller.emailController,
-                        decoration: _inputDecoration(
-                          "Email",
-                          icon: Icons.email_outlined,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: controller.waController,
-                        decoration: _inputDecoration(
-                          "WhatsApp",
-                          icon: Icons.phone_outlined,
-                        ),
-                        keyboardType: TextInputType.phone,
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: controller.igController,
-                        decoration: _inputDecoration(
-                          "Instagram (Username)",
-                          icon: Icons.camera_alt_outlined,
+                      ShakeWidget(
+                        key: controller.contactShakeKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle("Kontak"),
+                            Obx(
+                              () => controller.contactError.value.isNotEmpty
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 8.0,
+                                      ),
+                                      child: Text(
+                                        controller.contactError.value,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              controller: controller.emailController,
+                              decoration: _inputDecoration(
+                                "Email",
+                                icon: Icons.email_outlined,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              controller: controller.waController,
+                              decoration: _inputDecoration(
+                                "WhatsApp",
+                                icon: Icons.phone_outlined,
+                              ),
+                              keyboardType: TextInputType.phone,
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              controller: controller.igController,
+                              decoration: _inputDecoration(
+                                "Instagram (Username)",
+                                icon: Icons.camera_alt_outlined,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 25),
@@ -119,23 +149,35 @@ class ActivityFormView extends GetView<ActivityAdminController> {
                       _buildSectionTitle("Detail & Foto Sampul"),
                       const SizedBox(height: 10),
 
-                      TextFormField(
-                        controller: controller.descController,
-                        decoration: _inputDecoration(
-                          "Tentang Kami / Deskripsi",
+                      ShakeWidget(
+                        key: controller.descShakeKey,
+                        child: TextFormField(
+                          controller: controller.descController,
+                          decoration: _inputDecoration(
+                            "Tentang Kami / Deskripsi",
+                          ),
+                          maxLines: 3,
+                          validator: (val) => val!.isEmpty
+                              ? 'Wajib diisi'
+                              : null,
                         ),
-                        maxLines: 3,
                       ),
                       const SizedBox(height: 15),
 
-                      Obx(() => CustomImagePicker(
-                        label: "Foto Sampul (Hero Image)",
-                        initialImageUrl: controller.heroImageUrl.value.isNotEmpty 
-                            ? controller.heroImageUrl.value : null,
-                        onImagePicked: (file) {
-                          if (file != null) controller.heroImageUrl.value = file.path;
-                        },
-                      )),
+                      Obx(
+                        () => CustomImagePicker(
+                          label: "Foto Sampul (Hero Image)",
+                          initialImageUrl:
+                              controller.heroImageUrl.value.isNotEmpty
+                              ? controller.heroImageUrl.value
+                              : null,
+                          onImagePicked: (file) {
+                            if (file != null) {
+                              controller.heroImageUrl.value = file.path;
+                            }
+                          },
+                        ),
+                      ),
                       const SizedBox(height: 25),
 
                       _buildSectionTitle("Aktivitas Rutin"),
@@ -260,7 +302,7 @@ class ActivityFormView extends GetView<ActivityAdminController> {
                                       ),
                                       const SizedBox(height: 5),
                                       Text(
-                                        "Tambah Foto (Bisa banyak sekaligus)",
+                                        "Tambah Foto",
                                         style: TextStyle(
                                           color: Colors.grey[600],
                                           fontWeight: FontWeight.bold,
@@ -340,7 +382,6 @@ class ActivityFormView extends GetView<ActivityAdminController> {
                         ? null
                         : () => controller.saveActivity(
                             formKey: formKey,
-                            shakeKey: shakeKey,
                             category: category,
                             existingActivity: existingActivity,
                           ),

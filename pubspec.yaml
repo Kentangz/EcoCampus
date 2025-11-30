@@ -46,6 +46,7 @@ dependencies:
   connectivity_plus: ^7.0.0
   http: ^1.6.0
   crypto: ^3.0.7
+  simple_icons: ^14.6.1
 
 dev_dependencies:
   flutter_test:

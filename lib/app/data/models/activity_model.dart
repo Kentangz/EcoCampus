@@ -2,17 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ActivityModel {
   String? id;
-  String title;
+  String title; //Nama Kegiatan or Nama Perusahaan
   String icon;
   String category;
-  bool isActive;
-  bool isSynced;
-
   String description;
   String heroImage;
   ContactModel contacts;
   List<RoutineModel> routines;
   List<String> gallery;
+
+  String position;
+  String companyLogo;
+  String location;
+  List<String> techStacks;
+  List<String> qualifications;
+
+  bool isActive;
+  bool isSynced;
 
   ActivityModel({
     this.id,
@@ -26,6 +32,12 @@ class ActivityModel {
     required this.contacts,
     this.routines = const [],
     this.gallery = const [],
+    
+    this.position = '',
+    this.companyLogo = '',
+    this.location = '',
+    this.techStacks = const [],
+    this.qualifications = const [],
   });
 
   Map<String, dynamic> toJson() {
@@ -40,6 +52,12 @@ class ActivityModel {
       "contacts": contacts.toJson(),
       "routines": routines.map((e) => e.toJson()).toList(),
       "gallery": gallery,
+
+      "position": position,
+      "companyLogo": companyLogo,
+      "location": location,
+      "techStacks": techStacks,
+      "qualifications": qualifications,
     };
   }
 
@@ -55,8 +73,11 @@ class ActivityModel {
     String hero = data["heroImage"] ?? "";
     List<String> gall = List<String>.from(data["gallery"] ?? []);
     List<dynamic> routsRaw = data["routines"] ?? [];
+    String companyLogo = data["companyLogo"] ?? "";
+
     bool hasLocalImage = false;
     if (isLocalPath(hero)) hasLocalImage = true;
+    if (isLocalPath(companyLogo)) hasLocalImage = true;
 
     if (!hasLocalImage) {
       for (String url in gall) {
@@ -82,9 +103,6 @@ class ActivityModel {
       title: data["title"] ?? "",
       icon: data["icon"] ?? "help",
       category: data["category"] ?? "",
-      isActive: data["isActive"] ?? true,
-      isSynced: !document.metadata.hasPendingWrites && !hasLocalImage,
-
       description: data["description"] ?? "",
       heroImage: hero,
       contacts: ContactModel.fromJson(data["contacts"] ?? {}),
@@ -94,6 +112,15 @@ class ActivityModel {
               .toList() ??
           [],
       gallery: gall,
+
+      companyLogo: companyLogo,
+      position: data["position"] ?? "",
+      location: data["location"] ?? "",
+      techStacks: List<String>.from(data["techStacks"] ?? []),
+      qualifications: List<String>.from(data["qualifications"] ?? []),
+
+      isActive: data["isActive"] ?? true,
+      isSynced: !document.metadata.hasPendingWrites && !hasLocalImage,
     );
   }
 }

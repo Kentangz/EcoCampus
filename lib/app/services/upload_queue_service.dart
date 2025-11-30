@@ -177,10 +177,13 @@ class UploadQueueService extends GetxService {
 
       if (item.fieldName == 'heroImage') {
         await docRef.update({'heroImage': cloudUrl});
+      } else if (item.fieldName == 'companyLogo') {
+        await docRef.update({'companyLogo': cloudUrl});
       } else if (item.fieldName == 'gallery' && item.arrayIndex != null) {
         var snapshot = await docRef.get();
         if (snapshot.exists) {
           List<dynamic> currentList = List.from(snapshot.get('gallery') ?? []);
+
           if (currentList.length > item.arrayIndex!) {
             currentList[item.arrayIndex!] = cloudUrl;
             await docRef.update({'gallery': currentList});
