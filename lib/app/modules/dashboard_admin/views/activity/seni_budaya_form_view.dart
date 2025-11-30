@@ -1,4 +1,4 @@
-import 'package:ecocampus/app/data/models/activity_model.dart';
+import 'package:ecocampus/app/data/models/activity/activity_model.dart';
 import 'package:ecocampus/app/shared/utils/app_icons.dart';
 import 'package:ecocampus/app/shared/widgets/icon_picker_dialog.dart';
 import 'package:ecocampus/app/shared/widgets/image_picker.dart';
@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/activity_admin_controller.dart';
 
 class SeniBudayaFormView extends GetView<ActivityAdminController> {
-  final ActivityModel? existingActivity;
+  final EventActivity? existingActivity;
   final String category;
 
   const SeniBudayaFormView({
@@ -157,9 +157,8 @@ class SeniBudayaFormView extends GetView<ActivityAdminController> {
                             "Tentang Kami / Deskripsi",
                           ),
                           maxLines: 3,
-                          validator: (val) => val!.isEmpty
-                              ? 'Wajib diisi'
-                              : null,
+                          validator: (val) =>
+                              val!.isEmpty ? 'Wajib diisi' : null,
                         ),
                       ),
                       const SizedBox(height: 15),

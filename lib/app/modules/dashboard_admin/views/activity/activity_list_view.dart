@@ -2,7 +2,7 @@ import 'package:ecocampus/app/shared/widgets/filter_chip.dart';
 import 'package:ecocampus/app/shared/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ecocampus/app/data/models/activity_model.dart';
+import 'package:ecocampus/app/data/models/activity/activity_model.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/activity_admin_controller.dart';
 
 class ActivityListView extends GetView<ActivityAdminController> {
@@ -149,7 +149,7 @@ class ActivityListView extends GetView<ActivityAdminController> {
     );
   }
 
-  Widget _buildActivityItem(ActivityModel activity) {
+  Widget _buildActivityItem(BaseActivity activity) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAlias,

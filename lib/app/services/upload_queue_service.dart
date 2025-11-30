@@ -58,6 +58,7 @@ class UploadQueueService extends GetxService {
       if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
       _debounceTimer = Timer(const Duration(seconds: 2), () {
         if (!result.contains(ConnectivityResult.none)) {
+          // print("🟢 Koneksi Stabil. Memproses antrean...");
           processQueue();
         }
       });
@@ -68,6 +69,7 @@ class UploadQueueService extends GetxService {
     List<dynamic>? stored = _box.read(_storageKey);
     if (stored != null) {
       _queue.assignAll(stored.map((e) => QueueItem.fromJson(e)).toList());
+      // print("📂 Antrean dimuat: ${_queue.length} item pending.");
       if (_queue.isNotEmpty) processQueue();
     }
   }
@@ -98,6 +100,7 @@ class UploadQueueService extends GetxService {
     );
     _queue.add(item);
     _saveQueue();
+    // print("📥 Antre Upload: $fieldName");
 
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
     _debounceTimer = Timer(const Duration(seconds: 2), () => processQueue());
@@ -119,6 +122,7 @@ class UploadQueueService extends GetxService {
     );
     _queue.add(item);
     _saveQueue();
+    // print("🗑️ Antre Hapus Gambar");
   }
 
   Future<void> processQueue() async {
@@ -128,6 +132,7 @@ class UploadQueueService extends GetxService {
     if (connectivity.contains(ConnectivityResult.none)) return;
 
     _isProcessing = true;
+    // print("🚀 MEMULAI BATCH QUEUE (${_queue.length} item)...");
 
     try {
       while (_queue.isNotEmpty) {
@@ -140,34 +145,52 @@ class UploadQueueService extends GetxService {
           bool success = await _cloudinary.deleteImage(item.path);
 
           if (success) {
+            // print("✅ Terhapus: ...${item.path.substring(item.path.length - 10)}",);
             _queue.removeAt(0);
             _saveQueue();
           } else {
+            // print("❌ Gagal Hapus. Tunda.");
             break;
           }
         } else {
           File file = File(item.path);
           if (!file.existsSync()) {
+            // print("🗑️ File lokal hilang: ${item.path}");
             _queue.removeAt(0);
             _saveQueue();
             continue;
           }
 
+          // print(
+          //   "⬆️ Uploading: ...${item.path.substring(item.path.length - 10)}",);
           String? cloudUrl = await _cloudinary.uploadImage(file);
 
           if (cloudUrl != null) {
+            // print("✅ Upload OK: $cloudUrl");
             await _updateFirestore(item, cloudUrl);
+
+            try {
+              if (file.existsSync()) {
+                file.deleteSync();
+                // print("🗑️ File lokal dihapus: ${item.path}");
+              }
+            } catch (e) {
+              // print("⚠️ Gagal hapus file lokal: $e");
+            }
+
             _queue.removeAt(0);
             _saveQueue();
           } else {
+            // print("❌ Gagal Upload. Tunda.");
             break;
           }
         }
       }
     } catch (e) {
-      //
+      // print("💥 Error Queue: $e");
     } finally {
       _isProcessing = false;
+      // print("🏁 Queue Selesai/Berhenti.");
     }
   }
 
@@ -210,7 +233,7 @@ class UploadQueueService extends GetxService {
         }
       }
     } catch (e) {
-      //
+      // print("⚠️ Gagal update Firestore: $e");
     }
   }
 }

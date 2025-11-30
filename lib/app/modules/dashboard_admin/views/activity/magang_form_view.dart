@@ -1,4 +1,4 @@
-import 'package:ecocampus/app/data/models/activity_model.dart';
+import 'package:ecocampus/app/data/models/activity/activity_model.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/activity_admin_controller.dart';
 import 'package:ecocampus/app/shared/utils/tech_stack_icons.dart';
 import 'package:ecocampus/app/shared/widgets/tech_stack_picker_dialog.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MagangFormView extends GetView<ActivityAdminController> {
-  final ActivityModel? existingActivity;
+  final InternshipActivity? existingActivity;
 
   const MagangFormView({super.key, this.existingActivity});
 

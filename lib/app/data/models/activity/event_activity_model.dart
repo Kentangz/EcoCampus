@@ -1,67 +1,43 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecocampus/app/data/models/activity/activity_model.dart';
 
-class ActivityModel {
-  String? id;
-  String title; //Nama Kegiatan or Nama Perusahaan
-  String icon;
-  String category;
+class EventActivity extends BaseActivity {
   String description;
   String heroImage;
-  ContactModel contacts;
   List<RoutineModel> routines;
   List<String> gallery;
 
-  String position;
-  String companyLogo;
-  String location;
-  List<String> techStacks;
-  List<String> qualifications;
-
-  bool isActive;
-  bool isSynced;
-
-  ActivityModel({
-    this.id,
-    required this.title,
-    required this.icon,
-    required this.category,
-    required this.isActive,
-    this.isSynced = true,
+  EventActivity({
+    super.id,
+    required super.title,
+    required super.category,
+    required super.isActive,
+    super.isSynced,
+    required super.contacts,
+    required super.icon,
     this.description = '',
     this.heroImage = '',
-    required this.contacts,
     this.routines = const [],
     this.gallery = const [],
-    
-    this.position = '',
-    this.companyLogo = '',
-    this.location = '',
-    this.techStacks = const [],
-    this.qualifications = const [],
   });
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       "title": title,
-      "icon": icon,
       "category": category,
       "isActive": isActive,
       "createdAt": FieldValue.serverTimestamp(),
+      "contacts": contacts.toJson(),
+      "icon": icon,
       "description": description,
       "heroImage": heroImage,
-      "contacts": contacts.toJson(),
       "routines": routines.map((e) => e.toJson()).toList(),
       "gallery": gallery,
-
-      "position": position,
-      "companyLogo": companyLogo,
-      "location": location,
-      "techStacks": techStacks,
-      "qualifications": qualifications,
     };
   }
 
-  factory ActivityModel.fromSnapshot(
+  factory EventActivity.fromSnapshot(
     DocumentSnapshot<Map<String, dynamic>> document,
   ) {
     final data = document.data()!;
@@ -73,11 +49,9 @@ class ActivityModel {
     String hero = data["heroImage"] ?? "";
     List<String> gall = List<String>.from(data["gallery"] ?? []);
     List<dynamic> routsRaw = data["routines"] ?? [];
-    String companyLogo = data["companyLogo"] ?? "";
 
     bool hasLocalImage = false;
     if (isLocalPath(hero)) hasLocalImage = true;
-    if (isLocalPath(companyLogo)) hasLocalImage = true;
 
     if (!hasLocalImage) {
       for (String url in gall) {
@@ -98,51 +72,24 @@ class ActivityModel {
       }
     }
 
-    return ActivityModel(
+    return EventActivity(
       id: document.id,
       title: data["title"] ?? "",
-      icon: data["icon"] ?? "help",
       category: data["category"] ?? "",
+      isActive: data["isActive"] ?? true,
+      isSynced: !document.metadata.hasPendingWrites && !hasLocalImage,
+      contacts: ContactModel.fromJson(data["contacts"] ?? {}),
+      icon: data["icon"] ?? "help",
       description: data["description"] ?? "",
       heroImage: hero,
-      contacts: ContactModel.fromJson(data["contacts"] ?? {}),
       routines:
           (data["routines"] as List<dynamic>?)
               ?.map((e) => RoutineModel.fromJson(e))
               .toList() ??
           [],
       gallery: gall,
-
-      companyLogo: companyLogo,
-      position: data["position"] ?? "",
-      location: data["location"] ?? "",
-      techStacks: List<String>.from(data["techStacks"] ?? []),
-      qualifications: List<String>.from(data["qualifications"] ?? []),
-
-      isActive: data["isActive"] ?? true,
-      isSynced: !document.metadata.hasPendingWrites && !hasLocalImage,
     );
   }
-}
-
-class ContactModel {
-  String email;
-  String whatsapp;
-  String instagram;
-
-  ContactModel({this.email = '', this.whatsapp = '', this.instagram = ''});
-
-  Map<String, dynamic> toJson() => {
-    "email": email,
-    "whatsapp": whatsapp,
-    "instagram": instagram,
-  };
-
-  factory ContactModel.fromJson(Map<String, dynamic> json) => ContactModel(
-    email: json['email'] ?? '',
-    whatsapp: json['whatsapp'] ?? '',
-    instagram: json['instagram'] ?? '',
-  );
 }
 
 class RoutineModel {

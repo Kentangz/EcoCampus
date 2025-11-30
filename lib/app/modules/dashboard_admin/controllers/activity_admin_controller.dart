@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:ecocampus/app/data/models/activity_model.dart';
+import 'package:ecocampus/app/data/models/activity/activity_model.dart';
 import 'package:ecocampus/app/data/repositories/activity_repository.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/seni_budaya_form_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/magang_form_view.dart';
@@ -67,7 +67,7 @@ class ActivityAdminController extends GetxController {
   final filterStatus = 'semua'.obs;
   final sortOrder = 'terbaru'.obs;
 
-  final RxList<ActivityModel> _sourceActivities = <ActivityModel>[].obs;
+  final RxList<BaseActivity> _sourceActivities = <BaseActivity>[].obs;
   StreamSubscription? _activitySubscription;
   String _currentCategory = '';
 
@@ -76,13 +76,20 @@ class ActivityAdminController extends GetxController {
   // === SCROLL & SHAKE KEYS ===
   final ScrollController scrollController = ScrollController();
 
-  final GlobalKey<ShakeWidgetState> titleShakeKey = GlobalKey<ShakeWidgetState>();
-  final GlobalKey<ShakeWidgetState> descShakeKey = GlobalKey<ShakeWidgetState>();
-  final GlobalKey<ShakeWidgetState> contactShakeKey = GlobalKey<ShakeWidgetState>();
-  final GlobalKey<ShakeWidgetState> positionShakeKey = GlobalKey<ShakeWidgetState>();
-  final GlobalKey<ShakeWidgetState> locationShakeKey = GlobalKey<ShakeWidgetState>();
-  final GlobalKey<ShakeWidgetState> techStackShakeKey = GlobalKey<ShakeWidgetState>();
-  final GlobalKey<ShakeWidgetState> qualificationShakeKey = GlobalKey<ShakeWidgetState>();
+  final GlobalKey<ShakeWidgetState> titleShakeKey =
+      GlobalKey<ShakeWidgetState>();
+  final GlobalKey<ShakeWidgetState> descShakeKey =
+      GlobalKey<ShakeWidgetState>();
+  final GlobalKey<ShakeWidgetState> contactShakeKey =
+      GlobalKey<ShakeWidgetState>();
+  final GlobalKey<ShakeWidgetState> positionShakeKey =
+      GlobalKey<ShakeWidgetState>();
+  final GlobalKey<ShakeWidgetState> locationShakeKey =
+      GlobalKey<ShakeWidgetState>();
+  final GlobalKey<ShakeWidgetState> techStackShakeKey =
+      GlobalKey<ShakeWidgetState>();
+  final GlobalKey<ShakeWidgetState> qualificationShakeKey =
+      GlobalKey<ShakeWidgetState>();
 
   @override
   void onInit() {
@@ -114,8 +121,12 @@ class ActivityAdminController extends GetxController {
     searchController.dispose();
     scrollController.dispose();
 
-    for (var form in routineForms) { form.nameC.dispose(); }
-    for (var q in qualificationForms) { q.textC.dispose(); }
+    for (var form in routineForms) {
+      form.nameC.dispose();
+    }
+    for (var q in qualificationForms) {
+      q.textC.dispose();
+    }
 
     _activitySubscription?.cancel();
     super.onClose();
@@ -175,14 +186,16 @@ class ActivityAdminController extends GetxController {
   Future<void> pickCompanyLogo() async {
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image != null) { companyLogoUrl.value = image.path; }
+      if (image != null) {
+        companyLogoUrl.value = image.path;
+      }
     } catch (e) {
       NotificationHelper.showError("Error", "Gagal mengambil gambar");
     }
   }
 
   // === NAVIGASI (ROUTER) ===
-  void navigateToForm({String? category, ActivityModel? activity}) {
+  void navigateToForm({String? category, BaseActivity? activity}) {
     titleController.clear();
     selectedIcon.value = 'brush';
     isActive.value = true;
@@ -199,39 +212,45 @@ class ActivityAdminController extends GetxController {
     techStackError.value = '';
     qualificationError.value = '';
 
-    for (var form in routineForms) { form.nameC.dispose(); }
+    for (var form in routineForms) {
+      form.nameC.dispose();
+    }
     routineForms.clear();
     galleryUrls.clear();
     techStacks.clear();
-    for (var q in qualificationForms) { q.textC.dispose(); }
+    for (var q in qualificationForms) {
+      q.textC.dispose();
+    }
     qualificationForms.clear();
 
     if (activity != null) {
       titleController.text = activity.title;
       selectedIcon.value = activity.icon;
       isActive.value = activity.isActive;
-      descController.text = activity.description;
-      heroImageUrl.value = activity.heroImage;
       emailController.text = activity.contacts.email;
       waController.text = activity.contacts.whatsapp;
       igController.text = activity.contacts.instagram;
 
-      for (var r in activity.routines) {
-        var form = RoutineFormState();
-        form.nameC.text = r.activityName;
-        form.imageUrl.value = r.imageUrl;
-        routineForms.add(form);
-      }
-      galleryUrls.assignAll(activity.gallery);
-
-      positionController.text = activity.position;
-      locationController.text = activity.location;
-      companyLogoUrl.value = activity.companyLogo;
-      techStacks.assignAll(activity.techStacks);
-      for (var q in activity.qualifications) {
-        var form = QualificationState();
-        form.textC.text = q;
-        qualificationForms.add(form);
+      if (activity is EventActivity) {
+        descController.text = activity.description;
+        heroImageUrl.value = activity.heroImage;
+        for (var r in activity.routines) {
+          var form = RoutineFormState();
+          form.nameC.text = r.activityName;
+          form.imageUrl.value = r.imageUrl;
+          routineForms.add(form);
+        }
+        galleryUrls.assignAll(activity.gallery);
+      } else if (activity is InternshipActivity) {
+        positionController.text = activity.position;
+        locationController.text = activity.location;
+        companyLogoUrl.value = activity.companyLogo;
+        techStacks.assignAll(activity.techStacks);
+        for (var q in activity.qualifications) {
+          var form = QualificationState();
+          form.textC.text = q;
+          qualificationForms.add(form);
+        }
       }
     }
 
@@ -240,13 +259,13 @@ class ActivityAdminController extends GetxController {
 
     if (targetCategory == 'magang') {
       Get.dialog(
-        MagangFormView(existingActivity: activity),
+        MagangFormView(existingActivity: activity as InternshipActivity?),
         barrierDismissible: false,
       );
     } else {
       Get.dialog(
         SeniBudayaFormView(
-          existingActivity: activity,
+          existingActivity: activity as EventActivity?,
           category: targetCategory,
         ),
         barrierDismissible: false,
@@ -258,7 +277,7 @@ class ActivityAdminController extends GetxController {
   Future<void> saveActivity({
     required GlobalKey<FormState> formKey,
     required String category,
-    ActivityModel? existingActivity,
+    BaseActivity? existingActivity,
   }) async {
     contactError.value = '';
     techStackError.value = '';
@@ -270,10 +289,10 @@ class ActivityAdminController extends GetxController {
       isValid = false;
       if (titleController.text.isEmpty) titleShakeKey.currentState?.shake();
       if (category == 'magang') {
-        if (positionController.text.isEmpty) positionShakeKey.currentState?.shake();
-        if (locationController.text.isEmpty) locationShakeKey.currentState?.shake();
+        if (positionController.text.isEmpty) { positionShakeKey.currentState?.shake(); }
+        if (locationController.text.isEmpty) { locationShakeKey.currentState?.shake(); }
       } else {
-        if (descController.text.isEmpty) descShakeKey.currentState?.shake();
+        if (descController.text.isEmpty) { descShakeKey.currentState?.shake(); }
       }
     }
 
@@ -331,24 +350,38 @@ class ActivityAdminController extends GetxController {
           .map((q) => q.textC.text)
           .toList();
 
-      final activityData = ActivityModel(
-        id: docId,
-        title: titleController.text,
-        icon: selectedIcon.value,
-        category: category,
-        isActive: isActive.value,
-        description: descController.text,
-        heroImage: heroImageUrl.value,
-        contacts: contacts,
-        routines: routines,
-        gallery: galleryUrls,
-        position: positionController.text,
-        location: locationController.text,
-        companyLogo: companyLogoUrl.value,
-        techStacks: techStacks,
-        qualifications: qualifications,
-        isSynced: false,
-      );
+      BaseActivity activityData;
+
+      if (category == 'magang') {
+        activityData = InternshipActivity(
+          id: docId,
+          title: titleController.text,
+          category: category,
+          isActive: isActive.value,
+          contacts: contacts,
+          icon: selectedIcon.value,
+          companyLogo: companyLogoUrl.value,
+          position: positionController.text,
+          location: locationController.text,
+          techStacks: techStacks,
+          qualifications: qualifications,
+          isSynced: false,
+        );
+      } else {
+        activityData = EventActivity(
+          id: docId,
+          title: titleController.text,
+          category: category,
+          isActive: isActive.value,
+          contacts: contacts,
+          icon: selectedIcon.value,
+          description: descController.text,
+          heroImage: heroImageUrl.value,
+          routines: routines,
+          gallery: galleryUrls,
+          isSynced: false,
+        );
+      }
 
       if (existingActivity != null) {
         _cleanupReplacedImages(existingActivity, activityData);
@@ -384,10 +417,7 @@ class ActivityAdminController extends GetxController {
       }
 
       Get.back();
-      NotificationHelper.showSuccess(
-        "Disimpan",
-        "Data disimpan",
-      );
+      NotificationHelper.showSuccess("Disimpan", "Data disimpan");
     } catch (e) {
       NotificationHelper.showError("Gagal", "Gagal menyimpan data: $e");
     } finally {
@@ -395,27 +425,30 @@ class ActivityAdminController extends GetxController {
     }
   }
 
-  void _cleanupReplacedImages(ActivityModel oldData, ActivityModel newData) {
-    if (oldData.heroImage.startsWith('http') &&
-        oldData.heroImage != newData.heroImage) {
-      _safeDeleteImage(oldData.heroImage);
-    }
-    if (oldData.companyLogo.startsWith('http') &&
-        oldData.companyLogo != newData.companyLogo) {
-      _safeDeleteImage(oldData.companyLogo);
-    }
-    for (var oldUrl in oldData.gallery) {
-      if (oldUrl.startsWith('http') && !newData.gallery.contains(oldUrl)) {
-        _safeDeleteImage(oldUrl);
+  void _cleanupReplacedImages(BaseActivity oldData, BaseActivity newData) {
+    if (oldData is EventActivity && newData is EventActivity) {
+      if (oldData.heroImage.startsWith('http') &&
+          oldData.heroImage != newData.heroImage) {
+        _safeDeleteImage(oldData.heroImage);
       }
-    }
-    Set<String> newRoutineUrls = newData.routines
-        .map((e) => e.imageUrl)
-        .toSet();
-    for (var r in oldData.routines) {
-      if (r.imageUrl.startsWith('http') &&
-          !newRoutineUrls.contains(r.imageUrl)) {
-        _safeDeleteImage(r.imageUrl);
+      for (var oldUrl in oldData.gallery) {
+        if (oldUrl.startsWith('http') && !newData.gallery.contains(oldUrl)) {
+          _safeDeleteImage(oldUrl);
+        }
+      }
+      Set<String> newRoutineUrls = newData.routines
+          .map((e) => e.imageUrl)
+          .toSet();
+      for (var r in oldData.routines) {
+        if (r.imageUrl.startsWith('http') &&
+            !newRoutineUrls.contains(r.imageUrl)) {
+          _safeDeleteImage(r.imageUrl);
+        }
+      }
+    } else if (oldData is InternshipActivity && newData is InternshipActivity) {
+      if (oldData.companyLogo.startsWith('http') &&
+          oldData.companyLogo != newData.companyLogo) {
+        _safeDeleteImage(oldData.companyLogo);
       }
     }
   }
@@ -427,13 +460,25 @@ class ActivityAdminController extends GetxController {
       if (doc != null) {
         List<Future> deleteTasks = [];
 
-        if (doc.heroImage.isNotEmpty) { deleteTasks.add(_safeDeleteImage(doc.heroImage)); }
-        if (doc.companyLogo.isNotEmpty) { deleteTasks.add(_safeDeleteImage(doc.companyLogo)); }
+        if (doc is EventActivity) {
+          if (doc.heroImage.isNotEmpty) {
+            deleteTasks.add(_safeDeleteImage(doc.heroImage));
+          }
+          for (var url in doc.gallery) {
+            deleteTasks.add(_safeDeleteImage(url));
+          }
+          for (var r in doc.routines) {
+            deleteTasks.add(_safeDeleteImage(r.imageUrl));
+          }
+        } else if (doc is InternshipActivity) {
+          if (doc.companyLogo.isNotEmpty) {
+            deleteTasks.add(_safeDeleteImage(doc.companyLogo));
+          }
+        }
 
-        for (var url in doc.gallery) { deleteTasks.add(_safeDeleteImage(url)); }
-        for (var r in doc.routines) { deleteTasks.add(_safeDeleteImage(r.imageUrl)); }
-
-        if (deleteTasks.isNotEmpty) { await Future.wait(deleteTasks); }
+        if (deleteTasks.isNotEmpty) {
+          await Future.wait(deleteTasks);
+        }
       }
 
       await _activityRepo.deleteActivity(id);
@@ -444,8 +489,7 @@ class ActivityAdminController extends GetxController {
     }
   }
 
-
-  void confirmDeleteActivity(ActivityModel activity) {
+  void confirmDeleteActivity(BaseActivity activity) {
     Get.defaultDialog(
       title: "Hapus Data",
       middleText: "Yakin ingin menghapus data ini?",
@@ -454,9 +498,9 @@ class ActivityAdminController extends GetxController {
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
       onConfirm: () async {
-        if (Get.overlayContext != null) { Navigator.of(Get.overlayContext!).pop(); }
-        else 
-        { 
+        if (Get.overlayContext != null) {
+          Navigator.of(Get.overlayContext!).pop();
+        } else {
           Get.back();
         }
         await deleteActivity(activity.id!);
@@ -465,7 +509,7 @@ class ActivityAdminController extends GetxController {
     );
   }
 
-  Stream<List<ActivityModel>> getActivitiesByCategory(String category) {
+  Stream<List<BaseActivity>> getActivitiesByCategory(String category) {
     return _activityRepo.getActivitiesByCategory(category);
   }
 
@@ -482,8 +526,8 @@ class ActivityAdminController extends GetxController {
         });
   }
 
-  List<ActivityModel> get visibleActivities {
-    List<ActivityModel> list = List.from(_sourceActivities);
+  List<BaseActivity> get visibleActivities {
+    List<BaseActivity> list = List.from(_sourceActivities);
     if (filterStatus.value == 'aktif') {
       list = list.where((item) => item.isActive).toList();
     } else if (filterStatus.value == 'tidak_aktif') {
@@ -498,9 +542,13 @@ class ActivityAdminController extends GetxController {
           )
           .toList();
     }
-    if (sortOrder.value == 'terlama') { list = list.reversed.toList(); }
-    else if (sortOrder.value == 'az') { list.sort((a, b) => a.title.compareTo(b.title)); }
-    else if (sortOrder.value == 'za') { list.sort((a, b) => b.title.compareTo(a.title)); }
+    if (sortOrder.value == 'terlama') {
+      list = list.reversed.toList();
+    } else if (sortOrder.value == 'az') {
+      list.sort((a, b) => a.title.compareTo(b.title));
+    } else if (sortOrder.value == 'za') {
+      list.sort((a, b) => b.title.compareTo(a.title));
+    }
     return list;
   }
 

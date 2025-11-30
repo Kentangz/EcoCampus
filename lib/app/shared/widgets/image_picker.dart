@@ -42,7 +42,11 @@ class _CustomImagePickerState extends State<CustomImagePicker> {
       imageProvider = FileImage(_localImage!);
     } else if (widget.initialImageUrl != null &&
         widget.initialImageUrl!.isNotEmpty) {
-      imageProvider = NetworkImage(widget.initialImageUrl!);
+      if (widget.initialImageUrl!.startsWith('http')) {
+        imageProvider = NetworkImage(widget.initialImageUrl!);
+      } else {
+        imageProvider = FileImage(File(widget.initialImageUrl!));
+      }
     }
 
     return Column(
