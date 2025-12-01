@@ -45,7 +45,10 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-
-.pubspec.lock
+# custom ignores
 .env
 firebase.json
+pubspec.lock
+windows/
+linux/
+macos/
