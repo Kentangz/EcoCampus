@@ -186,7 +186,7 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
     );
   }
 }
-//navigasi bar
+
 class _BottomNavBar extends StatelessWidget {
   final DashboardUserController controller;
   const _BottomNavBar({required this.controller});
