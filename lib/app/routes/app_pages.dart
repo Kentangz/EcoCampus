@@ -6,6 +6,9 @@ import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_admin_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_list_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/course_form_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/course_list_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/module_detail_view.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -65,6 +68,21 @@ class AppPages {
     GetPage(
       name: _Paths.ADMIN_ACTIVITY_LIST,
       page: () => const ActivityListView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_COURSE_LIST,
+      page: () => const CourseListView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_COURSE_FORM,
+      page: () => const CourseFormView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_MODULE_DETAIL,
+      page: () => const ModuleDetailView(),
       binding: DashboardAdminBinding(),
     ),
   ];

@@ -64,17 +64,11 @@ class ActivityAdminView extends GetView<DashboardAdminController> {
                   ),
 
                   _buildCategoryCard(
-                    'Akademik & Karir',
-                    Icons.school_outlined,
-                    Colors.blue,
+                    'Kelas & E-Learning',
+                    Icons.class_rounded,
+                    Colors.purple,
                     () {
-                      Get.toNamed(
-                        Routes.ADMIN_ACTIVITY_LIST,
-                        arguments: {
-                          'category': 'akademik_karir',
-                          'title': 'Akademik & Karir',
-                        },
-                      );
+                      Get.toNamed(Routes.ADMIN_COURSE_LIST);
                     },
                   ),
 

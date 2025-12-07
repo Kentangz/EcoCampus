@@ -12,6 +12,7 @@ class QueueItem {
   String fieldName;
   String path;
   int? arrayIndex;
+  String collection;
 
   QueueItem({
     required this.type,
@@ -19,6 +20,7 @@ class QueueItem {
     required this.fieldName,
     required this.path,
     this.arrayIndex,
+    this.collection = 'Activities',
   });
 
   Map<String, dynamic> toJson() => {
@@ -27,6 +29,7 @@ class QueueItem {
     'fieldName': fieldName,
     'path': path,
     'arrayIndex': arrayIndex,
+    'collection': collection,
   };
 
   factory QueueItem.fromJson(Map<String, dynamic> json) => QueueItem(
@@ -35,6 +38,7 @@ class QueueItem {
     fieldName: json['fieldName'] ?? '',
     path: json['path'] ?? json['localPath'],
     arrayIndex: json['arrayIndex'],
+    collection: json['collection'] ?? 'Activities',
   );
 }
 
@@ -83,6 +87,7 @@ class UploadQueueService extends GetxService {
     String fieldName,
     String localPath, {
     int? index,
+    String collection = 'Activities',
   }) {
     if (localPath.startsWith('http') || localPath.isEmpty) return;
 
@@ -97,10 +102,11 @@ class UploadQueueService extends GetxService {
       fieldName: fieldName,
       path: localPath,
       arrayIndex: index,
+      collection: collection,
     );
     _queue.add(item);
     _saveQueue();
-    // print("📥 Antre Upload: $fieldName");
+    // print("📥 Antre Upload ($collection): $fieldName");
 
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
     _debounceTimer = Timer(const Duration(seconds: 2), () => processQueue());
@@ -123,6 +129,8 @@ class UploadQueueService extends GetxService {
     _queue.add(item);
     _saveQueue();
     // print("🗑️ Antre Hapus Gambar");
+    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+    _debounceTimer = Timer(const Duration(seconds: 2), () => processQueue());
   }
 
   Future<void> processQueue() async {
@@ -145,7 +153,7 @@ class UploadQueueService extends GetxService {
           bool success = await _cloudinary.deleteImage(item.path);
 
           if (success) {
-            // print("✅ Terhapus: ...${item.path.substring(item.path.length - 10)}",);
+            // print("✅ Terhapus: ...${item.path.substring(item.path.length - 10)}");
             _queue.removeAt(0);
             _saveQueue();
           } else {
@@ -161,8 +169,7 @@ class UploadQueueService extends GetxService {
             continue;
           }
 
-          // print(
-          //   "⬆️ Uploading: ...${item.path.substring(item.path.length - 10)}",);
+          // print("⬆️ Uploading: ...${item.path.substring(item.path.length - 10)}");
           String? cloudUrl = await _cloudinary.uploadImage(file);
 
           if (cloudUrl != null) {
@@ -196,7 +203,9 @@ class UploadQueueService extends GetxService {
 
   Future<void> _updateFirestore(QueueItem item, String cloudUrl) async {
     try {
-      DocumentReference docRef = _db.collection('Activities').doc(item.docId);
+      DocumentReference docRef = _db
+          .collection(item.collection)
+          .doc(item.docId);
 
       if (item.fieldName == 'heroImage') {
         await docRef.update({'heroImage': cloudUrl});
