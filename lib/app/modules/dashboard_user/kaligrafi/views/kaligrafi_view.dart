@@ -50,12 +50,8 @@ class _KaligrafiContent extends GetView<KaligrafiController> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
               ),
               Obx(() {
-                // Deklarasi variabel sekarang VALID di dalam blok kode Obx
                 final clubData = controller.clubData.value;
-                // Menggunakan ContactModel() sebagai fallback dengan field wajib
                 final contacts = controller.eventActivity.value?.contacts ?? ContactModel(email: '', whatsapp: '', instagram: '');
-
-                // Mengembalikan widget Column sebagai hasil dari Obx
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -68,7 +64,6 @@ class _KaligrafiContent extends GetView<KaligrafiController> {
                       contacts: contacts,
                     ),
                     const SizedBox(height: 20),
-                    // Akses data dari clubData yang sudah di-cache
                     AboutUsSection(
                       title: 'Tentang Kami',
                       content: clubData.aboutUsContent,
@@ -89,10 +84,7 @@ class _KaligrafiContent extends GetView<KaligrafiController> {
             ],
           ),
         ),
-
-        // Tombol Kembali (Positioned)
         Positioned(
-          // Sesuaikan posisi: topSafeArea + sedikit margin
           top: 30,
           left: -5,
           child: IconButton(
@@ -134,11 +126,9 @@ class BannerCard extends StatelessWidget {
         colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
       ),
     );
-
     return Container(
       height: 200,
       decoration: combinedDecoration,
-
       child: Stack(
         children: [
           Positioned(
@@ -153,7 +143,6 @@ class BannerCard extends StatelessWidget {
               ),
             ),
           ),
-
           Positioned(
             bottom: 5,
             right: 7,
@@ -204,21 +193,15 @@ void showContactDialog(BuildContext context, ContactModel contacts) {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(50.0),
-
               topRight: Radius.circular(15.0),
-
               bottomLeft: Radius.circular(50.0),
-
               bottomRight: Radius.circular(50.0),
             ),
           ),
-
           backgroundColor: const Color(0xFFA6DEFF),
-
           child: Container(
             padding: const EdgeInsets.only(bottom: 50),
             width: MediaQuery.of(context).size.width * 0.85,
-
             child: Stack(
               children: [
                 Positioned(
@@ -231,7 +214,6 @@ void showContactDialog(BuildContext context, ContactModel contacts) {
                     },
                   ),
                 ),
-
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -294,7 +276,6 @@ Widget _buildContactRow({required IconData icon, required String text}) {
 class AboutUsSection extends StatelessWidget {
   final String title;
   final String content;
-
   const AboutUsSection({required this.title, required this.content, Key? key}) : super(key: key);
 
   @override
@@ -313,52 +294,39 @@ class AboutUsSection extends StatelessWidget {
 class RoutineActivitiesSection extends GetView<KaligrafiController> {
   final String title;
   final List<RoutineModel> activities;
-
   const RoutineActivitiesSection({required this.title, required this.activities, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
-    // Tombol 'See More' hanya muncul jika total aktivitas lebih dari 3
     final bool showSeeMoreButton = activities.length > 3;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
-
         Obx(() {
           int itemCount = 0;
-
           if (controller.isActivitiesExpanded.value) {
-            // 💡 PERBAIKAN UNTUK INFINITY (TIDAK TERBATAS):
-            // Jika Expanded, tampilkan semua item.
             itemCount = activities.length;
           } else {
-            // Jika tidak Expanded, tampilkan maksimal 3 item.
             itemCount = activities.length > 3 ? 3 : activities.length;
           }
-
           if (itemCount == 0) return const SizedBox.shrink();
-
           return GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               childAspectRatio: 1,
             ),
-            itemCount: itemCount, // Menggunakan itemCount yang sudah disesuaikan
+            itemCount: itemCount,
             itemBuilder: (context, index) {
               return ActivityCard(activity: activities[index]);
             },
           );
         }),
-
         if (showSeeMoreButton)
           Align(
             alignment: Alignment.centerRight,
@@ -376,7 +344,6 @@ class RoutineActivitiesSection extends GetView<KaligrafiController> {
                         color: Colors.black,
                       ),
                     ),
-
                     Icon(
                       isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                       size: 20,
@@ -394,33 +361,26 @@ class RoutineActivitiesSection extends GetView<KaligrafiController> {
 
 class ActivityCard extends StatelessWidget {
   final RoutineModel activity;
-
   const ActivityCard({required this.activity, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
-    // Menggunakan Card untuk shadow dan border
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
         side: const BorderSide(color: Colors.black, width: 1.0),
       ),
-      margin: EdgeInsets.zero, // Biarkan GridView mengatur jarak
-
+      margin: EdgeInsets.zero,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: SizedBox(
-
           child: LayoutBuilder(
               builder: (context, constraints) {
                 final double cardWidth = constraints.maxWidth;
-
                 return Stack(
                   fit: StackFit.expand,
                   children: [
-                    // 1. Gambar (Ditempatkan di 80px bagian atas)
                     Align(
                       alignment: Alignment.topCenter,
                       child: Image.file(
@@ -434,8 +394,6 @@ class ActivityCard extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                    // 2. Label Overlay (Ditempatkan di 20px bagian bawah)
                     Positioned(
                       left: 0,
                       right: 0,
@@ -443,12 +401,12 @@ class ActivityCard extends StatelessWidget {
                       child: Container(
                         width: cardWidth,
                         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                        color: Colors.white, // Background label PUTIH
+                        color: Colors.white,
                         child: Text(
                           activity.activityName,
                           style: const TextStyle(
-                            fontSize: 10, // Ukuran teks diperkecil agar pas
-                            color: Colors.black, // Warna teks HITAM
+                            fontSize: 10,
+                            color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -470,7 +428,6 @@ class ActivityCard extends StatelessWidget {
 class GallerySection extends StatelessWidget {
   final String title;
   final List<String> images;
-
   const GallerySection({required this.title, required this.images, Key? key}) : super(key: key);
 
   @override
@@ -482,7 +439,7 @@ class GallerySection extends StatelessWidget {
         const SizedBox(height: 10),
         GridView.builder(
           shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(), // Nonaktifkan scroll GridView
+          physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 10,
