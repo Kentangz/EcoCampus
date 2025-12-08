@@ -13,6 +13,9 @@ abstract class Routes {
 
   //user
   static const DASHBOARD_USER = _Paths.DASHBOARD_USER;
+  static const KALIGRAFI = _Paths.KALIGRAFI;
+  static const AKUSTIK = _Paths.AKUSTIK;
+  static const NONTONFILM = _Paths.NONTONFILM;
 
 
   //admin
@@ -32,6 +35,9 @@ abstract class _Paths {
 
   //user
   static const DASHBOARD_USER = '/dashboard-user';
+  static const KALIGRAFI = '/kaligrafi';
+  static const AKUSTIK = '/akustik';
+  static const NONTONFILM = '/nontonfilm';
 
   //admin
   static const DASHBOARD_ADMIN = '/dashboard-admin';

@@ -1,3 +1,4 @@
+import 'package:ecocampus/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/dashboard_user/controllers/dashboard_user_controller.dart';
@@ -52,7 +53,7 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // TITLE
-          const Text("EcoCampus", style: TextStyle(fontFamily: "poppins", fontSize: 24, fontWeight: FontWeight.bold)),
+          const Text("EcoCampus", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
 
           Container(
@@ -61,7 +62,7 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Selamat Siang!", style: TextStyle(fontFamily: "poppins", fontSize: 20, fontWeight: FontWeight.w600)),
+                const Text("Selamat Siang!", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 6),
 
                 Obx(() => _infoRow(Icons.person, controller.userName.value)),
@@ -129,11 +130,26 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
       mainAxisSpacing: 12,
       childAspectRatio: 1,
       children: activities.map((activity) {
+        final String title = activity['title'] as String;
+        VoidCallback? onTapValue = () {
+          switch (title) {
+            case "Kaligrafi":
+              Get.toNamed(Routes.KALIGRAFI);
+              break;
+            case "Akustik":
+              Get.toNamed(Routes.AKUSTIK); // Navigasi ke halaman Akustik
+              break;
+            case "Nonton Film":
+              Get.toNamed(Routes.NONTONFILM); // Navigasi ke halaman Nonton Film
+              break;
+          }
+        };
+
         return _activityCard(
           icon: activity['icon'] as IconData,
           title: activity['title'] as String,
           color: color,
-          onTap: null,
+          onTap: onTapValue,
         );
       }).toList(),
     );
@@ -151,7 +167,7 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
         width: 100,
         height: 100,
         padding: const EdgeInsets.all(12),
-        decoration: _cardDecoration(color),
+        decoration: _activityDecoration(color),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -174,7 +190,7 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
   BoxDecoration _cardDecoration(Color color) {
     return BoxDecoration(
       color: color,
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(20),
       border: Border.all(color: Colors.black, width: 1),
       boxShadow: const [
         BoxShadow(
@@ -185,6 +201,21 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
       ],
     );
   }
+}
+
+BoxDecoration _activityDecoration(Color color) {
+  return BoxDecoration(
+    color: color,
+    borderRadius: BorderRadius.circular(15),
+    border: Border.all(color: Colors.black, width: 1),
+    boxShadow: const [
+      BoxShadow(
+        color: Colors.grey,
+        blurRadius: 5,
+        offset: Offset(0, 4),
+      ),
+    ],
+  );
 }
 
 class _BottomNavBar extends StatelessWidget {

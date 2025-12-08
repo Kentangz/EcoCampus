@@ -6,6 +6,12 @@ import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_admin_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_list_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/akustik/bindings/akustik_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/akustik/views/akustik_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/bindings/kaligrafi_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/views/kaligrafi_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/bindings/nonton_film_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/views/nonton_film_view.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -49,6 +55,22 @@ class AppPages {
       name: _Paths.DASHBOARD_USER,
       page: () => const DashboardUserView(),
       binding: DashboardUserBinding(),
+    ),
+    GetPage(
+      name: _Paths.KALIGRAFI,
+      page: () => const KaligrafiView(),
+      binding: KaligrafiBinding(),
+    ),
+    GetPage(
+      name: _Paths.AKUSTIK,
+      page: () => const AkustikView(),
+      binding: AkustikBinding(),
+    ),
+
+    GetPage(
+      name: _Paths.NONTONFILM,
+      page: () => const NontonFilmView(),
+      binding: NontonFilmBinding(),
     ),
 
     //admin
