@@ -545,7 +545,6 @@ class _BottomNavBar extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-
             _NavTabItem(
               icon: Icons.home_outlined,
               label: "Home",
@@ -553,7 +552,6 @@ class _BottomNavBar extends StatelessWidget {
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(0),
             ),
-
             _NavTabItem(
               icon: Icons.menu_book,
               label: "Project",
@@ -561,7 +559,6 @@ class _BottomNavBar extends StatelessWidget {
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(1),
             ),
-
             _NavTabItem(
               icon: Icons.monetization_on_outlined,
               label: "Finance",
