@@ -8,6 +8,7 @@ class DashboardUserController extends GetxController {
   final _authRepo = AuthenticationRepository.instance;
 
   final userName = 'Halo Fufufafa!'.obs;
+<<<<<<< HEAD
   final currentDate = ''.obs;
   final currentTime = ''.obs;
 
@@ -44,10 +45,22 @@ class DashboardUserController extends GetxController {
     currentTime.value = timeFormat.format(now);
   }
 
+=======
+  final currentDate = 'Selasa, 11 November 2025'.obs;
+  final currentTime = '11:00'.obs;
+
+  final selectedIndex = 0.obs;
+
+>>>>>>> main
   void logout() {
     _authRepo.logout();
   }
   void changeTab(int index) {
     selectedIndex.value = index;
   }
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> main
