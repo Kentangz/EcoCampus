@@ -1,3 +1,4 @@
+import 'package:ecocampus/app/data/repositories/activity_repository.dart';
 import 'package:ecocampus/app/services/upload_queue_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,6 +18,7 @@ Future<void> main() async {
   await DeepLinkService.instance.init();
   await GetStorage.init();
   Get.put(UploadQueueService());
+  Get.put(ActivityRepository());
 
   runApp(const MyApp());
 }

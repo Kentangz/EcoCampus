@@ -1,3 +1,4 @@
+import 'package:ecocampus/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/dashboard_user/controllers/dashboard_user_controller.dart';
@@ -19,9 +20,7 @@ class DashboardUserView extends GetView<DashboardUserController> {
       backgroundColor: const Color(0xffe8f6ff),
 
       body: Obx(() {
-        return SafeArea(
-          child: _pages[controller.selectedIndex.value],
-        );
+        return SafeArea(child: _pages[controller.selectedIndex.value]);
       }),
 
       bottomNavigationBar: _BottomNavBar(controller: controller),
@@ -52,7 +51,14 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // TITLE
-          const Text("EcoCampus", style: TextStyle(fontFamily: "poppins", fontSize: 24, fontWeight: FontWeight.bold)),
+          const Text(
+            "EcoCampus",
+            style: TextStyle(
+              fontFamily: "poppins",
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 20),
 
           Container(
@@ -61,14 +67,29 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Selamat Siang!", style: TextStyle(fontFamily: "poppins", fontSize: 20, fontWeight: FontWeight.w600)),
+                const Text(
+                  "Selamat Siang!",
+                  style: TextStyle(
+                    fontFamily: "poppins",
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 const SizedBox(height: 6),
 
                 Obx(() => _infoRow(Icons.person, controller.userName.value)),
                 const SizedBox(height: 6),
-                Obx(() => _infoRow(Icons.calendar_month, controller.currentDate.value)),
+                Obx(
+                  () => _infoRow(
+                    Icons.calendar_month,
+                    controller.currentDate.value,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Obx(() => _infoRow(Icons.access_time, controller.currentTime.value)),
+                Obx(
+                  () =>
+                      _infoRow(Icons.access_time, controller.currentTime.value),
+                ),
                 const SizedBox(height: 14),
 
                 Align(
@@ -76,32 +97,56 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff6c63ff),
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                     onPressed: controller.logout,
-                    child: const Text("Logout", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      "Logout",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                )
+                ),
               ],
             ),
           ),
 
           const SizedBox(height: 30),
-          const Text("Kegiatan Kampus", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+          const Text(
+            "Kegiatan Kampus",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+          ),
           const SizedBox(height: 20),
 
-          const Text("Seni & Budaya", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const Text(
+            "Seni & Budaya",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 12),
-          _buildActivityGrid(activities: _seniBudayaActivities, color: const Color(
-              0xffa5c2f5)),
+          _buildActivityGrid(
+            activities: _seniBudayaActivities,
+            color: const Color(0xffa5c2f5),
+          ),
 
           const SizedBox(height: 30),
 
-          const Text("Akademik & Karir", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const Text(
+            "Akademik & Karir",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 12),
-          _buildActivityGrid(activities: _akademikKarirActivities, color: const Color(
-              0xfff5a5a5)),
+          _buildActivityGrid(
+            activities: _akademikKarirActivities,
+            color: const Color(0xfff5a5a5),
+          ),
         ],
       ),
     );
@@ -129,11 +174,26 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
       mainAxisSpacing: 12,
       childAspectRatio: 1,
       children: activities.map((activity) {
+        final String title = activity['title'] as String;
+        VoidCallback? onTapValue = () {
+          switch (title) {
+            case "Kaligrafi":
+              Get.toNamed(Routes.KALIGRAFI);
+              break;
+            case "Akustik":
+              Get.toNamed(Routes.AKUSTIK); // Navigasi ke halaman Akustik
+              break;
+            case "Nonton Film":
+              Get.toNamed(Routes.NONTONFILM); // Navigasi ke halaman Nonton Film
+              break;
+          }
+        };
+
         return _activityCard(
           icon: activity['icon'] as IconData,
           title: activity['title'] as String,
           color: color,
-          onTap: null,
+          onTap: onTapValue,
         );
       }).toList(),
     );
@@ -151,7 +211,7 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
         width: 100,
         height: 100,
         padding: const EdgeInsets.all(12),
-        decoration: _cardDecoration(color),
+        decoration: _activityDecoration(color),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -160,11 +220,8 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            )
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),
@@ -174,17 +231,24 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
   BoxDecoration _cardDecoration(Color color) {
     return BoxDecoration(
       color: color,
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(20),
       border: Border.all(color: Colors.black, width: 1),
       boxShadow: const [
-        BoxShadow(
-          color: Colors.grey,
-          blurRadius: 5,
-          offset: Offset(0, 4),
-        ),
+        BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 4)),
       ],
     );
   }
+}
+
+BoxDecoration _activityDecoration(Color color) {
+  return BoxDecoration(
+    color: color,
+    borderRadius: BorderRadius.circular(15),
+    border: Border.all(color: Colors.black, width: 1),
+    boxShadow: const [
+      BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 4)),
+    ],
+  );
 }
 
 class _BottomNavBar extends StatelessWidget {
@@ -236,9 +300,9 @@ class _BottomNavBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: isSelected
                   ? BoxDecoration(
-                color: _selectedBgColor,
-                borderRadius: BorderRadius.circular(30),
-              )
+                      color: _selectedBgColor,
+                      borderRadius: BorderRadius.circular(30),
+                    )
                   : null,
               child: content,
             ),
@@ -269,7 +333,6 @@ class _BottomNavBar extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-
             _NavTabItem(
               icon: Icons.home_outlined,
               label: "Home",
