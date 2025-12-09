@@ -6,6 +6,8 @@ import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_admin_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_list_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/page_kolaborasi_kampus/bindings/kolaborasi_kampus_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/page_kolaborasi_kampus/views/kolaborasi_kampus_view.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -18,7 +20,7 @@ part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
-  
+
   //auth
   static const INITIAL = Routes.LOGIN;
 
@@ -49,6 +51,11 @@ class AppPages {
       name: _Paths.DASHBOARD_USER,
       page: () => const DashboardUserView(),
       binding: DashboardUserBinding(),
+    ),
+    GetPage(
+      name: _Paths.KOLABORASI_KAMPUS,
+      page: () => const KolaborasiKampusView(),
+      binding: KolaborasiKampusBinding(),
     ),
 
     //admin
