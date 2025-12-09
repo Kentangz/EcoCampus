@@ -12,6 +12,8 @@ import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/bindings/kaligraf
 import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/views/kaligrafi_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/bindings/nonton_film_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/views/nonton_film_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/page_kolaborasi_kampus/bindings/kolaborasi_kampus_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/page_kolaborasi_kampus/views/kolaborasi_kampus_view.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -24,7 +26,7 @@ part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
-  
+
   //auth
   static const INITIAL = Routes.LOGIN;
 
@@ -66,11 +68,15 @@ class AppPages {
       page: () => const AkustikView(),
       binding: AkustikBinding(),
     ),
-
     GetPage(
       name: _Paths.NONTONFILM,
       page: () => const NontonFilmView(),
       binding: NontonFilmBinding(),
+    ),
+    GetPage(
+      name: _Paths.KOLABORASI_KAMPUS,
+      page: () => const KolaborasiKampusView(),
+      binding: KolaborasiKampusBinding(),
     ),
 
     //admin
