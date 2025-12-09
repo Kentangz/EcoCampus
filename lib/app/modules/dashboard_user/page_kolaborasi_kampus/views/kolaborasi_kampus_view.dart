@@ -11,6 +11,13 @@ class KolaborasiKampusView extends GetView<KolaborasiController> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFEFF7F7),
+
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF2B7A78),
+        child: const Icon(Icons.add, size: 30, color: Colors.white),
+        onPressed: () => Get.toNamed('/dashboard/add-project'),
+      ),
+
       body: SafeArea(
         child: Column(
           children: [
@@ -60,7 +67,6 @@ class KolaborasiKampusView extends GetView<KolaborasiController> {
 
             const SizedBox(height: 12),
 
-            // GRID PROJECT
             Expanded(
               child: Obx(() {
                 final projects = controller.projects;
@@ -150,73 +156,6 @@ class KolaborasiKampusView extends GetView<KolaborasiController> {
             ),
           ],
         ),
-      ),
-
-      // BOTTOM NAV
-      bottomNavigationBar: Obx(() {
-        final idx = controller.selectedIndex.value;
-
-        return Container(
-          height: 72,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            border: Border(top: BorderSide(color: Colors.black12)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _navItem(Icons.home_outlined, 'Home', 0, idx),
-              GestureDetector(
-                onTap: () => controller.onTapBottomNav(1),
-                child: Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: idx == 1 ? const Color(0xFFDFF6F6) : const Color(0xFFEFF7F7),
-                    shape: BoxShape.circle,
-                    boxShadow: idx == 1
-                        ? [
-                      const BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 6,
-                        offset: Offset(0, 3),
-                      )
-                    ]
-                        : [],
-                  ),
-                  child: Icon(
-                    Icons.library_books,
-                    size: 28,
-                    color: idx == 1 ? Colors.black87 : Colors.black54,
-                  ),
-                ),
-              ),
-              _navItem(Icons.attach_money_outlined, 'Finance', 2, idx),
-            ],
-          ),
-        );
-      }),
-    );
-  }
-
-  Widget _navItem(IconData icon, String label, int index, int selectedIndex) {
-    final active = index == selectedIndex;
-    return GestureDetector(
-      onTap: () => controller.onTapBottomNav(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: active ? Colors.black87 : Colors.black45),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: active ? Colors.black87 : Colors.black45,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -1,11 +1,9 @@
 import 'package:get/get.dart';
+import 'package:ecocampus/app/project_model.dart';
 
 class KolaborasiController extends GetxController {
-  // List proyek - reactive
   final projects = <ProjectModel>[].obs;
-
-  // bottom navigation selected index
-  final selectedIndex = 1.obs; // 0 Home, 1 Project, 2 Finance
+  final selectedIndex = 1.obs;
 
   @override
   void onInit() {
@@ -14,24 +12,24 @@ class KolaborasiController extends GetxController {
   }
 
   void _loadDummyProjects() {
-    // Ganti imageAsset dengan path asset Anda
-    projects.addAll([
-      ProjectModel(
+    projects.assignAll([
+      const ProjectModel(
         title: 'Design UI/UX',
         duration: '8 Minggu',
         imageAsset: 'assets/images/ui_ux.jpg',
+        description: 'Proyek perancangan UI/UX untuk EcoCampus.',
       ),
-      ProjectModel(
+      const ProjectModel(
         title: 'Analisis Data Penjualan',
         duration: '16 Minggu',
         imageAsset: 'assets/images/analisis_data_penjualan.jpg',
       ),
-      ProjectModel(
+      const ProjectModel(
         title: 'Riset Pasar Produk',
         duration: '8 Minggu',
         imageAsset: 'assets/images/riset_pasar_produk.jpg',
       ),
-      ProjectModel(
+      const ProjectModel(
         title: 'Pembuatan Aplikasi',
         duration: '24 Minggu',
         imageAsset: 'assets/images/pembuatan_aplikasi.jpg',
@@ -39,51 +37,49 @@ class KolaborasiController extends GetxController {
     ]);
   }
 
+  /// Tambah project baru. Menghindari duplikat berdasarkan title (case-insensitive).
+  void addProject(ProjectModel project) {
+    final exists = projects.any((p) => p.title.toLowerCase() == project.title.toLowerCase());
+    if (!exists) {
+      projects.add(project);
+    } else {
+      // jika mau izinkan duplicate, hilangkan blok ini
+      Get.snackbar('Info', 'Project dengan judul yang sama sudah ada.',
+          snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  /// Navigasi ke halaman detail sesuai title (case-insensitive).
   void onTapProject(int index) {
+    if (index < 0 || index >= projects.length) return;
     final p = projects[index];
-    Get.snackbar('Buka Proyek', '${p.title} — ${p.duration}',
+    final key = p.title.toLowerCase();
+
+    if (key.contains('design ui/ux') || key.contains('ui/ux')) {
+      Get.toNamed('/dashboard/project-ui-ux', arguments: p);
+      return;
+    }
+
+    if (key.contains('analisis data penjualan') || key.contains('analisis data')) {
+      Get.toNamed('/dashboard/project-analisis-data', arguments: p);
+      return;
+    }
+
+    if (key.contains('riset pasar produk') || key.contains('riset pasar')) {
+      Get.toNamed('/dashboard/project-riset-pasar', arguments: p);
+      return;
+    }
+
+    if (key.contains('pembuatan aplikasi') || key.contains('pembuatan app')) {
+      Get.toNamed('/dashboard/project-pembuatan-aplikasi', arguments: p);
+      return;
+    }
+
+    Get.snackbar('Info', 'Halaman detail untuk "${p.title}" belum tersedia.',
         snackPosition: SnackPosition.BOTTOM);
   }
 
   void onTapBottomNav(int index) {
     selectedIndex.value = index;
-    switch (index) {
-      case 0:
-        Get.snackbar('Nav', 'Home tapped', snackPosition: SnackPosition.BOTTOM);
-        break;
-      case 1:
-        break;
-      case 2:
-        Get.snackbar('Nav', 'Finance tapped', snackPosition: SnackPosition.BOTTOM);
-        break;
-    }
-  }
-}
-
-class ProjectModel {
-  final String title;
-  final String duration;
-  final String imageAsset;
-
-  ProjectModel({
-    required this.title,
-    required this.duration,
-    required this.imageAsset,
-  });
-
-  factory ProjectModel.fromJson(Map<String, dynamic> json) {
-    return ProjectModel(
-      title: json['title'] ?? '',
-      duration: json['duration'] ?? '',
-      imageAsset: json['imageAsset'] ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'duration': duration,
-      'imageAsset': imageAsset,
-    };
   }
 }
