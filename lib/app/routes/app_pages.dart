@@ -13,6 +13,7 @@ import 'package:ecocampus/app/modules/dashboard_admin/views/dashboard_admin_view
 import 'package:ecocampus/app/modules/dashboard_admin/bindings/dashboard_admin_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/views/dashboard_user_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/bindings/dashboard_user_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_admin_view.dart';
 
 part 'app_routes.dart';
 
@@ -67,5 +68,20 @@ class AppPages {
       page: () => const ActivityListView(),
       binding: DashboardAdminBinding(),
     ),
+    GetPage(
+      name: _Paths.ADMIN_NEWS,
+      page: () => const NewsAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    // GetPage(
+    //   name: _Paths.ADMIN_NEWS_LIST,
+    //   page: () => const ActivityAdminView(),
+    //   binding: DashboardAdminBinding(),
+    // ),
+    // GetPage(
+    //   name: _Paths.ADMIN_NEWS_FORM,
+    //   page: () => const ActivityNewsView(),
+    //   binding: DashboardAdminBinding(),
+    // ),
   ];
 }
