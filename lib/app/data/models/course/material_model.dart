@@ -7,13 +7,20 @@ class ContentBlock {
   String id;
   BlockType type;
   String content;
+  Map<String, dynamic> attributes;
 
-  ContentBlock({required this.id, required this.type, required this.content});
+  ContentBlock({
+    required this.id,
+    required this.type,
+    required this.content,
+    this.attributes = const {},
+  });
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "type": type.name,
     "content": content,
+    "attributes": attributes,
   };
 
   factory ContentBlock.fromJson(Map<String, dynamic> json) {
@@ -24,6 +31,7 @@ class ContentBlock {
         orElse: () => BlockType.text,
       ),
       content: json['content'] ?? '',
+      attributes: Map<String, dynamic>.from(json['attributes'] ?? {}),
     );
   }
 }

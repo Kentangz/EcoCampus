@@ -18,7 +18,7 @@ class CloudinaryService {
     cloudinary = CloudinaryPublic(_cloudName, _uploadPreset, cache: false);
   }
 
-  Future<String?> uploadImage(File imageFile) async {
+  Future<String?> uploadImage(File file) async {
     if (_cloudName.isEmpty || _uploadPreset.isEmpty) {
       NotificationHelper.showError("Config Error", "Cek .env");
       return null;
@@ -26,12 +26,13 @@ class CloudinaryService {
     try {
       CloudinaryResponse response = await cloudinary.uploadFile(
         CloudinaryFile.fromFile(
-          imageFile.path,
-          resourceType: CloudinaryResourceType.Image,
+          file.path,
+          resourceType: CloudinaryResourceType.Auto,
         ),
       );
       return response.secureUrl;
     } catch (e) {
+      // print("Cloudinary Error: $e");
       return null;
     }
   }
@@ -42,6 +43,13 @@ class CloudinaryService {
     String? publicId = _getPublicIdFromUrl(imageUrl);
     if (publicId == null) return false;
 
+    String resourceType = 'image';
+    if (imageUrl.contains('/video/')) {
+      resourceType = 'video';
+    } else if (imageUrl.contains('/raw/')) {
+      resourceType = 'raw';
+    }
+
     try {
       String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -51,7 +59,7 @@ class CloudinaryService {
       String signature = digest.toString();
 
       var uri = Uri.parse(
-        "https://api.cloudinary.com/v1_1/$_cloudName/image/destroy",
+        "https://api.cloudinary.com/v1_1/$_cloudName/$resourceType/destroy",
       );
 
       var response = await http.post(

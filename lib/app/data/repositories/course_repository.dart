@@ -266,6 +266,28 @@ class CourseRepository extends GetxController {
     String sectionId,
     String materialId,
   ) async {
+    // 1. Get the material doc to check for images/videos
+    DocumentSnapshot materialDoc = await _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('modules')
+        .doc(moduleId)
+        .collection('sections')
+        .doc(sectionId)
+        .collection('materials')
+        .doc(materialId)
+        .get();
+
+    if (materialDoc.exists) {
+      List<dynamic> blocks = materialDoc.get('blocks') ?? [];
+      for (var block in blocks) {
+        String content = block['content'] ?? '';
+        if (content.startsWith('http')) {
+          _queueService.addDeleteToQueue(content);
+        }
+      }
+    }
+
     await _db
         .collection('Courses')
         .doc(courseId)

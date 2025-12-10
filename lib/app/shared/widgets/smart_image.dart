@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class SmartImage extends StatelessWidget {
   final String pathOrUrl;
@@ -24,16 +25,13 @@ class SmartImage extends StatelessWidget {
     if (pathOrUrl.isEmpty) {
       imageWidget = _buildPlaceholder(Icons.image_not_supported);
     } else if (pathOrUrl.startsWith('http')) {
-      imageWidget = Image.network(
-        pathOrUrl,
+      imageWidget = CachedNetworkImage(
+        imageUrl: pathOrUrl,
         width: width,
         height: height,
         fit: fit,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return _buildLoading();
-        },
-        errorBuilder: (context, error, stackTrace) =>
+        placeholder: (context, url) => _buildLoading(),
+        errorWidget: (context, url, error) =>
             _buildPlaceholder(Icons.broken_image),
       );
     } else {

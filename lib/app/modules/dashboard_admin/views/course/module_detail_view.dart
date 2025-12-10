@@ -83,7 +83,6 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
       stream: controller.getMaterialsStream(section.id!),
       builder: (context, snapshot) {
         var materials = snapshot.data ?? [];
-        materials.sort((a, b) => a.order.compareTo(b.order));
 
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
@@ -167,10 +166,7 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
                       ),
                       title: Text(material.title),
                       subtitle: Text("${material.blocks.length} Konten"),
-                      onTap: () => controller.navigateToBuilder(
-                        section.id!,
-                        material,
-                      ),
+                      onTap: () => controller.navigateToBuilder(section.id!, material),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

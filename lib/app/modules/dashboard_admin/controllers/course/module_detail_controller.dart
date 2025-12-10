@@ -88,7 +88,12 @@ class ModuleDetailController extends GetxController {
   // === MATERIAL (TOPIC) MANAGEMENT ===
 
   Stream<List<MaterialModel>> getMaterialsStream(String sectionId) {
-    return _courseRepo.getMaterials(courseId, module.id!, sectionId);
+    return _courseRepo.getMaterials(courseId, module.id!, sectionId).map((
+      materials,
+    ) {
+      materials.sort((a, b) => a.order.compareTo(b.order));
+      return materials;
+    });
   }
 
   void showAddMaterialDialog(String sectionId, int nextOrder) {

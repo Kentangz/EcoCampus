@@ -157,8 +157,10 @@ class UploadQueueService extends GetxService {
             _queue.removeAt(0);
             _saveQueue();
           } else {
-            // print("❌ Gagal Hapus. Tunda.");
-            break;
+            // print("❌ Gagal Hapus. Skip Item.");
+            _queue.removeAt(0);
+            _saveQueue();
+            continue;
           }
         } else {
           File file = File(item.path);
@@ -238,6 +240,26 @@ class UploadQueueService extends GetxService {
 
             rawList[item.arrayIndex!] = updatedItem;
             await docRef.update({'routines': rawList});
+          }
+        }
+      } else if (item.fieldName == 'blocks') {
+        var snapshot = await docRef.get();
+        if (snapshot.exists) {
+          List<dynamic> blocks = List.from(snapshot.get('blocks') ?? []);
+          bool updated = false;
+
+          for (int i = 0; i < blocks.length; i++) {
+            Map<String, dynamic> block = Map.from(blocks[i]);
+            if (block['content'] == item.path) {
+              block['content'] = cloudUrl;
+              blocks[i] = block;
+              updated = true;
+              break;
+            }
+          }
+
+          if (updated) {
+            await docRef.update({'blocks': blocks});
           }
         }
       }

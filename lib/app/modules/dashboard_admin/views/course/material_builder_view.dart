@@ -1,8 +1,14 @@
+import 'dart:io';
 import 'package:ecocampus/app/data/models/course/material_model.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/course/material_builder_controller.dart';
 import 'package:ecocampus/app/shared/widgets/smart_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:ecocampus/app/shared/widgets/markdown_toolbar.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/component/material_builder_components.dart';
 
 class MaterialBuilderView extends GetView<MaterialBuilderController> {
   const MaterialBuilderView({super.key});
@@ -10,6 +16,7 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
   @override
   Widget build(BuildContext context) {
     final isPreview = false.obs;
+    final showAddPanel = true.obs;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -91,15 +98,14 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
               }
 
               return ReorderableListView.builder(
+                scrollController: controller.scrollController,
                 padding: const EdgeInsets.only(bottom: 100, top: 10),
                 itemCount: controller.blocks.length,
                 onReorder: controller.reorderBlocks,
                 itemBuilder: (context, index) {
                   final block = controller.blocks[index];
                   return _buildEditorBlock(
-                    key: ValueKey(
-                      block.id,
-                    ),
+                    key: ValueKey(block.id),
                     index: index,
                     block: block,
                     controller: controller,
@@ -114,50 +120,75 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
       bottomNavigationBar: Obx(
         () => Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                offset: const Offset(0, -2),
-                blurRadius: 5,
-              ),
-            ],
-          ),
+          decoration: const BoxDecoration(color: Colors.white),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (!isPreview.value) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _addBtn(
-                      "Teks",
-                      Icons.notes,
-                      Colors.blue,
-                      () => controller.addBlock(BlockType.text),
-                    ),
-                    _addBtn(
-                      "Gambar",
-                      Icons.image,
-                      Colors.orange,
-                      () => controller.addBlock(BlockType.image),
-                    ),
-                    _addBtn(
-                      "Video",
-                      Icons.play_circle,
-                      Colors.red,
-                      () => controller.addBlock(BlockType.video),
-                    ),
-                  ],
+                Obx(
+                  () => AnimatedSize(
+                    duration: const Duration(milliseconds: 300),
+                    child: showAddPanel.value
+                        ? Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  _addBtn(
+                                    "Teks",
+                                    Icons.notes,
+                                    Colors.blue,
+                                    () => controller.addBlock(BlockType.text),
+                                  ),
+                                  _addBtn(
+                                    "Gambar",
+                                    Icons.image,
+                                    Colors.orange,
+                                    () => controller.addBlock(BlockType.image),
+                                  ),
+                                  _addBtn(
+                                    "Video",
+                                    Icons.play_circle,
+                                    Colors.red,
+                                    () => controller.addBlock(BlockType.video),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              const Divider(height: 1),
+                              const SizedBox(height: 12),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
+                  ),
                 ),
-                const SizedBox(height: 12),
-                const Divider(height: 1),
-                const SizedBox(height: 12),
               ],
 
               Row(
                 children: [
+                  if (!isPreview.value)
+                    Container(
+                      margin: const EdgeInsets.only(right: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: IconButton(
+                        onPressed: () => showAddPanel.toggle(),
+                        icon: Obx(
+                          () => Icon(
+                            showAddPanel.value
+                                ? Icons.keyboard_arrow_down
+                                : Icons.add,
+                            color: const Color(0xFF6C63FF),
+                          ),
+                        ),
+                        tooltip: "Toggle Menu Tambah",
+                      ),
+                    ),
+
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () {
@@ -215,59 +246,80 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
     required ContentBlock block,
     required MaterialBuilderController controller,
   }) {
-    return Container(
+    return AnimatedBlockWrapper(
       key: key,
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(8),
-              ),
+      onRemove: () => controller.removeBlockById(block.id),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade300),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 2,
+              offset: Offset(0, 1),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  _getIconByType(block.type),
-                  size: 14,
-                  color: Colors.grey[600],
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(8),
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  block.type.name.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    _getIconByType(block.type),
+                    size: 14,
                     color: Colors.grey[600],
                   ),
-                ),
-                const Spacer(),
-                InkWell(
-                  onTap: () => controller.removeBlock(index),
-                  child: const Icon(Icons.delete, size: 18, color: Colors.red),
-                ),
-                const SizedBox(width: 10),
-                const Icon(Icons.drag_handle, color: Colors.grey),
-              ],
+                  const SizedBox(width: 6),
+                  Text(
+                    block.type.name.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const Spacer(),
+                  Builder(
+                    builder: (context) {
+                      return InkWell(
+                        onTap: () {
+                          context
+                              .findAncestorStateOfType<
+                                AnimatedBlockWrapperState
+                              >()
+                              ?.animateDelete();
+                        },
+                        child: const Icon(
+                          Icons.delete,
+                          size: 18,
+                          color: Colors.red,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.drag_handle, color: Colors.grey),
+                ],
+              ),
             ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: _buildBlockInput(index, block, controller),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: _buildBlockInput(index, block, controller),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -279,79 +331,228 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
   ) {
     switch (block.type) {
       case BlockType.text:
-        return TextFormField(
-          initialValue: block.content,
-          onChanged: (val) => controller.updateBlockContent(index, val),
-          maxLines: null,
-          keyboardType: TextInputType.multiline,
-          decoration: const InputDecoration(
-            hintText: "Tulis materi di sini...",
-            border: InputBorder.none,
-            isDense: true,
-          ),
+        return Column(
+          children: [
+            TextFormField(
+              controller: controller.getTextController(block.id, block.content),
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                hintText: "Tulis materi di sini (Support Markdown)...",
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.all(12),
+              ),
+            ),
+            const Divider(height: 1),
+            MarkdownToolbar(
+              onFormat: (format) =>
+                  controller.applyTextFormat(block.id, format),
+            ),
+          ],
         );
       case BlockType.image:
-        return GestureDetector(
-          onTap: () => controller.pickAndUploadImage(index),
-          child: block.content.isEmpty
-              ? Container(
-                  height: 150,
-                  width: double.infinity,
-                  color: Colors.grey[100],
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_photo_alternate,
-                        size: 40,
-                        color: Colors.grey,
+        return Column(
+          children: [
+            GestureDetector(
+              onTap: () => controller.pickAndUploadImage(index),
+              child: block.content.isEmpty
+                  ? Container(
+                      height: 150,
+                      width: double.infinity,
+                      color: Colors.grey[100],
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_photo_alternate,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
+                          Text(
+                            "Tap untuk upload gambar",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
                       ),
-                      Text(
-                        "Tap untuk upload gambar",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                )
-              : Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: SmartImage(
-                        block.content,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(4),
+                    )
+                  : Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child:
+                              (block.attributes['isLocal'] == true &&
+                                  !block.content.startsWith('http'))
+                              ? Image.file(
+                                  File(block.content),
+                                  width: double.infinity,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                )
+                              : SmartImage(
+                                  block.content,
+                                  width: double.infinity,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
-                        child: const Icon(
-                          Icons.edit,
-                          color: Colors.white,
-                          size: 16,
+                        Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              initialValue: block.attributes['caption'] ?? '',
+              onChanged: (val) =>
+                  controller.updateBlockAttribute(index, 'caption', val),
+              decoration: const InputDecoration(
+                labelText: "Caption Gambar",
+                isDense: true,
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.short_text),
+              ),
+            ),
+          ],
         );
       case BlockType.video:
-        return TextFormField(
-          initialValue: block.content,
-          onChanged: (val) => controller.updateBlockContent(index, val),
-          decoration: const InputDecoration(
-            hintText: "Tempel URL Video (YouTube/MP4)",
-            prefixIcon: Icon(Icons.link),
-            border: OutlineInputBorder(),
-            isDense: true,
-          ),
+        String source = block.attributes['source'] ?? 'link';
+        bool isLocal = block.attributes['isLocal'] == true;
+
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment<String>(
+                      value: 'link',
+                      label: Text('Link URL'),
+                      icon: Icon(Icons.link),
+                    ),
+                    ButtonSegment<String>(
+                      value: 'upload',
+                      label: Text('Upload File'),
+                      icon: Icon(Icons.upload_file),
+                    ),
+                  ],
+                  selected: {source},
+                  onSelectionChanged: (Set<String> newSelection) {
+                    controller.updateBlockAttribute(
+                      index,
+                      'source',
+                      newSelection.first,
+                    );
+                    controller.updateBlockContent(index, '');
+                  },
+                ),
+              ),
+            ),
+            if (source == 'upload')
+              GestureDetector(
+                onTap: () => controller.pickAndUploadVideo(index),
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 150),
+                  width: double.infinity,
+                  color: Colors.grey[100],
+                  alignment: Alignment.center,
+                  child: block.content.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: (isLocal && !block.content.startsWith('http'))
+                              ? SizedBox(
+                                  height: 200,
+                                  width: double.infinity,
+                                  child: VideoPreview(
+                                    path: block.content,
+                                    isUrl: false,
+                                  ),
+                                )
+                              : (block.content.startsWith('http'))
+                              ? SizedBox(
+                                  height: 200,
+                                  width: double.infinity,
+                                  child: VideoPreview(
+                                    path: block.content,
+                                    isUrl: true,
+                                  ),
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green,
+                                      size: 40,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text("Video terupload"),
+                                    Text(
+                                      block.content.split('/').last,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        )
+                      : const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.video_call,
+                              size: 40,
+                              color: Colors.grey,
+                            ),
+                            Text(
+                              "Tap untuk pilih video dari galeri",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                ),
+              )
+            else
+              TextFormField(
+                initialValue: block.content,
+                onChanged: (val) => controller.updateBlockContent(index, val),
+                decoration: const InputDecoration(
+                  hintText: "Tempel URL Video (YouTube/Drive)...",
+                  prefixIcon: Icon(Icons.link),
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+
+            const SizedBox(height: 12),
+            TextFormField(
+              initialValue: block.attributes['description'] ?? '',
+              onChanged: (val) =>
+                  controller.updateBlockAttribute(index, 'description', val),
+              decoration: const InputDecoration(
+                labelText: "Deskripsi Video (Tampil di atas player)",
+                isDense: true,
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.description),
+              ),
+            ),
+          ],
         );
     }
   }
@@ -361,40 +562,200 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
       case BlockType.text:
         return Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
-          child: Text(
-            block.content,
-            style: const TextStyle(
-              fontSize: 14,
-              height: 1.6,
-              color: Color(0xFF333333),
-              fontFamily: 'Montserrat',
+          child: MarkdownBody(
+            data: block.content,
+            selectable: true,
+            onTapLink: (text, href, title) {
+              if (href != null) launchUrl(Uri.parse(href));
+            },
+            styleSheet: MarkdownStyleSheet(
+              p: const TextStyle(
+                fontSize: 16,
+                height: 1.6,
+                color: Color(0xFF333333),
+                fontFamily: 'Montserrat',
+              ),
+              h1: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              h2: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              code: TextStyle(
+                backgroundColor: Colors.grey[200],
+                fontFamily: 'monospace',
+              ),
             ),
-            textAlign: TextAlign.justify,
           ),
         );
       case BlockType.image:
         if (block.content.isEmpty) return const SizedBox.shrink();
+        final caption = block.attributes['caption'] ?? '';
+
         return Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: SmartImage(
-              block.content,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+          padding: const EdgeInsets.only(bottom: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child:
+                    (block.attributes['isLocal'] == true &&
+                        !block.content.startsWith('http'))
+                    ? Image.file(
+                        File(block.content),
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : SmartImage(
+                        block.content,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+              ),
+              if (caption.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  caption,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ],
           ),
         );
       case BlockType.video:
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
+        final description = block.attributes['description'] ?? '';
+        final isLocal = block.attributes['isLocal'] == true;
+        final source = block.attributes['source'];
+
+        Widget videoWidget = Container(
           height: 200,
-          decoration: BoxDecoration(
+          color: Colors.black,
+          child: const Center(child: Icon(Icons.error, color: Colors.white)),
+        );
+
+        if (isLocal && block.content.isNotEmpty) {
+          videoWidget = Container(
+            constraints: const BoxConstraints(minHeight: 200),
             color: Colors.black,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Center(
-            child: Icon(Icons.play_circle_fill, color: Colors.white, size: 50),
+            child: VideoPreview(
+              path: block.content,
+              isUrl: block.content.startsWith('http'),
+            ),
+          );
+        } else if (source == 'youtube' ||
+            (block.content.contains('youtube.com') ||
+                block.content.contains('youtu.be'))) {
+          final videoId = YoutubePlayer.convertUrlToId(block.content);
+          if (videoId != null) {
+            videoWidget = ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Image.network(
+                    'https://img.youtube.com/vi/$videoId/0.jpg',
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.black,
+                      child: const Center(
+                        child: Icon(Icons.error, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const Icon(
+                    Icons.play_arrow_rounded,
+                    color: Color.fromARGB(255, 255, 255, 255),
+                    size: 70,
+                  ),
+                ],
+              ),
+            );
+          }
+        } else if (block.content.contains('drive.google.com')) {
+          videoWidget = Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F0FE),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF4285F4), width: 1),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.add_to_drive,
+                  size: 50,
+                  color: Color(0xFF4285F4),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Video Google Drive",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF4285F4),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 4,
+                  ),
+                  child: Text(
+                    block.content,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => launchUrl(Uri.parse(block.content)),
+                  icon: const Icon(Icons.open_in_new, size: 16),
+                  label: const Text("Buka di Drive"),
+                ),
+              ],
+            ),
+          );
+        } else if (block.content.isNotEmpty) {
+          videoWidget = Container(
+            height: 200,
+            width: double.infinity,
+            color: Colors.black,
+            alignment: Alignment.center,
+            child: const Icon(
+              Icons.video_library,
+              color: Colors.white,
+              size: 70,
+            ),
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (description.isNotEmpty) ...[
+                Text(
+                  description,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+              ],
+              videoWidget,
+            ],
           ),
         );
     }
