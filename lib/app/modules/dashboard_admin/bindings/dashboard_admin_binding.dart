@@ -8,8 +8,8 @@ class DashboardAdminBinding extends Bindings {
   void dependencies() {
 
     Get.lazyPut<ActivityRepository>(() => ActivityRepository());
-
     Get.lazyPut<DashboardAdminController>(() => DashboardAdminController());
     Get.lazyPut<ActivityAdminController>(() => ActivityAdminController());
+  
   }
 }
