@@ -7,8 +7,12 @@ import 'package:get/get.dart';
 class CourseRepository extends GetxController {
   static CourseRepository get instance => Get.find();
 
+  // ignore: constant_identifier_names
+  static const String COLLECTION = 'Courses';
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final UploadQueueService _queueService = Get.find<UploadQueueService>();
+
+  String get newId => _db.collection(COLLECTION).doc().id;
 
   Stream<List<CourseModel>> getAllCourses() {
     return _db

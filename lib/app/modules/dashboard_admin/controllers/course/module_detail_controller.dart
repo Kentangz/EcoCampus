@@ -1,6 +1,8 @@
 import 'package:ecocampus/app/data/models/course/course_model.dart';
 
 import 'package:ecocampus/app/data/repositories/course_repository.dart';
+import 'package:ecocampus/app/routes/app_pages.dart';
+import 'package:ecocampus/app/shared/utils/notification_helper.dart';
 import 'package:flutter/material.dart' hide MaterialType;
 import 'package:get/get.dart';
 
@@ -14,7 +16,8 @@ class ModuleDetailController extends GetxController {
   final sections = <SectionModel>[].obs;
   final isLoading = true.obs;
 
-  // === LIFECYCLE ===
+  final isPreviewMode = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -22,17 +25,18 @@ class ModuleDetailController extends GetxController {
     if (args != null) {
       courseId = args['courseId'];
       module = args['module'];
-
       sections.bindStream(_courseRepo.getSections(courseId, module.id!));
     }
   }
 
-  // === SECTION DIALOG ===
+  void togglePreview() {
+    isPreviewMode.value = !isPreviewMode.value;
+  }
+
+  // === SECTION MANAGEMENT ===
+
   void showSectionDialog({SectionModel? existingSection}) {
     final titleC = TextEditingController(text: existingSection?.title ?? '');
-    final orderC = TextEditingController(
-      text: existingSection?.order.toString() ?? '${sections.length + 1}',
-    );
 
     Get.defaultDialog(
       title: existingSection == null ? "Tambah Section" : "Edit Section",
@@ -42,13 +46,8 @@ class ModuleDetailController extends GetxController {
             controller: titleC,
             decoration: const InputDecoration(
               labelText: "Judul Section (Misal: Pengenalan)",
+              border: OutlineInputBorder(),
             ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: orderC,
-            decoration: const InputDecoration(labelText: "Urutan"),
-            keyboardType: TextInputType.number,
           ),
         ],
       ),
@@ -63,7 +62,7 @@ class ModuleDetailController extends GetxController {
         final section = SectionModel(
           id: existingSection?.id,
           title: titleC.text,
-          order: int.tryParse(orderC.text) ?? (sections.length + 1),
+          order: existingSection?.order ?? (sections.length + 1),
         );
 
         await _courseRepo.saveSection(courseId, module.id!, section);
@@ -71,12 +70,10 @@ class ModuleDetailController extends GetxController {
     );
   }
 
-  // === DELETE SECTION ===
   void deleteSection(String sectionId) {
     Get.defaultDialog(
       title: "Hapus Section",
-      middleText:
-          "Semua materi di dalam section ini akan terhapus. Yakin hapus?",
+      middleText: "Semua materi di dalam section ini akan terhapus permanen.",
       textConfirm: "Hapus",
       textCancel: "Batal",
       confirmTextColor: Colors.white,
@@ -88,74 +85,30 @@ class ModuleDetailController extends GetxController {
     );
   }
 
-  // === MATERIAL STREAM ===
+  // === MATERIAL (TOPIC) MANAGEMENT ===
+
   Stream<List<MaterialModel>> getMaterialsStream(String sectionId) {
     return _courseRepo.getMaterials(courseId, module.id!, sectionId);
   }
 
-  // === MATERIAL DIALOG ===
-  void showMaterialDialog(
-    String sectionId, {
-    MaterialModel? existingMaterial,
-    int? nextOrder,
-  }) {
-    final titleC = TextEditingController(text: existingMaterial?.title ?? '');
-    final contentC = TextEditingController(
-      text: existingMaterial?.content ?? '',
-    );
-
-    final initialOrder = existingMaterial?.order ?? nextOrder ?? 1;
-
-    final orderC = TextEditingController(text: initialOrder.toString());
-    var selectedType = existingMaterial?.type ?? MaterialType.text;
+  void showAddMaterialDialog(String sectionId, int nextOrder) {
+    final titleC = TextEditingController();
 
     Get.defaultDialog(
-      title: existingMaterial == null ? "Tambah Materi" : "Edit Materi",
-      content: StatefulBuilder(
-        builder: (context, setState) {
-          return Column(
-            children: [
-              TextField(
-                controller: titleC,
-                decoration: const InputDecoration(labelText: "Judul Materi"),
-              ),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<MaterialType>(
-                initialValue: selectedType,
-                decoration: const InputDecoration(labelText: "Tipe Konten"),
-                items: MaterialType.values.map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(type.name.toUpperCase()),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  if (val != null) setState(() => selectedType = val);
-                },
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: contentC,
-                maxLines: selectedType == MaterialType.text ? 5 : 2,
-                decoration: InputDecoration(
-                  labelText: selectedType == MaterialType.text
-                      ? "Isi Teks (Markdown/HTML)"
-                      : "URL Video / Gambar",
-                  alignLabelWithHint: true,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: orderC,
-                decoration: const InputDecoration(labelText: "Urutan"),
-                keyboardType: TextInputType.number,
-              ),
-            ],
-          );
-        },
+      title: "Tambah Materi Baru",
+      content: Column(
+        children: [
+          TextField(
+            controller: titleC,
+            decoration: const InputDecoration(
+              labelText: "Judul Materi (Misal: Sejarah Python)",
+              border: OutlineInputBorder(),
+            ),
+            textCapitalization: TextCapitalization.sentences,
+          ),
+        ],
       ),
-      textConfirm: "Simpan",
+      textConfirm: "Buat",
       textCancel: "Batal",
       confirmTextColor: Colors.white,
       buttonColor: const Color(0xFF6C63FF),
@@ -163,29 +116,31 @@ class ModuleDetailController extends GetxController {
         if (titleC.text.isEmpty) return;
         Get.back();
 
-        final material = MaterialModel(
-          id: existingMaterial?.id,
+        final newMaterial = MaterialModel(
           title: titleC.text,
-          type: selectedType,
-          content: contentC.text,
-          order: int.tryParse(orderC.text) ?? 1,
+          order: nextOrder,
+          blocks: [],
         );
 
-        await _courseRepo.saveMaterial(
-          courseId,
-          module.id!,
-          sectionId,
-          material,
-        );
+        try {
+          await _courseRepo.saveMaterial(
+            courseId,
+            module.id!,
+            sectionId,
+            newMaterial,
+          );
+          NotificationHelper.showSuccess("Berhasil", "Materi berhasil dibuat");
+        } catch (e) {
+          NotificationHelper.showError("Gagal", "Gagal membuat materi: $e");
+        }
       },
     );
   }
 
-  // === DELETE MATERIAL ===
   void deleteMaterial(String sectionId, String materialId) {
     Get.defaultDialog(
       title: "Hapus Materi",
-      middleText: "Yakin hapus materi ini?",
+      middleText: "Yakin hapus materi ini beserta seluruh isinya?",
       textConfirm: "Hapus",
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
@@ -197,6 +152,44 @@ class ModuleDetailController extends GetxController {
           sectionId,
           materialId,
         );
+      },
+    );
+  }
+
+  // === REORDER MATERIAL ===
+  Future<void> reorderMaterials(
+    String sectionId,
+    int oldIndex,
+    int newIndex,
+    List<MaterialModel> materials,
+  ) async {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = materials.removeAt(oldIndex);
+    materials.insert(newIndex, item);
+
+    for (int i = 0; i < materials.length; i++) {
+      if (materials[i].order != i + 1) {
+        materials[i].order = i + 1;
+        await _courseRepo.saveMaterial(
+          courseId,
+          module.id!,
+          sectionId,
+          materials[i],
+        );
+      }
+    }
+  }
+
+  void navigateToBuilder(String sectionId, MaterialModel material) {
+    Get.toNamed(
+      Routes.ADMIN_MATERIAL_BUILDER,
+      arguments: {
+        'courseId': courseId,
+        'moduleId': module.id,
+        'sectionId': sectionId,
+        'material': material,
       },
     );
   }

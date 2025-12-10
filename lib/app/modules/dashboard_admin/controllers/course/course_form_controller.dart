@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecocampus/app/data/models/course/course_model.dart';
 import 'package:ecocampus/app/data/repositories/course_repository.dart';
 import 'package:ecocampus/app/routes/app_pages.dart';
@@ -7,13 +6,11 @@ import 'package:ecocampus/app/shared/utils/notification_helper.dart';
 import 'package:ecocampus/app/shared/widgets/shake_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
 class CourseFormController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final CourseRepository _courseRepo = Get.find<CourseRepository>();
   final UploadQueueService _queueService = Get.find<UploadQueueService>();
-  final ImagePicker _picker = ImagePicker();
 
   late TabController tabController;
   final formKey = GlobalKey<FormState>();
@@ -48,7 +45,7 @@ class CourseFormController extends GetxController
       isActive.value = args.isActive;
       _loadModules();
     } else {
-      courseId = FirebaseFirestore.instance.collection('Courses').doc().id;
+      courseId = _courseRepo.newId;
     }
   }
 
@@ -66,18 +63,6 @@ class CourseFormController extends GetxController
     titleC.dispose();
     tabController.dispose();
     super.onClose();
-  }
-
-  // === IMAGE PICKER ===
-  Future<void> pickHeroImage() async {
-    try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        heroImageUrl.value = image.path;
-      }
-    } catch (e) {
-      NotificationHelper.showError("Error", "Gagal memilih gambar");
-    }
   }
 
   // === SAVE DATA ===
@@ -115,7 +100,7 @@ class CourseFormController extends GetxController
           courseId!,
           'heroImage',
           finalHeroUrl,
-          collection: 'Courses',
+          collection: CourseRepository.COLLECTION,
         );
       }
 

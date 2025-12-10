@@ -1,42 +1,67 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecocampus/app/data/models/course/base_course_model.dart';
 
-enum MaterialType { text, video, quiz }
+enum BlockType { text, image, video }
 
-class MaterialModel {
-  String? id;
-  String title;
-  MaterialType type;
-  String content; 
-  int order; 
+class ContentBlock {
+  String id;
+  BlockType type;
+  String content;
 
-  MaterialModel({
-    this.id,
-    required this.title,
-    required this.type,
-    required this.content,
-    required this.order,
-  });
+  ContentBlock({required this.id, required this.type, required this.content});
 
   Map<String, dynamic> toJson() => {
-    "title": title,
-    "type": type.name, 
+    "id": id,
+    "type": type.name,
     "content": content,
+  };
+
+  factory ContentBlock.fromJson(Map<String, dynamic> json) {
+    return ContentBlock(
+      id: json['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      type: BlockType.values.firstWhere(
+        (e) => e.name == (json['type'] ?? 'text'),
+        orElse: () => BlockType.text,
+      ),
+      content: json['content'] ?? '',
+    );
+  }
+}
+
+class MaterialModel extends BaseOrderedCourseModel {
+  List<ContentBlock> blocks;
+
+  MaterialModel({
+    super.id,
+    required super.title,
+    required super.order,
+    this.blocks = const [],
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+    "title": title,
     "order": order,
+    "blocks": blocks.map((b) => b.toJson()).toList(),
   };
 
   factory MaterialModel.fromSnapshot(
     DocumentSnapshot<Map<String, dynamic>> doc,
   ) {
     final data = doc.data()!;
+
+    List<ContentBlock> loadedBlocks = [];
+    if (data['blocks'] != null) {
+      loadedBlocks = (data['blocks'] as List)
+          .map((item) => ContentBlock.fromJson(item))
+          .toList();
+    }
+
     return MaterialModel(
       id: doc.id,
       title: data['title'] ?? '',
-      type: MaterialType.values.firstWhere(
-        (e) => e.name == (data['type'] ?? 'text'),
-        orElse: () => MaterialType.text,
-      ),
-      content: data['content'] ?? '',
       order: data['order'] ?? 0,
+      blocks: loadedBlocks,
     );
   }
 }

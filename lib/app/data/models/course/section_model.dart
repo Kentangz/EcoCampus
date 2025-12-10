@@ -1,13 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecocampus/app/data/models/course/base_course_model.dart';
 
-class SectionModel {
-  String? id;
-  String title;
-  int order;
-
-  SectionModel({this.id, required this.title, required this.order});
-
-  Map<String, dynamic> toJson() => {"title": title, "order": order};
+class SectionModel extends BaseOrderedCourseModel {
+  SectionModel({super.id, required super.title, required super.order});
 
   factory SectionModel.fromSnapshot(
     DocumentSnapshot<Map<String, dynamic>> doc,

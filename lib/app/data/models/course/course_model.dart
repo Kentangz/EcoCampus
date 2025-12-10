@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecocampus/app/data/models/course/base_course_model.dart';
 import 'package:ecocampus/app/data/models/course/module_model.dart';
 
 export 'module_model.dart';
 export 'section_model.dart';
 export 'material_model.dart';
+export 'base_course_model.dart';
 
-class CourseModel {
-  String? id;
-  String title;
+class CourseModel extends BaseCourseModel {
   String category;
   String heroImage;
   bool isActive;
@@ -16,8 +16,8 @@ class CourseModel {
   List<ModuleModel>? temporaryModules;
 
   CourseModel({
-    this.id,
-    required this.title,
+    super.id,
+    required super.title,
     this.category = 'akademik_karir',
     required this.heroImage,
     this.isActive = true,
@@ -25,6 +25,7 @@ class CourseModel {
     this.temporaryModules,
   });
 
+  @override
   Map<String, dynamic> toJson() => {
     "title": title,
     "category": category,

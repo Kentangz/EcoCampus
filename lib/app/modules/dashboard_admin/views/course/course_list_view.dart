@@ -9,8 +9,6 @@ class CourseListView extends GetView<CourseAdminController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.lazyPut(() => CourseAdminController());
-
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(

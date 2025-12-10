@@ -1,17 +1,14 @@
-import 'dart:io';
+import 'package:ecocampus/app/shared/widgets/image_picker.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/course/course_form_controller.dart';
-import 'package:ecocampus/app/shared/widgets/smart_image.dart';
 import 'package:ecocampus/app/shared/widgets/shake_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class CourseFormView extends StatelessWidget {
+class CourseFormView extends GetView<CourseFormController> {
   const CourseFormView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CourseFormController());
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -56,41 +53,16 @@ class CourseFormView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InkWell(
-              onTap: controller.pickHeroImage,
-              borderRadius: BorderRadius.circular(12),
-              child: Obx(() {
-                final url = controller.heroImageUrl.value;
-                return Container(
-                  height: 200,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[300]!),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: url.isEmpty
-                      ? const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.add_photo_alternate_rounded,
-                              size: 50,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              "Upload Hero Image",
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ],
-                        )
-                      : (url.startsWith('http')
-                            ? SmartImage(url, fit: BoxFit.cover)
-                            : Image.file(File(url), fit: BoxFit.cover)),
-                );
-              }),
+            Obx(
+              () => CustomImagePicker(
+                label: "Upload Hero Image",
+                initialImageUrl: controller.heroImageUrl.value,
+                onImagePicked: (file) {
+                  if (file != null) {
+                    controller.heroImageUrl.value = file.path;
+                  }
+                },
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -207,7 +179,7 @@ class CourseFormView extends StatelessWidget {
                     0xFF6C63FF,
                   ).withValues(alpha: 0.1),
                   child: Text(
-                    "${module.order}", // Auto order representation
+                    "${module.order}",
                     style: const TextStyle(
                       color: Color(0xFF6C63FF),
                       fontWeight: FontWeight.bold,
