@@ -6,6 +6,8 @@ import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_admin_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_list_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_form_admin.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_list_admin.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -73,15 +75,15 @@ class AppPages {
       page: () => const NewsAdminView(),
       binding: DashboardAdminBinding(),
     ),
-    // GetPage(
-    //   name: _Paths.ADMIN_NEWS_LIST,
-    //   page: () => const ActivityAdminView(),
-    //   binding: DashboardAdminBinding(),
-    // ),
-    // GetPage(
-    //   name: _Paths.ADMIN_NEWS_FORM,
-    //   page: () => const ActivityNewsView(),
-    //   binding: DashboardAdminBinding(),
-    // ),
+    GetPage(
+      name: _Paths.ADMIN_NEWS_LIST,
+      page: () => const NewsListAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_NEWS_FORM,
+      page: () => NewsFormAdmin(),
+      binding: DashboardAdminBinding(),
+    ),
   ];
 }
