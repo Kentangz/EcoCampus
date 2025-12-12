@@ -6,6 +6,8 @@ export 'module_model.dart';
 export 'section_model.dart';
 export 'material_model.dart';
 export 'base_course_model.dart';
+export 'quiz_model.dart';
+export 'question_model.dart';
 
 class CourseModel extends BaseCourseModel {
   String category;

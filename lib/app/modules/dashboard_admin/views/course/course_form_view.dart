@@ -1,3 +1,4 @@
+import 'package:ecocampus/app/data/models/course/quiz_model.dart';
 import 'package:ecocampus/app/shared/widgets/image_picker.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/course/course_form_controller.dart';
 import 'package:ecocampus/app/shared/widgets/shake_widget.dart';
@@ -32,6 +33,7 @@ class CourseFormView extends GetView<CourseFormController> {
           tabs: const [
             Tab(text: "Info Umum"),
             Tab(text: "Kurikulum (Modul)"),
+            Tab(text: "Kuis & Latihan"),
           ],
         ),
       ),
@@ -40,6 +42,7 @@ class CourseFormView extends GetView<CourseFormController> {
         children: [
           _buildGeneralInfoTab(controller),
           _buildCurriculumTab(controller),
+          _buildQuizTab(controller),
         ],
       ),
     );
@@ -229,6 +232,130 @@ class CourseFormView extends GetView<CourseFormController> {
           },
         );
       }),
+    );
+  }
+
+  Widget _buildQuizTab(CourseFormController controller) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => controller.showQuizDialog(),
+        backgroundColor: const Color(0xFF6C63FF),
+        icon: const Icon(Icons.quiz, color: Colors.white),
+        label: const Text("Buat Kuis", style: TextStyle(color: Colors.white)),
+      ),
+      body: Obx(() {
+        if (!controller.isEditMode.value) {
+          return Center(
+            child: Text(
+              "Simpan kelas terlebih dahulu untuk mengelola kuis.",
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+          );
+        }
+
+        if (controller.quizzes.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.assignment_turned_in_outlined,
+                  size: 60,
+                  color: Colors.grey[400],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Belum ada kuis/latihan",
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.only(
+            top: 10,
+            bottom: 80,
+            left: 10,
+            right: 10,
+          ),
+          itemCount: controller.quizzes.length,
+          itemBuilder: (context, index) {
+            final quiz = controller.quizzes[index];
+            return _buildQuizItem(quiz);
+          },
+        );
+      }),
+    );
+  }
+
+  Widget _buildQuizItem(QuizModel quiz) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      clipBehavior: Clip.antiAlias,
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.orange.withValues(alpha: 0.1),
+                child: Icon(
+                  controller.getIcon(quiz.icon),
+                  color: Colors.orange,
+                ),
+              ),
+              title: Text(
+                quiz.title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text("${quiz.totalQuestions} Soal"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, color: Colors.blue),
+                    onPressed: () =>
+                        controller.showQuizDialog(existingQuiz: quiz),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () => controller.confirmDeleteQuiz(quiz),
+                  ),
+                ],
+              ),
+              onTap: () => controller.navigateToQuizDetail(quiz),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: quiz.isSynced ? Colors.green : Colors.orange,
+                borderRadius: const BorderRadius.only(
+                  bottomRight: Radius.circular(10),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    quiz.isSynced ? Icons.cloud_done : Icons.cloud_upload,
+                    size: 10,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -24,6 +24,8 @@ abstract class Routes {
   static const ADMIN_COURSE_FORM = _Paths.ADMIN_COURSE_FORM;
   static const ADMIN_MODULE_DETAIL = _Paths.ADMIN_MODULE_DETAIL;
   static const ADMIN_MATERIAL_BUILDER = _Paths.ADMIN_MATERIAL_BUILDER;
+  static const ADMIN_QUIZ_LIST = _Paths.ADMIN_QUIZ_LIST;
+  static const ADMIN_QUESTION_FORM = _Paths.ADMIN_QUESTION_FORM;
 }
 
 abstract class _Paths {
@@ -46,4 +48,6 @@ abstract class _Paths {
   static const ADMIN_COURSE_FORM = '/admin-course-form';
   static const ADMIN_MODULE_DETAIL = '/admin-module-detail';
   static const ADMIN_MATERIAL_BUILDER = '/admin-material-builder';
+  static const ADMIN_QUIZ_LIST = '/admin-quiz-list';
+  static const ADMIN_QUESTION_FORM = '/admin-question-form';
 }

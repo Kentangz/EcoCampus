@@ -4,12 +4,15 @@ import 'package:ecocampus/app/modules/auth/bindings/auth_binding.dart';
 import 'package:ecocampus/app/modules/auth/bindings/reset_password_binding.dart';
 import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/question_form_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_admin_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_list_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/course/course_form_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/course/course_list_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/course/module_detail_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/course/material_builder_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/question_form_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/quiz_list_view.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -94,6 +97,16 @@ class AppPages {
       name: _Paths.ADMIN_MATERIAL_BUILDER,
       page: () => const MaterialBuilderView(),
       binding: MaterialBuilderBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_QUIZ_LIST,
+      page: () => const QuizListView(),
+      binding: QuestionFormBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_QUESTION_FORM,
+      page: () => const QuestionFormView(),
+      binding: QuestionFormBinding(),
     ),
   ];
 }

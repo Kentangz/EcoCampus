@@ -14,11 +14,14 @@ class CourseRepository extends GetxController {
 
   String get newId => _db.collection(COLLECTION).doc().id;
 
+
+  // ==== COURSE MANAGEMENT ====
+
   Stream<List<CourseModel>> getAllCourses() {
     return _db
         .collection('Courses')
         .orderBy('createdAt', descending: true)
-        .snapshots()
+        .snapshots(includeMetadataChanges: true)
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => CourseModel.fromSnapshot(doc))
@@ -73,6 +76,16 @@ class CourseRepository extends GetxController {
         }
       }
 
+      final quizzesSnapshot = await _db
+          .collection('Courses')
+          .doc(courseId)
+          .collection('quizzes')
+          .get();
+
+      for (var quizDoc in quizzesSnapshot.docs) {
+        await deleteQuiz(courseId, quizDoc.id);
+      }
+
       final modulesSnapshot = await _db
           .collection('Courses')
           .doc(courseId)
@@ -106,13 +119,16 @@ class CourseRepository extends GetxController {
     }
   }
 
+
+  // ==== MODULE MANAGEMENT ====
+
   Stream<List<ModuleModel>> getModules(String courseId) {
     return _db
         .collection('Courses')
         .doc(courseId)
         .collection('modules')
         .orderBy('order', descending: false)
-        .snapshots()
+        .snapshots(includeMetadataChanges: true)
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => ModuleModel.fromSnapshot(doc))
@@ -149,6 +165,9 @@ class CourseRepository extends GetxController {
 
     await batch.commit();
   }
+
+
+  // ==== SECTION MANAGEMENT ====
 
   Stream<List<SectionModel>> getSections(String courseId, String moduleId) {
     return _db
@@ -206,6 +225,9 @@ class CourseRepository extends GetxController {
         .doc(sectionId)
         .delete();
   }
+
+
+  // ==== MATERIAL MANAGEMENT (Materi)====
 
   Stream<List<MaterialModel>> getMaterials(
     String courseId,
@@ -266,7 +288,6 @@ class CourseRepository extends GetxController {
     String sectionId,
     String materialId,
   ) async {
-    // 1. Get the material doc to check for images/videos
     DocumentSnapshot materialDoc = await _db
         .collection('Courses')
         .doc(courseId)
@@ -298,5 +319,195 @@ class CourseRepository extends GetxController {
         .collection('materials')
         .doc(materialId)
         .delete();
+  }
+
+
+  // ==== QUIZ MANAGEMENT ====
+
+  Future<QuizModel?> getQuiz(String courseId, String quizId) async {
+    final doc = await _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .doc(quizId)
+        .get();
+
+    if (doc.exists) {
+      return QuizModel.fromSnapshot(doc);
+    }
+    return null;
+  }
+
+  Stream<List<QuizModel>> getQuizzes(String courseId) {
+    return _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .orderBy('order', descending: false)
+        .snapshots(includeMetadataChanges: true)
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => QuizModel.fromSnapshot(doc)).toList(),
+        );
+  }
+
+  Future<void> saveQuiz(String courseId, QuizModel quiz) async {
+    String docId =
+        quiz.id ??
+        _db.collection('Courses').doc(courseId).collection('quizzes').doc().id;
+
+    await _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .doc(docId)
+        .set(quiz.toJson(), SetOptions(merge: true));
+  }
+
+  Future<void> deleteQuiz(String courseId, String quizId) async {
+    final questionsSnapshot = await _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .doc(quizId)
+        .collection('questions')
+        .get();
+
+    WriteBatch batch = _db.batch();
+    for (var doc in questionsSnapshot.docs) {
+      String? imageUrl = doc.data().containsKey('imageUrl')
+          ? doc['imageUrl']
+          : null;
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        _queueService.addDeleteToQueue(imageUrl);
+      }
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+
+    await _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .doc(quizId)
+        .delete();
+  }
+
+
+  // ==== QUESTION MANAGEMENT (SOAL) ====
+
+  Stream<List<QuestionModel>> getQuestions(String courseId, String quizId) {
+    return _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .doc(quizId)
+        .collection('questions')
+        .orderBy('order', descending: false)
+        .snapshots(includeMetadataChanges: true)
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => QuestionModel.fromSnapshot(doc))
+              .toList(),
+        );
+  }
+
+  Future<void> saveQuestion(
+    String courseId,
+    String quizId,
+    QuestionModel question, {
+    bool isNew = false,
+  }) async {
+    String docId =
+        question.id ??
+        _db
+            .collection('Courses')
+            .doc(courseId)
+            .collection('quizzes')
+            .doc(quizId)
+            .collection('questions')
+            .doc()
+            .id;
+
+    WriteBatch batch = _db.batch();
+
+    if (isNew || question.id == null) {
+      DocumentReference quizRef = _db
+          .collection('Courses')
+          .doc(courseId)
+          .collection('quizzes')
+          .doc(quizId);
+      batch.update(quizRef, {'totalQuestions': FieldValue.increment(1)});
+    }
+
+    // Ensure ID is set in the model to be saved
+    question.id ??= docId;
+
+    DocumentReference questionRef = _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .doc(quizId)
+        .collection('questions')
+        .doc(docId);
+
+    batch.set(questionRef, question.toJson(), SetOptions(merge: true));
+
+    await batch.commit();
+  }
+
+  Future<void> deleteQuestion(
+    String courseId,
+    String quizId,
+    String questionId,
+  ) async {
+    DocumentSnapshot questionDoc = await _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .doc(quizId)
+        .collection('questions')
+        .doc(questionId)
+        .get();
+
+    if (questionDoc.exists) {
+      String? imageUrl = questionDoc['imageUrl'];
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        _queueService.addDeleteToQueue(imageUrl);
+      }
+    }
+
+    WriteBatch batch = _db.batch();
+
+    batch.delete(
+      _db
+          .collection('Courses')
+          .doc(courseId)
+          .collection('quizzes')
+          .doc(quizId)
+          .collection('questions')
+          .doc(questionId),
+    );
+
+    DocumentReference quizRef = _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .doc(quizId);
+
+    batch.update(quizRef, {'totalQuestions': FieldValue.increment(-1)});
+
+    await batch.commit();
+  }
+
+  String newQuestionId(String courseId, String quizId) {
+    return _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('quizzes')
+        .doc(quizId)
+        .collection('questions')
+        .doc()
+        .id;
   }
 }

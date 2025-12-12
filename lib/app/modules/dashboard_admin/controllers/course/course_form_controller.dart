@@ -2,7 +2,9 @@ import 'package:ecocampus/app/data/models/course/course_model.dart';
 import 'package:ecocampus/app/data/repositories/course_repository.dart';
 import 'package:ecocampus/app/routes/app_pages.dart';
 import 'package:ecocampus/app/services/upload_queue_service.dart';
+import 'package:ecocampus/app/shared/utils/app_icons.dart';
 import 'package:ecocampus/app/shared/utils/notification_helper.dart';
+import 'package:ecocampus/app/shared/widgets/icon_picker_dialog.dart';
 import 'package:ecocampus/app/shared/widgets/shake_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,12 +31,13 @@ class CourseFormController extends GetxController
   final isEditMode = false.obs;
 
   final modules = <ModuleModel>[].obs;
+  final quizzes = <QuizModel>[].obs;
   final deletedModuleIds = <String>[];
 
   @override
   void onInit() {
     super.onInit();
-    tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 3, vsync: this);
 
     final CourseModel? args = Get.arguments;
     if (args != null) {
@@ -44,6 +47,7 @@ class CourseFormController extends GetxController
       heroImageUrl.value = args.heroImage;
       isActive.value = args.isActive;
       _loadModules();
+      _loadQuizzes();
     } else {
       courseId = _courseRepo.newId;
     }
@@ -54,6 +58,15 @@ class CourseFormController extends GetxController
     _courseRepo.getModules(courseId!).listen((data) {
       if (isEditMode.value) {
         modules.assignAll(data);
+      }
+    });
+  }
+
+  void _loadQuizzes() {
+    if (courseId == null) return;
+    _courseRepo.getQuizzes(courseId!).listen((data) {
+      if (isEditMode.value) {
+        quizzes.assignAll(data);
       }
     });
   }
@@ -251,6 +264,146 @@ class CourseFormController extends GetxController
     Get.toNamed(
       Routes.ADMIN_MODULE_DETAIL,
       arguments: {'courseId': courseId, 'module': module},
+    );
+  }
+
+
+  // === QUIZ MANAGEMENT ===
+
+  IconData getIcon(String name) => AppIcons.getIcon(name);
+
+  void showQuizDialog({QuizModel? existingQuiz}) {
+    if (!isEditMode.value) {
+      NotificationHelper.showWarning("Info", "Simpan kelas terlebih dahulu.");
+      return;
+    }
+
+    final titleQuizC = TextEditingController(text: existingQuiz?.title ?? '');
+
+    final selectedIcon = (existingQuiz?.icon ?? 'quiz').obs;
+    final isActive = (existingQuiz?.isActive ?? false).obs;
+
+    Get.defaultDialog(
+      title: existingQuiz == null ? "Buat Kuis Baru" : "Edit Kuis",
+      contentPadding: const EdgeInsets.all(20),
+      content: SizedBox(
+        width: 300,
+        child: Column(
+          children: [
+            TextField(
+              controller: titleQuizC,
+              decoration: const InputDecoration(
+                labelText: "Judul Kuis / Latihan",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Obx(
+              () => SwitchListTile(
+                title: const Text("Status Aktif"),
+                value: isActive.value,
+                onChanged: (val) => isActive.value = val,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Pilih Ikon:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Obx(
+              () => InkWell(
+                onTap: () {
+                  Get.dialog(
+                    IconPickerDialog(
+                      onIconSelected: (iconName) {
+                        selectedIcon.value = iconName;
+                      },
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            AppIcons.getIcon(selectedIcon.value),
+                            color: const Color(0xFF6C63FF),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(selectedIcon.value),
+                        ],
+                      ),
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      textConfirm: "Simpan",
+      textCancel: "Batal",
+      confirmTextColor: Colors.white,
+      buttonColor: const Color(0xFF6C63FF),
+      onConfirm: () async {
+        if (titleQuizC.text.isEmpty) return;
+        Get.back();
+
+        final quiz = QuizModel(
+          id: existingQuiz?.id,
+          title: titleQuizC.text,
+          order: existingQuiz?.order ?? (quizzes.length + 1),
+          icon: selectedIcon.value,
+          rules: existingQuiz?.rules ?? [],
+          isActive: isActive.value,
+          totalQuestions: existingQuiz?.totalQuestions ?? 0,
+        );
+
+        await _courseRepo.saveQuiz(courseId!, quiz);
+        quizzes.bindStream(_courseRepo.getQuizzes(courseId!));
+      },
+    );
+  }
+
+  void confirmDeleteQuiz(QuizModel quiz) {
+    Get.defaultDialog(
+      title: "Hapus Kuis",
+      middleText:
+          "Yakin hapus '${quiz.title}'? Semua soal di dalamnya akan hilang.",
+      textConfirm: "Hapus",
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.red,
+      onConfirm: () async {
+        Get.back();
+        await _courseRepo.deleteQuiz(courseId!, quiz.id!);
+      },
+    );
+  }
+
+  void navigateToQuizDetail(QuizModel quiz) {
+    Get.toNamed(
+      Routes.ADMIN_QUIZ_LIST,
+      arguments: {
+        'quizTitle': quiz.title,
+        'quizId': quiz.id,
+        'courseId': courseId,
+      },
     );
   }
 }
