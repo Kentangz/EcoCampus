@@ -81,15 +81,19 @@ class AdminSidebar extends GetView<DashboardAdminController> {
                   isActive: Get.currentRoute == Routes.ADMIN_ACTIVITY,
                   primaryColor: primaryPurple,
                 ),
-                // const Divider(),
-                // _buildDrawerItem(
-                //   icon: Icons.notifications_outlined,
-                //   text: 'Notifications',
-                //   onTap: () {
-                //     Get.back();
-                //   },
-                //   primaryColor: primaryPurple,
-                // ),
+                _buildDrawerItem(
+                  icon: Icons.newspaper,
+                  text: 'News',
+                  onTap: () {
+                    if (Get.currentRoute == Routes.ADMIN_NEWS) {
+                      Get.back();
+                    } else {
+                      Get.toNamed(Routes.ADMIN_NEWS);
+                    }
+                  },
+                  isActive: Get.currentRoute == Routes.ADMIN_NEWS,
+                  primaryColor: primaryPurple,
+                ),
               ],
             ),
           ),

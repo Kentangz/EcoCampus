@@ -1,5 +1,4 @@
 // ignore_for_file: constant_identifier_names
-
 import 'package:ecocampus/app/modules/auth/bindings/auth_binding.dart';
 import 'package:ecocampus/app/modules/auth/bindings/reset_password_binding.dart';
 import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
@@ -13,6 +12,22 @@ import 'package:ecocampus/app/modules/dashboard_admin/views/course/module_detail
 import 'package:ecocampus/app/modules/dashboard_admin/views/course/material_builder_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/course/question_form_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/course/quiz_list_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_form_admin.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_list_admin.dart';
+import 'package:ecocampus/app/modules/dashboard_user/akustik/bindings/akustik_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/akustik/views/akustik_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/bindings/kaligrafi_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/views/kaligrafi_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/bindings/nonton_film_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/views/nonton_film_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penjualan/bindings/analis_data_penjualan_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penjualan/views/analisis_data_penjualan_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/bindings/project_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/views/project_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/bindings/aplikasi_bindings.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/views/aplikasi_views.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/bindings/project_ui_ux_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/view/project_ui_ux_view.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -24,6 +39,7 @@ import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/course_for
 import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/module_detail_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/views/dashboard_user_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/bindings/dashboard_user_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_admin_view.dart';
 
 part 'app_routes.dart';
 
@@ -60,6 +76,36 @@ class AppPages {
       name: _Paths.DASHBOARD_USER,
       page: () => const DashboardUserView(),
       binding: DashboardUserBinding(),
+    ),
+    GetPage(
+      name: _Paths.KALIGRAFI,
+      page: () => const KaligrafiView(),
+      binding: KaligrafiBinding(),
+    ),
+    GetPage(
+      name: _Paths.AKUSTIK,
+      page: () => const AkustikView(),
+      binding: AkustikBinding(),
+    ),
+    GetPage(
+      name: _Paths.NONTONFILM,
+      page: () => const NontonFilmView(),
+      binding: NontonFilmBinding(),
+    ),
+    GetPage(
+      name: _Paths.KOLABORASI_KAMPUS,
+      page: () => const ProjectView(),
+      binding: KolaborasiKampusBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROJECT_ANALISIS,
+      page: () => const AnalisisView(),
+      binding: ProjectAnalisisDataBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROJECT_UIUX,
+      page: () => const ProjectUiUxView(),
+      binding: ProjectUiUxBinding(),
     ),
 
     //admin
@@ -107,6 +153,19 @@ class AppPages {
       name: _Paths.ADMIN_QUESTION_FORM,
       page: () => const QuestionFormView(),
       binding: QuestionFormBinding(),
+      name: _Paths.ADMIN_NEWS,
+      page: () => const NewsAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_NEWS_LIST,
+      page: () => const NewsListAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_NEWS_FORM,
+      page: () => NewsFormAdmin(),
+      binding: DashboardAdminBinding(),
     ),
   ];
 }
