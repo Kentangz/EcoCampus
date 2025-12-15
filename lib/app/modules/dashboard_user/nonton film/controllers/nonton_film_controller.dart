@@ -41,13 +41,14 @@ class NontonFilmController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    fetchClubData('f8tzgZyNj2fglNLnrmQ9');
+    fetchClubDataByTitle('Nonton Film');
   }
 
-  Future<void> fetchClubData(String activityId) async {
+  Future<void> fetchClubDataByTitle(String clubTitle) async {
     try {
       isLoading.value = true;
-      final data = await _activityRepo.getActivityById(activityId);
+
+      final data = await _activityRepo.getActivityByTitle(clubTitle);
 
       if (data != null && data is EventActivity) {
         eventActivity.value = data;
@@ -60,9 +61,9 @@ class NontonFilmController extends GetxController {
         );
       } else {
         clubData.value = ClubData(
-          title:'',
+          title: clubTitle,
           bannerUrl: '',
-          aboutUsContent: 'Data klub tidak ditemukan.',
+          aboutUsContent: 'Data klub "$clubTitle" tidak ditemukan.',
           routineActivities: const [],
           galleryImages: const [],
         );
