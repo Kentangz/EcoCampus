@@ -153,6 +153,8 @@ class AppPages {
       name: _Paths.ADMIN_QUESTION_FORM,
       page: () => const QuestionFormView(),
       binding: QuestionFormBinding(),
+    ),
+    GetPage(
       name: _Paths.ADMIN_NEWS,
       page: () => const NewsAdminView(),
       binding: DashboardAdminBinding(),
