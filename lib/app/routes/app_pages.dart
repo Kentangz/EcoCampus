@@ -6,6 +6,8 @@ import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_admin_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_list_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_form_admin.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_list_admin.dart';
 import 'package:ecocampus/app/modules/dashboard_user/akustik/bindings/akustik_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/akustik/views/akustik_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/bindings/kaligrafi_binding.dart';
@@ -21,6 +23,7 @@ import 'package:ecocampus/app/modules/dashboard_admin/views/dashboard_admin_view
 import 'package:ecocampus/app/modules/dashboard_admin/bindings/dashboard_admin_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/views/dashboard_user_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/bindings/dashboard_user_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_admin_view.dart';
 
 part 'app_routes.dart';
 
@@ -93,6 +96,21 @@ class AppPages {
     GetPage(
       name: _Paths.ADMIN_ACTIVITY_LIST,
       page: () => const ActivityListView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_NEWS,
+      page: () => const NewsAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_NEWS_LIST,
+      page: () => const NewsListAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_NEWS_FORM,
+      page: () => NewsFormAdmin(),
       binding: DashboardAdminBinding(),
     ),
   ];
