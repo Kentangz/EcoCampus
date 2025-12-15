@@ -14,6 +14,10 @@ class AuthenticationRepository extends GetxController {
   String? _lastRoute;
   late Rx<User?> _firebaseUser;
 
+  User? get currentUser {
+    return _auth.currentUser;
+  }
+
   @override
   void onReady() {
     _firebaseUser = Rx<User?>(_auth.currentUser);

@@ -181,10 +181,10 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
               Get.toNamed(Routes.KALIGRAFI);
               break;
             case "Akustik":
-              Get.toNamed(Routes.AKUSTIK); // Navigasi ke halaman Akustik
+              Get.toNamed(Routes.AKUSTIK);
               break;
             case "Nonton Film":
-              Get.toNamed(Routes.NONTONFILM); // Navigasi ke halaman Nonton Film
+              Get.toNamed(Routes.NONTONFILM);
               break;
           }
         };
