@@ -16,8 +16,9 @@ abstract class Routes {
   static const KALIGRAFI = _Paths.KALIGRAFI;
   static const AKUSTIK = _Paths.AKUSTIK;
   static const NONTONFILM = _Paths.NONTONFILM;
-
   static const KOLABORASI_KAMPUS = _Paths.KOLABORASI_KAMPUS;
+  static const PROJECT_ANALISIS = _Paths.PROJECT_ANALISIS;
+  static const PROJECT_UIUX = _Paths.PROJECT_UIUX;
 
   //admin
   static const DASHBOARD_ADMIN = _Paths.DASHBOARD_ADMIN;
@@ -44,6 +45,8 @@ abstract class _Paths {
   static const AKUSTIK = '/akustik';
   static const NONTONFILM = '/nontonfilm';
   static const KOLABORASI_KAMPUS = '/kolaborasi-kampus';
+  static const PROJECT_ANALISIS = '/project-analisis';
+  static const PROJECT_UIUX = '/project-ui-ux';
 
   //admin
   static const DASHBOARD_ADMIN = '/dashboard-admin';
