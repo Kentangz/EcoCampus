@@ -1,6 +1,7 @@
+import 'package:ecocampus/app/modules/dashboard_user/project/controllers/project_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ecocampus/app/modules/dashboard_user/page_kolaborasi_kampus/controllers/kolaborasi_kampus_controller.dart';
+// import 'package:ecocampus/app/modules/dashboard_user/project/controllers/project_controller.dart';
 import 'package:ecocampus/app/project_model.dart';
 
 class AddProjectController extends GetxController {
@@ -63,7 +64,7 @@ class AddProjectController extends GetxController {
 
       // coba cari KolaborasiController dan tambahkan
       try {
-        final kolab = Get.find<KolaborasiController>();
+        final kolab = Get.find<ProjectController>();
         kolab.addProject(newProject);
       } catch (e) {
         // fallback: jika KolaborasiController tidak ada, simpan di local storage atau log

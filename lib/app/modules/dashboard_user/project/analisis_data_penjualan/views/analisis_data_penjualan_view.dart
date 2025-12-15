@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/analisis_data_penjualan_controller.dart';
 
-class ProjectAnalisisDataView extends GetView<ProjectAnalisisDataController> {
-  const ProjectAnalisisDataView({super.key});
+class AnalisisView extends GetView<ProjectAnalisisDataController> {
+  const AnalisisView({super.key});
 
   @override
   Widget build(BuildContext context) {

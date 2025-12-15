@@ -1,5 +1,4 @@
 // ignore_for_file: constant_identifier_names
-
 import 'package:ecocampus/app/modules/auth/bindings/auth_binding.dart';
 import 'package:ecocampus/app/modules/auth/bindings/reset_password_binding.dart';
 import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
@@ -12,8 +11,14 @@ import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/bindings/kaligraf
 import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/views/kaligrafi_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/bindings/nonton_film_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/views/nonton_film_view.dart';
-import 'package:ecocampus/app/modules/dashboard_user/page_kolaborasi_kampus/bindings/kolaborasi_kampus_binding.dart';
-import 'package:ecocampus/app/modules/dashboard_user/page_kolaborasi_kampus/views/kolaborasi_kampus_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penjualan/bindings/analis_data_penjualan_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penjualan/views/analisis_data_penjualan_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/bindings/project_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/views/project_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/bindings/aplikasi_bindings.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/views/aplikasi_views.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/bindings/project_ui_ux_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/view/project_ui_ux_view.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -75,8 +80,18 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.KOLABORASI_KAMPUS,
-      page: () => const KolaborasiKampusView(),
+      page: () => const ProjectView(),
       binding: KolaborasiKampusBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROJECT_ANALISIS,
+      page: () => const AnalisisView(),
+      binding: ProjectAnalisisDataBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROJECT_UIUX,
+      page: () => const ProjectUiUxView(),
+      binding: ProjectUiUxBinding(),
     ),
 
     //admin

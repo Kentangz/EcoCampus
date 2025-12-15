@@ -1,7 +1,5 @@
 import 'package:get/get.dart';
 
-import 'package:get/get.dart';
-
 // lib/app/models/project_model.dart
 
 class ProjectModel {
