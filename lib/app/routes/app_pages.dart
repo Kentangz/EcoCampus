@@ -3,8 +3,15 @@ import 'package:ecocampus/app/modules/auth/bindings/auth_binding.dart';
 import 'package:ecocampus/app/modules/auth/bindings/reset_password_binding.dart';
 import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/question_form_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_admin_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/activity/activity_list_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/course_form_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/course_list_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/module_detail_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/material_builder_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/question_form_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/course/quiz_list_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_form_admin.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_list_admin.dart';
 import 'package:ecocampus/app/modules/dashboard_user/akustik/bindings/akustik_binding.dart';
@@ -26,6 +33,10 @@ import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/dashboard_admin_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/bindings/dashboard_admin_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/material_builder_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/course_list_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/course_form_binding.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/module_detail_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/views/dashboard_user_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/bindings/dashboard_user_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_admin_view.dart';
@@ -114,6 +125,34 @@ class AppPages {
       binding: DashboardAdminBinding(),
     ),
     GetPage(
+      name: _Paths.ADMIN_COURSE_LIST,
+      page: () => const CourseListView(),
+      binding: CourseListBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_COURSE_FORM,
+      page: () => const CourseFormView(),
+      binding: CourseFormBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_MODULE_DETAIL,
+      page: () => const ModuleDetailView(),
+      binding: ModuleDetailBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_MATERIAL_BUILDER,
+      page: () => const MaterialBuilderView(),
+      binding: MaterialBuilderBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_QUIZ_LIST,
+      page: () => const QuizListView(),
+      binding: QuestionFormBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_QUESTION_FORM,
+      page: () => const QuestionFormView(),
+      binding: QuestionFormBinding(),
       name: _Paths.ADMIN_NEWS,
       page: () => const NewsAdminView(),
       binding: DashboardAdminBinding(),

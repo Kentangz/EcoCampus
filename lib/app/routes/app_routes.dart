@@ -25,6 +25,12 @@ abstract class Routes {
   static const ADMIN_ACTIVITY = _Paths.ADMIN_ACTIVITY;
   static const ADMIN_ACTIVITY_LIST = _Paths.ADMIN_ACTIVITY_LIST;
   static const ADMIN_ACTIVITY_FORM = _Paths.ADMIN_ACTIVITY_FORM;
+  static const ADMIN_COURSE_LIST = _Paths.ADMIN_COURSE_LIST;
+  static const ADMIN_COURSE_FORM = _Paths.ADMIN_COURSE_FORM;
+  static const ADMIN_MODULE_DETAIL = _Paths.ADMIN_MODULE_DETAIL;
+  static const ADMIN_MATERIAL_BUILDER = _Paths.ADMIN_MATERIAL_BUILDER;
+  static const ADMIN_QUIZ_LIST = _Paths.ADMIN_QUIZ_LIST;
+  static const ADMIN_QUESTION_FORM = _Paths.ADMIN_QUESTION_FORM;
   static const ADMIN_NEWS = _Paths.ADMIN_NEWS;
   static const ADMIN_NEWS_LIST = _Paths.ADMIN_NEWS_LIST;
   static const ADMIN_NEWS_FORM = _Paths.ADMIN_NEWS_FORM;
@@ -53,6 +59,12 @@ abstract class _Paths {
   static const ADMIN_ACTIVITY = '/admin-activity';
   static const ADMIN_ACTIVITY_LIST = '/admin-activity-list';
   static const ADMIN_ACTIVITY_FORM = '/admin-activity-form';
+  static const ADMIN_COURSE_LIST = '/admin-course-list';
+  static const ADMIN_COURSE_FORM = '/admin-course-form';
+  static const ADMIN_MODULE_DETAIL = '/admin-module-detail';
+  static const ADMIN_MATERIAL_BUILDER = '/admin-material-builder';
+  static const ADMIN_QUIZ_LIST = '/admin-quiz-list';
+  static const ADMIN_QUESTION_FORM = '/admin-question-form';
   static const ADMIN_NEWS = '/admin-news';
   static const ADMIN_NEWS_LIST = '/admin-news-list';
   static const ADMIN_NEWS_FORM =  '/admin-news-form';
