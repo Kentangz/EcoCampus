@@ -44,6 +44,7 @@ class MaterialModel extends BaseOrderedCourseModel {
     required super.title,
     required super.order,
     this.blocks = const [],
+    super.isSynced,
   });
 
   @override
@@ -65,11 +66,28 @@ class MaterialModel extends BaseOrderedCourseModel {
           .toList();
     }
 
+    bool allBlocksSynced = true;
+    for (var b in loadedBlocks) {
+      if (b.type == BlockType.image) {
+        if (!b.content.startsWith('http')) {
+          allBlocksSynced = false;
+          break;
+        }
+      } else if (b.type == BlockType.video) {
+        final source = b.attributes['source'] ?? 'link';
+        if (source == 'upload' && !b.content.startsWith('http')) {
+          allBlocksSynced = false;
+          break;
+        }
+      }
+    }
+
     return MaterialModel(
       id: doc.id,
       title: data['title'] ?? '',
       order: data['order'] ?? 0,
       blocks: loadedBlocks,
+      isSynced: !doc.metadata.hasPendingWrites && allBlocksSynced,
     );
   }
 }

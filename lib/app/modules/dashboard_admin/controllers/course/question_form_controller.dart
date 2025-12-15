@@ -23,6 +23,43 @@ class QuestionFormController extends GetxController {
   final isLoading = false.obs;
   final isSaving = false.obs;
 
+  // === FILTER & SEARCH ===
+  final searchController = TextEditingController();
+  final sortOrder = 'default'.obs;
+  final filterStatus = 'semua'.obs;
+
+  List<QuestionModel> get visibleQuestions {
+    var list = List<QuestionModel>.from(questions);
+
+    if (filterStatus.value == 'tersimpan') {
+      list = list.where((q) => q.isSynced).toList();
+    } else if (filterStatus.value == 'belum') {
+      list = list.where((q) => !q.isSynced).toList();
+    }
+
+    if (searchController.text.isNotEmpty) {
+      final query = searchController.text.toLowerCase();
+      list = list
+          .where((q) => q.question.toLowerCase().contains(query))
+          .toList();
+    }
+
+    switch (sortOrder.value) {
+      case 'az':
+        list.sort((a, b) => a.question.compareTo(b.question));
+        break;
+      case 'za':
+        list.sort((a, b) => b.question.compareTo(a.question));
+        break;
+      case 'default':
+      default:
+        list.sort((a, b) => a.order.compareTo(b.order));
+        break;
+    }
+
+    return list;
+  }
+
   // === QUESTION FORM VARIABLES ===
   final questionController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -45,14 +82,6 @@ class QuestionFormController extends GetxController {
   final isEditing = false.obs;
   String? _editingQuestionId;
 
-  // === PREVIEW VARIABLES ===
-  final previewQuestion = ''.obs;
-  final previewDescription = ''.obs;
-  final previewOptionA = ''.obs;
-  final previewOptionB = ''.obs;
-  final previewOptionC = ''.obs;
-  final previewOptionD = ''.obs;
-
   @override
   void onInit() {
     super.onInit();
@@ -64,20 +93,11 @@ class QuestionFormController extends GetxController {
       quizId = args['quizId'];
       _loadQuestions();
 
-      questionController.addListener(
-        () => previewQuestion.value = questionController.text,
-      );
-      descriptionController.addListener(
-        () => previewDescription.value = descriptionController.text,
-      );
-      optionA.addListener(() => previewOptionA.value = optionA.text);
-      optionB.addListener(() => previewOptionB.value = optionB.text);
-      optionC.addListener(() => previewOptionC.value = optionC.text);
-      optionD.addListener(() => previewOptionD.value = optionD.text);
-
       questionController.addListener(() {
         if (questionController.text.isNotEmpty) questionError.value = null;
       });
+      searchController.addListener(() => questions.refresh());
+
       optionA.addListener(() {
         if (optionA.text.isNotEmpty) optionAError.value = null;
       });
@@ -101,6 +121,7 @@ class QuestionFormController extends GetxController {
     optionB.dispose();
     optionC.dispose();
     optionD.dispose();
+    searchController.dispose();
     super.onClose();
   }
 
@@ -401,6 +422,7 @@ class QuestionFormController extends GetxController {
       title: "Hapus Soal",
       middleText: "Yakin hapus soal ini?",
       textConfirm: "Ya",
+      textCancel: "Batal",
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
       onConfirm: () async {
@@ -408,5 +430,22 @@ class QuestionFormController extends GetxController {
         await _courseRepo.deleteQuestion(courseId, quizId, questionId);
       },
     );
+  }
+
+  void reorderQuestions(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final QuestionModel item = questions.removeAt(oldIndex);
+    questions.insert(newIndex, item);
+
+    for (int i = 0; i < questions.length; i++) {
+      questions[i].order = i + 1;
+    }
+
+    _courseRepo.reorderQuestions(courseId, quizId, questions).catchError((e) {
+      NotificationHelper.showError("Error", "Gagal menyimpan urutan soal");
+      _loadQuestions();
+    });
   }
 }

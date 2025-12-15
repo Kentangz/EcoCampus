@@ -113,21 +113,6 @@ class UploadQueueService extends GetxService {
   }
 
   void addDeleteToQueue(String urlToDelete) {
-    if (urlToDelete.isEmpty) return;
-
-    if (!urlToDelete.startsWith('http')) {
-      int pendingIndex = _queue.indexWhere(
-        (item) => item.type == 'upload' && item.path == urlToDelete,
-      );
-      if (pendingIndex != -1) {
-        _queue.removeAt(pendingIndex);
-        _saveQueue();
-        // print("🗑️ Pending Upload Dibatalkan: ...${urlToDelete.substring(urlToDelete.length - 10)}");
-        return;
-      }
-      return;
-    }
-
     if (!urlToDelete.startsWith('http')) return;
 
     bool isExists = _queue.any(

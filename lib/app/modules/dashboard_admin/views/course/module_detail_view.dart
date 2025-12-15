@@ -57,7 +57,7 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
                     ],
                   ),
                 )
-              : ListView.builder(
+              : ReorderableListView.builder(
                   padding: const EdgeInsets.only(
                     bottom: 100,
                     top: 20,
@@ -65,9 +65,23 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
                     right: 20,
                   ),
                   itemCount: controller.sections.length,
+                  onReorder: controller.reorderSections,
+                  proxyDecorator: (child, index, animation) {
+                    return Material(
+                      elevation: 5.0,
+                      color: Colors.transparent,
+                      shadowColor: Colors.black.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                      child: child,
+                    );
+                  },
                   itemBuilder: (context, index) {
                     final section = controller.sections[index];
-                    return _buildSectionItem(controller, section);
+                    return Container(
+                      key: ValueKey(section.id),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: _buildSectionItem(controller, section),
+                    );
                   },
                 ),
         );
@@ -85,14 +99,16 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
         var materials = snapshot.data ?? [];
 
         return Card(
-          margin: const EdgeInsets.only(bottom: 16),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(color: Colors.grey.shade300),
           ),
           child: ExpansionTile(
-            initiallyExpanded: true,
+            controller: controller.getTileController(section.id!),
+            onExpansionChanged: (isOpen) {
+              if (isOpen) controller.onSectionExpanded(section.id!);
+            },
             shape: const Border(),
             leading: Container(
               padding: const EdgeInsets.all(8),
@@ -109,28 +125,30 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
               section.title,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            trailing: PopupMenuButton(
-              icon: const Icon(Icons.more_horiz),
-              onSelected: (val) {
-                if (val == 'edit') {
-                  controller.showSectionDialog(existingSection: section);
-                }
-                if (val == 'delete') {
-                  controller.deleteSection(section.id!);
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'edit',
-                  child: Text("Edit Judul Section"),
-                ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Text(
-                    "Hapus Section",
-                    style: TextStyle(color: Colors.red),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.blueGrey,
+                    size: 20,
                   ),
+                  onPressed: () =>
+                      controller.showSectionDialog(existingSection: section),
+                  tooltip: "Edit Judul",
                 ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.red,
+                    size: 20,
+                  ),
+                  onPressed: () => controller.deleteSection(section.id!),
+                  tooltip: "Hapus Section",
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.drag_handle, color: Colors.grey),
               ],
             ),
             children: [
@@ -143,10 +161,26 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
                     style: TextStyle(color: Colors.grey[400]),
                   ),
                 )
+              else if (materials.length <= 1)
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: materials.length,
+                  itemBuilder: (context, index) {
+                    final material = materials[index];
+                    return _buildMaterialItem(
+                      controller,
+                      section,
+                      material,
+                      false,
+                    );
+                  },
+                )
               else
                 ReorderableListView.builder(
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
+                  physics: const ClampingScrollPhysics(),
+                  onReorderStart: (_) => FocusScope.of(context).unfocus(),
                   itemCount: materials.length,
                   onReorder: (oldIndex, newIndex) {
                     controller.reorderMaterials(
@@ -158,43 +192,13 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
                   },
                   itemBuilder: (context, index) {
                     final material = materials[index];
-                    return ListTile(
+                    return Container(
                       key: ValueKey(material.id),
-                      leading: const Icon(
-                        Icons.description,
-                        color: Colors.blue,
-                      ),
-                      title: Text(material.title),
-                      subtitle: Text("${material.blocks.length} Konten"),
-                      onTap: () => controller.navigateToBuilder(section.id!, material),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.edit_note,
-                              size: 22,
-                              color: Colors.green,
-                            ),
-                            onPressed: () => controller.navigateToBuilder(
-                              section.id!,
-                              material,
-                            ),
-                            tooltip: "Edit Isi Konten",
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              size: 20,
-                              color: Colors.red,
-                            ),
-                            onPressed: () => controller.deleteMaterial(
-                              section.id!,
-                              material.id!,
-                            ),
-                          ),
-                          const Icon(Icons.drag_handle, color: Colors.grey),
-                        ],
+                      child: _buildMaterialItem(
+                        controller,
+                        section,
+                        material,
+                        true,
                       ),
                     );
                   },
@@ -203,7 +207,7 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: OutlinedButton.icon(
-                  onPressed: () => controller.showAddMaterialDialog(
+                  onPressed: () => controller.addMaterialDirectly(
                     section.id!,
                     materials.length + 1,
                   ),
@@ -220,6 +224,62 @@ class ModuleDetailView extends GetView<ModuleDetailController> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildMaterialItem(
+    ModuleDetailController controller,
+    SectionModel section,
+    MaterialModel material,
+    bool isReorderable,
+  ) {
+    return ListTile(
+      leading: const Icon(Icons.description, color: Color(0xFF6C63FF)),
+      title: Text(
+        material.title,
+        style: const TextStyle(fontWeight: FontWeight.w500),
+      ),
+      subtitle: Row(
+        children: [
+          Text(
+            "${material.blocks.length} Konten",
+            style: const TextStyle(fontSize: 12),
+          ),
+          const SizedBox(width: 8),
+          Icon(
+            material.isSynced ? Icons.cloud_done : Icons.cloud_upload,
+            size: 16,
+            color: material.isSynced ? Colors.green : Colors.orange,
+          ),
+        ],
+      ),
+      onTap: material.isSynced
+          ? () => controller.navigateToBuilder(section.id!, material)
+          : null,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (material.isSynced) ...[
+            IconButton(
+              icon: const Icon(Icons.edit_note, size: 22, color: Colors.green),
+              onPressed: () =>
+                  controller.navigateToBuilder(section.id!, material),
+              tooltip: "Edit Isi Konten",
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.delete_outline,
+                size: 20,
+                color: Colors.red,
+              ),
+              onPressed: () =>
+                  controller.deleteMaterial(section.id!, material.id!),
+            ),
+            if (isReorderable)
+              const Icon(Icons.drag_handle, color: Colors.grey),
+          ],
+        ],
+      ),
     );
   }
 }

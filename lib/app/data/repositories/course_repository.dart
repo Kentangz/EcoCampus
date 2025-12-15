@@ -14,7 +14,6 @@ class CourseRepository extends GetxController {
 
   String get newId => _db.collection(COLLECTION).doc().id;
 
-
   // ==== COURSE MANAGEMENT ====
 
   Stream<List<CourseModel>> getAllCourses() {
@@ -65,14 +64,17 @@ class CourseRepository extends GetxController {
 
   Future<void> deleteCourse(String courseId) async {
     try {
-      DocumentSnapshot courseDoc = await _db
-          .collection('Courses')
-          .doc(courseId)
-          .get();
+      // 1. Queue Course Image for Deletion
+      final courseDoc = await _db.collection('Courses').doc(courseId).get();
       if (courseDoc.exists) {
-        String? heroImage = courseDoc['heroImage'];
-        if (heroImage != null && heroImage.isNotEmpty) {
-          _queueService.addDeleteToQueue(heroImage);
+        final data = courseDoc.data();
+        if (data != null && data.containsKey('imageUrl')) {
+          String? imageUrl = data['imageUrl'];
+          if (imageUrl != null &&
+              imageUrl.isNotEmpty &&
+              imageUrl.startsWith('http')) {
+            _queueService.addDeleteToQueue(imageUrl);
+          }
         }
       }
 
@@ -93,24 +95,8 @@ class CourseRepository extends GetxController {
           .get();
 
       for (var moduleDoc in modulesSnapshot.docs) {
-        final sectionsSnapshot = await moduleDoc.reference
-            .collection('sections')
-            .get();
-
-        for (var sectionDoc in sectionsSnapshot.docs) {
-          final materialsSnapshot = await sectionDoc.reference
-              .collection('materials')
-              .get();
-          WriteBatch batch = _db.batch();
-          for (var materialDoc in materialsSnapshot.docs) {
-            batch.delete(materialDoc.reference);
-          }
-          await batch.commit();
-
-          await sectionDoc.reference.delete();
-        }
-
-        await moduleDoc.reference.delete();
+        final module = ModuleModel.fromSnapshot(moduleDoc);
+        await deleteModule(courseId, module);
       }
 
       await _db.collection('Courses').doc(courseId).delete();
@@ -118,7 +104,6 @@ class CourseRepository extends GetxController {
       throw "Gagal menghapus kelas beserta isinya: $e";
     }
   }
-
 
   // ==== MODULE MANAGEMENT ====
 
@@ -136,36 +121,96 @@ class CourseRepository extends GetxController {
         );
   }
 
-  Future<void> saveModule(String courseId, ModuleModel module) async {
+  Future<void> saveModule(
+    String courseId,
+    ModuleModel module, {
+    bool isNew = false,
+  }) async {
     String docId =
         module.id ??
         _db.collection('Courses').doc(courseId).collection('modules').doc().id;
 
-    await _db
+    WriteBatch batch = _db.batch();
+
+    if (isNew) {
+      DocumentReference courseRef = _db.collection('Courses').doc(courseId);
+      batch.update(courseRef, {'totalModules': FieldValue.increment(1)});
+    }
+
+    DocumentReference moduleRef = _db
         .collection('Courses')
         .doc(courseId)
         .collection('modules')
-        .doc(docId)
-        .set(module.toJson(), SetOptions(merge: true));
+        .doc(docId);
+
+    batch.set(moduleRef, module.toJson(), SetOptions(merge: true));
+
+    await batch.commit();
   }
 
-  Future<void> deleteModule(String courseId, String moduleId) async {
+  Future<void> deleteModule(String courseId, ModuleModel module) async {
+    final sectionsSnapshot = await _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('modules')
+        .doc(module.id)
+        .collection('sections')
+        .get();
+
+    for (var sectionDoc in sectionsSnapshot.docs) {
+      await deleteSection(courseId, module.id!, sectionDoc.id);
+    }
+
     WriteBatch batch = _db.batch();
 
     DocumentReference moduleRef = _db
         .collection('Courses')
         .doc(courseId)
         .collection('modules')
-        .doc(moduleId);
+        .doc(module.id);
 
     DocumentReference courseRef = _db.collection('Courses').doc(courseId);
+
+    if (module.imageUrl != null && module.imageUrl!.startsWith('http')) {
+      _queueService.addDeleteToQueue(module.imageUrl!);
+    }
 
     batch.delete(moduleRef);
     batch.update(courseRef, {'totalModules': FieldValue.increment(-1)});
 
     await batch.commit();
+
+    final remainingModulesSnapshot = await _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('modules')
+        .orderBy('order')
+        .get();
+
+    final remainingModules = remainingModulesSnapshot.docs
+        .map((doc) => ModuleModel.fromSnapshot(doc))
+        .toList();
+
+    if (remainingModules.isNotEmpty) {
+      await reorderModules(courseId, remainingModules);
+    }
   }
 
+  Future<void> reorderModules(
+    String courseId,
+    List<ModuleModel> modules,
+  ) async {
+    WriteBatch batch = _db.batch();
+    for (int i = 0; i < modules.length; i++) {
+      DocumentReference docRef = _db
+          .collection('Courses')
+          .doc(courseId)
+          .collection('modules')
+          .doc(modules[i].id);
+      batch.update(docRef, {'order': i + 1});
+    }
+    await batch.commit();
+  }
 
   // ==== SECTION MANAGEMENT ====
 
@@ -177,7 +222,7 @@ class CourseRepository extends GetxController {
         .doc(moduleId)
         .collection('sections')
         .orderBy('order', descending: false)
-        .snapshots()
+        .snapshots(includeMetadataChanges: true)
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => SectionModel.fromSnapshot(doc))
@@ -216,16 +261,63 @@ class CourseRepository extends GetxController {
     String moduleId,
     String sectionId,
   ) async {
-    await _db
+    final materialsSnapshot = await _db
         .collection('Courses')
         .doc(courseId)
         .collection('modules')
         .doc(moduleId)
         .collection('sections')
         .doc(sectionId)
-        .delete();
+        .collection('materials')
+        .get();
+
+    for (var doc in materialsSnapshot.docs) {
+      if (doc.exists) {
+        List<dynamic> blocks = doc.get('blocks') ?? [];
+        for (var block in blocks) {
+          String content = block['content'] ?? '';
+          if (content.startsWith('http')) {
+            _queueService.addDeleteToQueue(content);
+          }
+        }
+      }
+    }
+
+    WriteBatch batch = _db.batch();
+    for (var doc in materialsSnapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    DocumentReference sectionRef = _db
+        .collection('Courses')
+        .doc(courseId)
+        .collection('modules')
+        .doc(moduleId)
+        .collection('sections')
+        .doc(sectionId);
+
+    batch.delete(sectionRef);
+
+    await batch.commit();
   }
 
+  Future<void> reorderSections(
+    String courseId,
+    String moduleId,
+    List<SectionModel> sections,
+  ) async {
+    WriteBatch batch = _db.batch();
+    for (int i = 0; i < sections.length; i++) {
+      DocumentReference docRef = _db
+          .collection('Courses')
+          .doc(courseId)
+          .collection('modules')
+          .doc(moduleId)
+          .collection('sections')
+          .doc(sections[i].id);
+      batch.update(docRef, {'order': i + 1});
+    }
+    await batch.commit();
+  }
 
   // ==== MATERIAL MANAGEMENT (Materi)====
 
@@ -243,7 +335,7 @@ class CourseRepository extends GetxController {
         .doc(sectionId)
         .collection('materials')
         .orderBy('order', descending: false)
-        .snapshots()
+        .snapshots(includeMetadataChanges: true)
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => MaterialModel.fromSnapshot(doc))
@@ -321,6 +413,27 @@ class CourseRepository extends GetxController {
         .delete();
   }
 
+  Future<void> reorderMaterials(
+    String courseId,
+    String moduleId,
+    String sectionId,
+    List<MaterialModel> materials,
+  ) async {
+    WriteBatch batch = _db.batch();
+    for (int i = 0; i < materials.length; i++) {
+      DocumentReference docRef = _db
+          .collection('Courses')
+          .doc(courseId)
+          .collection('modules')
+          .doc(moduleId)
+          .collection('sections')
+          .doc(sectionId)
+          .collection('materials')
+          .doc(materials[i].id);
+      batch.update(docRef, {'order': i + 1});
+    }
+    await batch.commit();
+  }
 
   // ==== QUIZ MANAGEMENT ====
 
@@ -351,17 +464,31 @@ class CourseRepository extends GetxController {
         );
   }
 
-  Future<void> saveQuiz(String courseId, QuizModel quiz) async {
+  Future<void> saveQuiz(
+    String courseId,
+    QuizModel quiz, {
+    bool isNew = false,
+  }) async {
     String docId =
         quiz.id ??
         _db.collection('Courses').doc(courseId).collection('quizzes').doc().id;
 
-    await _db
+    WriteBatch batch = _db.batch();
+
+    if (isNew) {
+      DocumentReference courseRef = _db.collection('Courses').doc(courseId);
+      batch.update(courseRef, {'totalQuizzes': FieldValue.increment(1)});
+    }
+
+    DocumentReference quizRef = _db
         .collection('Courses')
         .doc(courseId)
         .collection('quizzes')
-        .doc(docId)
-        .set(quiz.toJson(), SetOptions(merge: true));
+        .doc(docId);
+
+    batch.set(quizRef, quiz.toJson(), SetOptions(merge: true));
+
+    await batch.commit();
   }
 
   Future<void> deleteQuiz(String courseId, String quizId) async {
@@ -378,21 +505,24 @@ class CourseRepository extends GetxController {
       String? imageUrl = doc.data().containsKey('imageUrl')
           ? doc['imageUrl']
           : null;
-      if (imageUrl != null && imageUrl.isNotEmpty) {
+      if (imageUrl != null && imageUrl.startsWith('http')) {
         _queueService.addDeleteToQueue(imageUrl);
       }
       batch.delete(doc.reference);
     }
-    await batch.commit();
 
-    await _db
+    DocumentReference quizRef = _db
         .collection('Courses')
         .doc(courseId)
         .collection('quizzes')
-        .doc(quizId)
-        .delete();
-  }
+        .doc(quizId);
+    batch.delete(quizRef);
 
+    DocumentReference courseRef = _db.collection('Courses').doc(courseId);
+    batch.update(courseRef, {'totalQuizzes': FieldValue.increment(-1)});
+
+    await batch.commit();
+  }
 
   // ==== QUESTION MANAGEMENT (SOAL) ====
 
@@ -471,8 +601,9 @@ class CourseRepository extends GetxController {
         .get();
 
     if (questionDoc.exists) {
-      String? imageUrl = questionDoc['imageUrl'];
-      if (imageUrl != null && imageUrl.isNotEmpty) {
+      final data = questionDoc.data() as Map<String, dynamic>?;
+      String? imageUrl = data?['imageUrl'];
+      if (imageUrl != null && imageUrl.startsWith('http')) {
         _queueService.addDeleteToQueue(imageUrl);
       }
     }
@@ -509,5 +640,24 @@ class CourseRepository extends GetxController {
         .collection('questions')
         .doc()
         .id;
+  }
+
+  Future<void> reorderQuestions(
+    String courseId,
+    String quizId,
+    List<QuestionModel> questions,
+  ) async {
+    WriteBatch batch = _db.batch();
+    for (int i = 0; i < questions.length; i++) {
+      DocumentReference docRef = _db
+          .collection('Courses')
+          .doc(courseId)
+          .collection('quizzes')
+          .doc(quizId)
+          .collection('questions')
+          .doc(questions[i].id);
+      batch.update(docRef, {'order': i + 1});
+    }
+    await batch.commit();
   }
 }

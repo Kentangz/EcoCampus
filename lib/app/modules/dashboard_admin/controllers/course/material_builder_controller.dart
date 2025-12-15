@@ -3,8 +3,10 @@ import 'package:ecocampus/app/data/repositories/course_repository.dart';
 import 'package:ecocampus/app/services/upload_queue_service.dart';
 import 'package:ecocampus/app/shared/utils/notification_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ecocampus/app/shared/widgets/shake_widget.dart';
 import 'package:uuid/uuid.dart';
 
 class MaterialBuilderController extends GetxController {
@@ -13,9 +15,10 @@ class MaterialBuilderController extends GetxController {
   final ImagePicker _picker = ImagePicker();
 
   late String courseId;
-  late String moduleId;
-  late String sectionId;
+  late String? moduleId;
+  String? sectionId;
   MaterialModel? existingMaterial;
+  int? nextOrder;
 
   final titleController = TextEditingController();
   final blocks = <ContentBlock>[].obs;
@@ -24,11 +27,19 @@ class MaterialBuilderController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    titleController.addListener(() {
+      if (fieldErrors.containsKey('title')) {
+        fieldErrors.remove('title');
+      }
+    });
+
     final args = Get.arguments;
     if (args != null) {
       courseId = args['courseId'];
       moduleId = args['moduleId'];
       sectionId = args['sectionId'];
+      nextOrder = args['nextOrder'];
 
       if (args['material'] != null) {
         existingMaterial = args['material'] as MaterialModel;
@@ -56,6 +67,10 @@ class MaterialBuilderController extends GetxController {
     if (!_textControllers.containsKey(blockId)) {
       _textControllers[blockId] = TextEditingController(text: initialText)
         ..addListener(() {
+          if (fieldErrors.containsKey(blockId)) {
+            fieldErrors.remove(blockId);
+          }
+
           int index = blocks.indexWhere((b) => b.id == blockId);
           if (index != -1) {
             var block = blocks[index];
@@ -181,7 +196,6 @@ class MaterialBuilderController extends GetxController {
     );
     blocks.add(newBlock);
 
-    // Auto scroll to bottom
     Future.delayed(const Duration(milliseconds: 300), () {
       if (scrollController.hasClients) {
         scrollController.animateTo(
@@ -241,10 +255,44 @@ class MaterialBuilderController extends GetxController {
 
         updateBlockContent(index, localPath);
         updateBlockAttribute(index, 'isLocal', true);
+
+        fieldErrors.remove(blocks[index].id);
       }
     } catch (e) {
       NotificationHelper.showError("Error", "Terjadi kesalahan: $e");
     }
+  }
+
+  // === ACTION HELPERS ===
+  void clearBlockContent(int index) {
+    updateBlockContent(index, '');
+    final blockId = blocks[index].id;
+    if (_textControllers.containsKey(blockId)) {
+      _textControllers[blockId]!.clear();
+    }
+    if (fieldErrors.containsKey(blockId)) {
+      fieldErrors.remove(blockId);
+    }
+  }
+
+  Future<void> pasteFromClipboard(int index) async {
+    final ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (data != null && data.text != null) {
+      final blockId = blocks[index].id;
+      getTextController(blockId, "").text = data.text!;
+    }
+  }
+
+  void setVideoSource(int index, String newSource) {
+    final block = blocks[index];
+    if (block.content.isNotEmpty) {
+      getBlockShakeKey(block.id).currentState?.shake();
+      fieldErrors[block.id] =
+          "Hapus konten video/link saat ini sebelum mengganti jenis input.";
+      return;
+    }
+
+    updateBlockAttribute(index, 'source', newSource);
   }
 
   // === ATTRIBUTE UPDATE ===
@@ -270,21 +318,98 @@ class MaterialBuilderController extends GetxController {
         updateBlockContent(index, localPath);
         updateBlockAttribute(index, 'source', 'upload');
         updateBlockAttribute(index, 'isLocal', true);
+
+        fieldErrors.remove(blocks[index].id);
       }
     } catch (e) {
       NotificationHelper.showError("Error", "Gagal mengambil video: $e");
     }
   }
 
+  // === VALIDATION & SHAKE KEYS ===
+  final fieldErrors = <String, String>{}.obs;
+  final titleShakeKey = GlobalKey<ShakeWidgetState>();
+  // Map blockId -> key
+  final blockShakeKeys = <String, GlobalKey<ShakeWidgetState>>{}.obs;
+
+  GlobalKey<ShakeWidgetState> getBlockShakeKey(String blockId) {
+    if (!blockShakeKeys.containsKey(blockId)) {
+      blockShakeKeys[blockId] = GlobalKey<ShakeWidgetState>();
+    }
+    return blockShakeKeys[blockId]!;
+  }
+
   // === SAVE TO FIRESTORE ===
   Future<void> saveMaterial() async {
-    if (titleController.text.isEmpty) {
-      NotificationHelper.showError("Error", "Judul materi tidak boleh kosong");
-      return;
+    fieldErrors.clear();
+    bool isValid = true;
+    String? firstErrorKey;
+    BuildContext? scrollContext;
+
+    if (titleController.text.trim().isEmpty) {
+      fieldErrors['title'] = "Judul topik tidak boleh kosong";
+      titleShakeKey.currentState?.shake();
+      isValid = false;
+      firstErrorKey ??= 'title';
+      scrollContext ??= titleShakeKey.currentContext;
     }
 
     if (blocks.isEmpty) {
       NotificationHelper.showWarning("Peringatan", "Isi materi masih kosong");
+      return;
+    }
+
+    for (int i = 0; i < blocks.length; i++) {
+      final block = blocks[i];
+      final shakeKey = getBlockShakeKey(block.id);
+
+      if (block.type == BlockType.text) {
+        if (block.content.trim().isEmpty) {
+          fieldErrors[block.id] = "Konten teks tidak boleh kosong";
+          shakeKey.currentState?.shake();
+          isValid = false;
+          firstErrorKey ??= block.id;
+          scrollContext ??= shakeKey.currentContext;
+        }
+      } else if (block.type == BlockType.image) {
+        if (block.content.isEmpty) {
+          fieldErrors[block.id] = "Gambar belum dipilih";
+          shakeKey.currentState?.shake();
+          isValid = false;
+          firstErrorKey ??= block.id;
+          scrollContext ??= shakeKey.currentContext;
+        }
+      } else if (block.type == BlockType.video) {
+        String source = block.attributes['source'] ?? 'link';
+        if (source == 'upload') {
+          if (block.content.isEmpty) {
+            fieldErrors[block.id] = "Video belum dipilih";
+            shakeKey.currentState?.shake();
+            isValid = false;
+            firstErrorKey ??= block.id;
+            scrollContext ??= shakeKey.currentContext;
+          }
+        } else {
+          if (block.content.trim().isEmpty) {
+            fieldErrors[block.id] = "Link video tidak boleh kosong";
+            shakeKey.currentState?.shake();
+            isValid = false;
+            firstErrorKey ??= block.id;
+            scrollContext ??= shakeKey.currentContext;
+          }
+        }
+      }
+    }
+
+    if (!isValid) {
+      if (scrollContext != null) {
+        Scrollable.ensureVisible(
+          scrollContext,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+          alignment: 0.1,
+        );
+      }
       return;
     }
 
@@ -296,11 +421,20 @@ class MaterialBuilderController extends GetxController {
       final material = MaterialModel(
         id: materialId,
         title: titleController.text,
-        order: existingMaterial?.order ?? DateTime.now().millisecondsSinceEpoch,
+        order:
+            existingMaterial?.order ??
+            nextOrder ??
+            DateTime.now().millisecondsSinceEpoch,
         blocks: blocks,
       );
 
-      await _courseRepo.saveMaterial(courseId, moduleId, sectionId, material);
+      if (moduleId != null && sectionId != null) {
+        await _courseRepo
+            .saveMaterial(courseId, moduleId!, sectionId!, material)
+            .timeout(const Duration(seconds: 2), onTimeout: () => null);
+      } else {
+        throw "Module ID or Section ID is null";
+      }
 
       for (var url in _deletedUrls) {
         _queueService.addDeleteToQueue(url);
@@ -310,27 +444,17 @@ class MaterialBuilderController extends GetxController {
       for (var block in blocks) {
         if (block.type == BlockType.image || block.type == BlockType.video) {
           String content = block.content;
+          bool isLocal =
+              block.attributes['isLocal'] == true ||
+              !content.startsWith('http');
 
-          bool needsUpload = false;
-          if (block.type == BlockType.image) {
-            needsUpload = content.isNotEmpty && !content.startsWith('http');
-          } else if (block.type == BlockType.video) {
-            String source = block.attributes['source'] ?? 'link';
-            needsUpload =
-                source == 'upload' &&
-                content.isNotEmpty &&
-                !content.startsWith('http');
-          }
-
-          if (needsUpload) {
-            String collectionPath =
-                'Courses/$courseId/modules/$moduleId/sections/$sectionId/materials';
-
+          if (isLocal && content.isNotEmpty) {
             _queueService.addToQueue(
               materialId,
               'blocks',
               content,
-              collection: collectionPath,
+              collection:
+                  'Courses/$courseId/modules/$moduleId/sections/$sectionId/materials',
             );
           }
         }
@@ -339,6 +463,7 @@ class MaterialBuilderController extends GetxController {
       Get.back();
       NotificationHelper.showSuccess("Tersimpan", "Materi berhasil disimpan");
     } catch (e) {
+      isSaving.value = false;
       NotificationHelper.showError("Gagal", "Gagal menyimpan materi: $e");
     } finally {
       isSaving.value = false;

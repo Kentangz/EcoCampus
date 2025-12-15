@@ -5,13 +5,17 @@ import 'package:image_picker/image_picker.dart';
 class CustomImagePicker extends StatefulWidget {
   final String label;
   final String? initialImageUrl;
+  final bool showLabel;
   final Function(XFile?) onImagePicked;
+  final bool allowDelete;
 
   const CustomImagePicker({
     super.key,
     required this.label,
     this.initialImageUrl,
+    this.showLabel = true,
     required this.onImagePicked,
+    this.allowDelete = true,
   });
 
   @override
@@ -21,6 +25,7 @@ class CustomImagePicker extends StatefulWidget {
 class _CustomImagePickerState extends State<CustomImagePicker> {
   final ImagePicker _picker = ImagePicker();
   File? _localImage;
+  bool _isRemoved = false;
 
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(
@@ -30,6 +35,7 @@ class _CustomImagePickerState extends State<CustomImagePicker> {
     if (pickedFile != null) {
       setState(() {
         _localImage = File(pickedFile.path);
+        _isRemoved = false;
       });
       widget.onImagePicked(pickedFile);
     }
@@ -40,7 +46,8 @@ class _CustomImagePickerState extends State<CustomImagePicker> {
     ImageProvider? imageProvider;
     if (_localImage != null) {
       imageProvider = FileImage(_localImage!);
-    } else if (widget.initialImageUrl != null &&
+    } else if (!_isRemoved &&
+        widget.initialImageUrl != null &&
         widget.initialImageUrl!.isNotEmpty) {
       if (widget.initialImageUrl!.startsWith('http')) {
         imageProvider = NetworkImage(widget.initialImageUrl!);
@@ -52,42 +59,71 @@ class _CustomImagePickerState extends State<CustomImagePicker> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
-        InkWell(
-          onTap: _pickImage,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            height: 150,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
-              image: imageProvider != null
-                  ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
-                  : null,
-            ),
-            child: imageProvider == null
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_photo_alternate,
-                        size: 40,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        "Pilih Gambar",
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
-                  )
-                : null,
+        if (widget.showLabel) ...[
+          Text(
+            widget.label,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
+          const SizedBox(height: 10),
+        ],
+        Stack(
+          children: [
+            InkWell(
+              onTap: _pickImage,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                height: 150,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                  image: imageProvider != null
+                      ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
+                      : null,
+                ),
+                child: imageProvider == null
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_photo_alternate,
+                            size: 40,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            "Pilih Gambar",
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ],
+                      )
+                    : null,
+              ),
+            ),
+            if (imageProvider != null && widget.allowDelete)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  radius: 16,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                    onPressed: () {
+                      setState(() {
+                        _localImage = null;
+                        _isRemoved = true;
+                      });
+                      widget.onImagePicked(null);
+                    },
+                  ),
+                ),
+              ),
+          ],
         ),
-        if (imageProvider != null)
+        if (imageProvider != null && _localImage == null)
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Align(

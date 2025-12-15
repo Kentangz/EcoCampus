@@ -1,7 +1,12 @@
 import 'package:ecocampus/app/data/models/course/quiz_model.dart';
-import 'package:ecocampus/app/shared/widgets/image_picker.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/course/course_form_controller.dart';
+import 'package:ecocampus/app/shared/utils/app_icons.dart';
+import 'package:ecocampus/app/shared/widgets/icon_picker_dialog.dart';
+import 'package:ecocampus/app/shared/widgets/image_picker.dart';
 import 'package:ecocampus/app/shared/widgets/shake_widget.dart';
+import 'package:ecocampus/app/shared/widgets/smart_image.dart';
+import 'package:ecocampus/app/shared/widgets/tech_stack_picker_dialog.dart';
+import 'package:ecocampus/app/shared/utils/tech_stack_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,24 +30,39 @@ class CourseFormView extends GetView<CourseFormController> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
-        bottom: TabBar(
-          controller: controller.tabController,
-          labelColor: const Color(0xFF6C63FF),
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: const Color(0xFF6C63FF),
-          tabs: const [
-            Tab(text: "Info Umum"),
-            Tab(text: "Kurikulum (Modul)"),
-            Tab(text: "Kuis & Latihan"),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: controller.tabController,
+      body: Column(
         children: [
-          _buildGeneralInfoTab(controller),
-          _buildCurriculumTab(controller),
-          _buildQuizTab(controller),
+          Container(
+            color: Colors.white,
+            child: Obx(
+              () => TabBar(
+                controller: controller.tabController,
+                labelColor: const Color(0xFF6C63FF),
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: const Color(0xFF6C63FF),
+                tabs: [
+                  const Tab(text: "Info Umum"),
+                  if (controller.isEditMode.value) ...[
+                    const Tab(text: "Kurikulum (Modul)"),
+                    const Tab(text: "Kuis & Latihan"),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: controller.tabController,
+              children: [
+                _buildGeneralInfoTab(controller),
+                if (controller.isEditMode.value) ...[
+                  _buildCurriculumTab(controller),
+                  _buildQuizTab(controller),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -56,15 +76,56 @@ class CourseFormView extends GetView<CourseFormController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Ikon Kelas",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+            const SizedBox(height: 10),
             Obx(
-              () => CustomImagePicker(
-                label: "Upload Hero Image",
-                initialImageUrl: controller.heroImageUrl.value,
-                onImagePicked: (file) {
-                  if (file != null) {
-                    controller.heroImageUrl.value = file.path;
-                  }
+              () => InkWell(
+                onTap: () {
+                  Get.dialog(
+                    IconPickerDialog(
+                      onIconSelected: (iconName) {
+                        controller.selectedIcon.value = iconName;
+                      },
+                    ),
+                  );
                 },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            AppIcons.getIcon(controller.selectedIcon.value),
+                            color: const Color(0xFF6C63FF),
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            controller.selectedIcon.value,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -77,7 +138,84 @@ class CourseFormView extends GetView<CourseFormController> {
                 validator: (val) => val!.isEmpty ? "Wajib diisi" : null,
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 24),
+
+            Obx(
+              () => Stack(
+                children: [
+                  CustomImagePicker(
+                    label: "Upload Banner Kelas",
+                    showLabel: false,
+                    initialImageUrl: controller.courseImagePath.value.isNotEmpty
+                        ? controller.courseImagePath.value
+                        : null,
+                    onImagePicked: (file) {
+                      if (file != null) {
+                        controller.courseImagePath.value = file.path;
+                        controller.isCourseImageRemoved.value = false;
+                      } else {
+                        controller.courseImagePath.value = '';
+                        controller.isCourseImageRemoved.value = true;
+                      }
+                    },
+                  ),
+                  Positioned(
+                    top: 80,
+                    right: 20,
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Obx(() {
+                        final iconKey = controller.techStackIcon.value;
+                        return InkWell(
+                          onTap: () {
+                            Get.dialog(
+                              TechStackPickerDialog(
+                                onIconSelected: (iconName) {
+                                  controller.techStackIcon.value = iconName;
+                                },
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Center(
+                            child: iconKey.isEmpty
+                                ? Icon(
+                                    Icons.code,
+                                    size: 24,
+                                    color: Colors.grey[400],
+                                  )
+                                : Icon(
+                                    TechStackIcons.getIcon(iconKey),
+                                    size: 28,
+                                    color: TechStackIcons.getColor(iconKey),
+                                  ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "* Upload banner dan pilih icon teknologi (opsional)",
+              style: TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+
+            const SizedBox(height: 24),
 
             Obx(
               () => SwitchListTile(
@@ -160,7 +298,7 @@ class CourseFormView extends GetView<CourseFormController> {
           );
         }
 
-        return ListView.builder(
+        return ReorderableListView.builder(
           padding: const EdgeInsets.only(
             top: 10,
             bottom: 80,
@@ -168,65 +306,142 @@ class CourseFormView extends GetView<CourseFormController> {
             right: 10,
           ),
           itemCount: controller.modules.length,
+          onReorder: controller.reorderModules,
+          proxyDecorator: (child, index, animation) {
+            return AnimatedBuilder(
+              animation: animation,
+              builder: (BuildContext context, Widget? child) {
+                return Material(
+                  elevation: 5.0,
+                  color: Colors.transparent,
+                  shadowColor: Colors.black.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  child: child,
+                );
+              },
+              child: child,
+            );
+          },
           itemBuilder: (context, index) {
             final module = controller.modules[index];
             return Card(
-              margin: const EdgeInsets.only(bottom: 10),
-              elevation: 1,
+              key: ValueKey(module.id ?? module.order),
+              margin: const EdgeInsets.only(bottom: 16),
+              elevation: 2,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: const Color(
-                    0xFF6C63FF,
-                  ).withValues(alpha: 0.1),
-                  child: Text(
-                    "${module.order}",
-                    style: const TextStyle(
-                      color: Color(0xFF6C63FF),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                title: Text(
-                  module.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: const Text("Tap untuk kelola materi"),
-                trailing: PopupMenuButton(
-                  onSelected: (value) {
-                    if (value == 'edit') {
-                      controller.showModuleDialog(existingModule: module);
-                    }
-                    if (value == 'delete') {
-                      controller.confirmDeleteModule(module);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () => controller.navigateToModuleDetail(module),
+                borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 140,
+                      width: double.infinity,
+                      child: Stack(
+                        fit: StackFit.expand,
                         children: [
-                          Icon(Icons.edit, size: 18),
-                          SizedBox(width: 8),
-                          Text("Edit Nama"),
+                          module.imageUrl != null && module.imageUrl!.isNotEmpty
+                              ? SmartImage(module.imageUrl!, fit: BoxFit.cover)
+                              : Container(
+                                  color: Colors.grey[300],
+                                  child: const Icon(
+                                    Icons.image,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                          Positioned(
+                            top: 10,
+                            left: 10,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.6),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                "${module.order}",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
-                      value: 'delete',
+                    Padding(
+                      padding: const EdgeInsets.all(12),
                       child: Row(
                         children: [
-                          Icon(Icons.delete, color: Colors.red, size: 18),
-                          SizedBox(width: 8),
-                          Text("Hapus", style: TextStyle(color: Colors.red)),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    module.title,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                _buildStatusChip(module.isActive),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit_outlined,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () => controller.showModuleDialog(
+                                  existingModule: module,
+                                ),
+                                tooltip: "Edit",
+                              ),
+                              if (module.isSynced)
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () =>
+                                      controller.confirmDeleteModule(module),
+                                  tooltip: "Hapus",
+                                ),
+                            ],
+                          ),
+                          const SizedBox(width: 4),
+                          const CircleAvatar(
+                            backgroundColor: Color(0xFF6C63FF),
+                            radius: 16,
+                            child: Icon(
+                              Icons.arrow_forward,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                onTap: () => controller.navigateToModuleDetail(module),
               ),
             );
           },
@@ -309,9 +524,18 @@ class CourseFormView extends GetView<CourseFormController> {
                   color: Colors.orange,
                 ),
               ),
-              title: Text(
-                quiz.title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              title: Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      quiz.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildStatusChip(quiz.isActive),
+                ],
               ),
               subtitle: Text("${quiz.totalQuestions} Soal"),
               trailing: Row(
@@ -322,39 +546,40 @@ class CourseFormView extends GetView<CourseFormController> {
                     onPressed: () =>
                         controller.showQuizDialog(existingQuiz: quiz),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () => controller.confirmDeleteQuiz(quiz),
-                  ),
+                  if (quiz.isSynced)
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      onPressed: () => controller.confirmDeleteQuiz(quiz),
+                    ),
                 ],
               ),
               onTap: () => controller.navigateToQuizDetail(quiz),
             ),
           ),
-          Positioned(
-            top: 0,
-            left: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: quiz.isSynced ? Colors.green : Colors.orange,
-                borderRadius: const BorderRadius.only(
-                  bottomRight: Radius.circular(10),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    quiz.isSynced ? Icons.cloud_done : Icons.cloud_upload,
-                    size: 10,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(bool isActive) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: isActive
+            ? Colors.green.withValues(alpha: 0.1)
+            : Colors.grey.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: isActive ? Colors.green : Colors.grey,
+          width: 0.5,
+        ),
+      ),
+      child: Text(
+        isActive ? "Aktif" : "Draft",
+        style: TextStyle(
+          fontSize: 10,
+          color: isActive ? Colors.green : Colors.grey,
+        ),
       ),
     );
   }

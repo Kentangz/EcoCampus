@@ -9,6 +9,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ecocampus/app/shared/widgets/markdown_toolbar.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/course/component/material_builder_components.dart';
+import 'package:ecocampus/app/shared/widgets/shake_widget.dart';
 
 class MaterialBuilderView extends GetView<MaterialBuilderController> {
   const MaterialBuilderView({super.key});
@@ -18,222 +19,273 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
     final isPreview = false.obs;
     final showAddPanel = true.obs;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          controller.existingMaterial?.title ?? "Edit Konten",
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        backgroundColor: const Color(0xFF6C63FF),
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
-          Obx(() {
-            if (isPreview.value) return const SizedBox.shrink();
-            return Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.grey[50],
-              child: TextField(
-                controller: controller.titleController,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                decoration: const InputDecoration(
-                  labelText: "Judul Topik (Misal: Sejarah Python)",
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  fillColor: Colors.white,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        if (controller.isSaving.value) return;
+
+        final shouldPop = await Get.dialog<bool>(
+          AlertDialog(
+            title: const Text("Batal Edit?"),
+            content: const Text(
+              "Perubahan yang belum disimpan akan hilang. Yakin ingin keluar?",
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(result: false),
+                child: const Text("Lanjut Edit"),
+              ),
+              TextButton(
+                onPressed: () => Get.back(result: true),
+                child: const Text(
+                  "Keluar",
+                  style: TextStyle(color: Colors.red),
                 ),
               ),
-            );
-          }),
-
-          Expanded(
-            child: Obx(() {
-              if (isPreview.value) {
-                return Container(
-                  color: const Color(0xFFE8F6FF),
-                  padding: const EdgeInsets.all(20),
-                  child: ListView(
-                    children: [
-                      Text(
-                        controller.titleController.text,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      ...controller.blocks.map(
-                        (block) => _renderPreviewBlock(block),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              if (controller.blocks.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.dashboard_customize,
-                        size: 60,
-                        color: Colors.grey[300],
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Belum ada konten. Tambahkan di bawah!",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return ReorderableListView.builder(
-                scrollController: controller.scrollController,
-                padding: const EdgeInsets.only(bottom: 100, top: 10),
-                itemCount: controller.blocks.length,
-                onReorder: controller.reorderBlocks,
-                itemBuilder: (context, index) {
-                  final block = controller.blocks[index];
-                  return _buildEditorBlock(
-                    key: ValueKey(block.id),
-                    index: index,
-                    block: block,
-                    controller: controller,
-                  );
-                },
-              );
-            }),
+            ],
           ),
-        ],
-      ),
-
-      bottomNavigationBar: Obx(
-        () => Container(
-          padding: const EdgeInsets.all(12),
-          decoration: const BoxDecoration(color: Colors.white),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (!isPreview.value) ...[
-                Obx(
-                  () => AnimatedSize(
-                    duration: const Duration(milliseconds: 300),
-                    child: showAddPanel.value
-                        ? Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  _addBtn(
-                                    "Teks",
-                                    Icons.notes,
-                                    Colors.blue,
-                                    () => controller.addBlock(BlockType.text),
-                                  ),
-                                  _addBtn(
-                                    "Gambar",
-                                    Icons.image,
-                                    Colors.orange,
-                                    () => controller.addBlock(BlockType.image),
-                                  ),
-                                  _addBtn(
-                                    "Video",
-                                    Icons.play_circle,
-                                    Colors.red,
-                                    () => controller.addBlock(BlockType.video),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              const Divider(height: 1),
-                              const SizedBox(height: 12),
-                            ],
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ),
-              ],
-
-              Row(
-                children: [
-                  if (!isPreview.value)
-                    Container(
-                      margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey.shade300),
-                      ),
-                      child: IconButton(
-                        onPressed: () => showAddPanel.toggle(),
-                        icon: Obx(
-                          () => Icon(
-                            showAddPanel.value
-                                ? Icons.keyboard_arrow_down
-                                : Icons.add,
-                            color: const Color(0xFF6C63FF),
+        );
+        if (shouldPop == true) {
+          Get.back();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: Text(
+            controller.existingMaterial?.title ?? "Edit Konten",
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          backgroundColor: const Color(0xFF6C63FF),
+          foregroundColor: Colors.white,
+        ),
+        body: Column(
+          children: [
+            Obx(() {
+              if (isPreview.value) return const SizedBox.shrink();
+              return Container(
+                padding: const EdgeInsets.all(16),
+                color: Colors.grey[50],
+                child: Obx(() {
+                  String? error = controller.fieldErrors['title'];
+                  return ShakeWidget(
+                    key: controller.titleShakeKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: controller.titleController,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: "Judul Topik (Misal: Sejarah Python)",
+                            border: const OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Colors.white,
+                            errorText: error,
                           ),
                         ),
-                        tooltip: "Toggle Menu Tambah",
-                      ),
+                      ],
                     ),
+                  );
+                }),
+              );
+            }),
 
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        isPreview.value = !isPreview.value;
-                      },
-                      icon: Icon(
-                        isPreview.value ? Icons.edit : Icons.remove_red_eye,
-                      ),
-                      label: Text(isPreview.value ? "Kembali Edit" : "Preview"),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF6C63FF),
-                        side: const BorderSide(color: Color(0xFF6C63FF)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
+            Expanded(
+              child: Obx(() {
+                if (isPreview.value) {
+                  return Container(
+                    color: const Color(0xFFE8F6FF),
+                    padding: const EdgeInsets.all(20),
+                    child: ListView(
+                      children: [
+                        Text(
+                          controller.titleController.text,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        ...controller.blocks.map(
+                          (block) => _renderPreviewBlock(block),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: controller.isSaving.value
-                          ? null
-                          : controller.saveMaterial,
-                      icon: controller.isSaving.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
+                  );
+                }
+
+                if (controller.blocks.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.dashboard_customize,
+                          size: 60,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "Belum ada konten. Tambahkan di bawah!",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ReorderableListView.builder(
+                  scrollController: controller.scrollController,
+                  padding: const EdgeInsets.only(bottom: 100, top: 10),
+                  itemCount: controller.blocks.length,
+                  onReorder: controller.reorderBlocks,
+                  onReorderStart: (_) => FocusScope.of(context).unfocus(),
+                  itemBuilder: (context, index) {
+                    final block = controller.blocks[index];
+                    return _buildEditorBlock(
+                      key: ValueKey(block.id),
+                      index: index,
+                      block: block,
+                      controller: controller,
+                    );
+                  },
+                );
+              }),
+            ),
+          ],
+        ),
+        bottomNavigationBar: Obx(
+          () => Container(
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(color: Colors.white),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!isPreview.value) ...[
+                  Obx(
+                    () => AnimatedSize(
+                      duration: const Duration(milliseconds: 300),
+                      child: showAddPanel.value
+                          ? Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    _addBtn(
+                                      "Teks",
+                                      Icons.notes,
+                                      Colors.blue,
+                                      () => controller.addBlock(BlockType.text),
+                                    ),
+                                    _addBtn(
+                                      "Gambar",
+                                      Icons.image,
+                                      Colors.orange,
+                                      () =>
+                                          controller.addBlock(BlockType.image),
+                                    ),
+                                    _addBtn(
+                                      "Video",
+                                      Icons.play_circle,
+                                      Colors.red,
+                                      () =>
+                                          controller.addBlock(BlockType.video),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                const Divider(height: 1),
+                                const SizedBox(height: 12),
+                              ],
                             )
-                          : const Icon(Icons.save),
-                      label: Text(
-                        controller.isSaving.value ? "Menyimpan..." : "Simpan",
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6C63FF),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
+                          : const SizedBox.shrink(),
                     ),
                   ),
                 ],
-              ),
-            ],
+
+                Row(
+                  children: [
+                    if (!isPreview.value)
+                      Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: IconButton(
+                          onPressed: () => showAddPanel.toggle(),
+                          icon: Obx(
+                            () => Icon(
+                              showAddPanel.value
+                                  ? Icons.keyboard_arrow_down
+                                  : Icons.add,
+                              color: const Color(0xFF6C63FF),
+                            ),
+                          ),
+                          tooltip: "Toggle Menu Tambah",
+                        ),
+                      ),
+
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          isPreview.value = !isPreview.value;
+                        },
+                        icon: Icon(
+                          isPreview.value ? Icons.edit : Icons.remove_red_eye,
+                        ),
+                        label: Text(
+                          isPreview.value ? "Kembali Edit" : "Preview",
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF6C63FF),
+                          side: const BorderSide(color: Color(0xFF6C63FF)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: controller.isSaving.value
+                            ? null
+                            : controller.saveMaterial,
+                        icon: controller.isSaving.value
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.save),
+                        label: Text(
+                          controller.isSaving.value ? "Menyimpan..." : "Simpan",
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6C63FF),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -249,76 +301,105 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
     return AnimatedBlockWrapper(
       key: key,
       onRemove: () => controller.removeBlockById(block.id),
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade300),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 2,
-              offset: Offset(0, 1),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(8),
-                ),
+      child: ShakeWidget(
+        key: controller.getBlockShakeKey(block.id),
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade300),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 2,
+                offset: Offset(0, 1),
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    _getIconByType(block.type),
-                    size: 14,
-                    color: Colors.grey[600],
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(8),
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    block.type.name.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _getIconByType(block.type),
+                      size: 14,
                       color: Colors.grey[600],
                     ),
-                  ),
-                  const Spacer(),
-                  Builder(
-                    builder: (context) {
-                      return InkWell(
-                        onTap: () {
-                          context
-                              .findAncestorStateOfType<
-                                AnimatedBlockWrapperState
-                              >()
-                              ?.animateDelete();
-                        },
-                        child: const Icon(
-                          Icons.delete,
-                          size: 18,
-                          color: Colors.red,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  const Icon(Icons.drag_handle, color: Colors.grey),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      block.type.name.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const Spacer(),
+                    Builder(
+                      builder: (context) {
+                        return InkWell(
+                          onTap: () {
+                            context
+                                .findAncestorStateOfType<
+                                  AnimatedBlockWrapperState
+                                >()
+                                ?.animateDelete();
+                          },
+                          child: const Icon(
+                            Icons.delete,
+                            size: 18,
+                            color: Colors.red,
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.drag_handle, color: Colors.grey),
+                  ],
+                ),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: _buildBlockInput(index, block, controller),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildBlockInput(index, block, controller),
+                    Obx(() {
+                      final error = controller.fieldErrors[block.id];
+                      if (error != null) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            error,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -429,6 +510,7 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
             ),
           ],
         );
+
       case BlockType.video:
         String source = block.attributes['source'] ?? 'link';
         bool isLocal = block.attributes['isLocal'] == true;
@@ -454,12 +536,7 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
                   ],
                   selected: {source},
                   onSelectionChanged: (Set<String> newSelection) {
-                    controller.updateBlockAttribute(
-                      index,
-                      'source',
-                      newSelection.first,
-                    );
-                    controller.updateBlockContent(index, '');
+                    controller.setVideoSource(index, newSelection.first);
                   },
                 ),
               ),
@@ -473,44 +550,71 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
                   color: Colors.grey[100],
                   alignment: Alignment.center,
                   child: block.content.isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: (isLocal && !block.content.startsWith('http'))
-                              ? SizedBox(
-                                  height: 200,
-                                  width: double.infinity,
-                                  child: VideoPreview(
-                                    path: block.content,
-                                    isUrl: false,
-                                  ),
-                                )
-                              : (block.content.startsWith('http'))
-                              ? SizedBox(
-                                  height: 200,
-                                  width: double.infinity,
-                                  child: VideoPreview(
-                                    path: block.content,
-                                    isUrl: true,
-                                  ),
-                                )
-                              : Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.check_circle,
-                                      color: Colors.green,
-                                      size: 40,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    const Text("Video terupload"),
-                                    Text(
-                                      block.content.split('/').last,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
+                      ? Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child:
+                                  (isLocal && !block.content.startsWith('http'))
+                                  ? SizedBox(
+                                      height: 200,
+                                      width: double.infinity,
+                                      child: VideoPreview(
+                                        path: block.content,
+                                        isUrl: false,
                                       ),
+                                    )
+                                  : (block.content.startsWith('http'))
+                                  ? SizedBox(
+                                      height: 200,
+                                      width: double.infinity,
+                                      child: VideoPreview(
+                                        path: block.content,
+                                        isUrl: true,
+                                      ),
+                                    )
+                                  : Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                          size: 40,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        const Text("Video terupload"),
+                                        Text(
+                                          block.content.split('/').last,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: InkWell(
+                                onTap: () =>
+                                    controller.clearBlockContent(index),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
                                 ),
+                              ),
+                            ),
+                          ],
                         )
                       : const Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -530,12 +634,34 @@ class MaterialBuilderView extends GetView<MaterialBuilderController> {
               )
             else
               TextFormField(
-                initialValue: block.content,
-                onChanged: (val) => controller.updateBlockContent(index, val),
-                decoration: const InputDecoration(
+                controller: controller.getTextController(
+                  block.id,
+                  block.content,
+                ),
+                decoration: InputDecoration(
                   hintText: "Tempel URL Video (YouTube/Drive)...",
-                  prefixIcon: Icon(Icons.link),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.link),
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (controller
+                          .getTextController(block.id, block.content)
+                          .text
+                          .isEmpty)
+                        IconButton(
+                          icon: const Icon(Icons.paste),
+                          tooltip: "Tempel Link",
+                          onPressed: () => controller.pasteFromClipboard(index),
+                        )
+                      else
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          tooltip: "Hapus Link",
+                          onPressed: () => controller.clearBlockContent(index),
+                        ),
+                    ],
+                  ),
+                  border: const OutlineInputBorder(),
                   isDense: true,
                 ),
               ),

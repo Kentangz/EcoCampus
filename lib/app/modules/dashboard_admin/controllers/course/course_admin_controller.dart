@@ -13,11 +13,65 @@ class CourseAdminController extends GetxController {
 
   final isLoading = true.obs;
 
+  // === FILTER & SEARCH ===
+  final searchController = TextEditingController();
+  final sortOrder = 'terbaru'.obs;
+  final filterStatus = 'semua'.obs;
+
+  List<CourseModel> get visibleCourses {
+    var list = List<CourseModel>.from(courses);
+
+    if (filterStatus.value == 'aktif') {
+      list = list.where((c) => c.isActive).toList();
+    } else if (filterStatus.value == 'draft') {
+      list = list.where((c) => !c.isActive).toList();
+    }
+
+    if (searchController.text.isNotEmpty) {
+      final query = searchController.text.toLowerCase();
+      list = list.where((c) => c.title.toLowerCase().contains(query)).toList();
+    }
+    switch (sortOrder.value) {
+      case 'terbaru':
+        list.sort((a, b) {
+          final aDate = a.createdAt ?? DateTime(0);
+          final bDate = b.createdAt ?? DateTime(0);
+          return bDate.compareTo(aDate);
+        });
+        break;
+      case 'terlama':
+        list.sort((a, b) {
+          final aDate = a.createdAt ?? DateTime(0);
+          final bDate = b.createdAt ?? DateTime(0);
+          return aDate.compareTo(bDate);
+        });
+        break;
+      case 'az':
+        list.sort((a, b) => a.title.compareTo(b.title));
+        break;
+      case 'za':
+        list.sort((a, b) => b.title.compareTo(a.title));
+        break;
+    }
+
+    return list;
+  }
+
   // === LIFECYCLE ===
   @override
   void onInit() {
     super.onInit();
     courses.bindStream(_courseRepo.getAllCourses());
+    courses.listen((event) {
+      isLoading.value = false;
+    });
+    searchController.addListener(() => courses.refresh());
+  }
+
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
   }
 
   // === NAVIGATION ===

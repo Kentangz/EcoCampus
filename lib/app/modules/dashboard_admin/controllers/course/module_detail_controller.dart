@@ -16,7 +16,20 @@ class ModuleDetailController extends GetxController {
   final sections = <SectionModel>[].obs;
   final isLoading = true.obs;
 
-  final isPreviewMode = false.obs;
+  // === REORDER SECTION ===
+  Future<void> reorderSections(int oldIndex, int newIndex) async {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = sections.removeAt(oldIndex);
+    sections.insert(newIndex, item);
+
+    for (int i = 0; i < sections.length; i++) {
+      sections[i].order = i + 1;
+    }
+
+    await _courseRepo.reorderSections(courseId, module.id!, sections);
+  }
 
   @override
   void onInit() {
@@ -25,12 +38,13 @@ class ModuleDetailController extends GetxController {
     if (args != null) {
       courseId = args['courseId'];
       module = args['module'];
+      if (module.id == null) {
+        NotificationHelper.showError("Error", "ID Modul tidak ditemukan");
+        Get.back();
+        return;
+      }
       sections.bindStream(_courseRepo.getSections(courseId, module.id!));
     }
-  }
-
-  void togglePreview() {
-    isPreviewMode.value = !isPreviewMode.value;
   }
 
   // === SECTION MANAGEMENT ===
@@ -81,63 +95,39 @@ class ModuleDetailController extends GetxController {
       onConfirm: () async {
         Get.back();
         await _courseRepo.deleteSection(courseId, module.id!, sectionId);
+        tileControllers.remove(sectionId);
+        _materialStreams.remove(sectionId);
       },
     );
   }
 
   // === MATERIAL (TOPIC) MANAGEMENT ===
+  final Map<String, Stream<List<MaterialModel>>> _materialStreams = {};
 
   Stream<List<MaterialModel>> getMaterialsStream(String sectionId) {
-    return _courseRepo.getMaterials(courseId, module.id!, sectionId).map((
-      materials,
-    ) {
-      materials.sort((a, b) => a.order.compareTo(b.order));
-      return materials;
-    });
+    if (_materialStreams.containsKey(sectionId)) {
+      return _materialStreams[sectionId]!;
+    }
+
+    final stream = _courseRepo
+        .getMaterials(courseId, module.id!, sectionId)
+        .map((materials) {
+          materials.sort((a, b) => a.order.compareTo(b.order));
+          return materials;
+        });
+
+    _materialStreams[sectionId] = stream;
+    return stream;
   }
 
-  void showAddMaterialDialog(String sectionId, int nextOrder) {
-    final titleC = TextEditingController();
-
-    Get.defaultDialog(
-      title: "Tambah Materi Baru",
-      content: Column(
-        children: [
-          TextField(
-            controller: titleC,
-            decoration: const InputDecoration(
-              labelText: "Judul Materi (Misal: Sejarah Python)",
-              border: OutlineInputBorder(),
-            ),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-        ],
-      ),
-      textConfirm: "Buat",
-      textCancel: "Batal",
-      confirmTextColor: Colors.white,
-      buttonColor: const Color(0xFF6C63FF),
-      onConfirm: () async {
-        if (titleC.text.isEmpty) return;
-        Get.back();
-
-        final newMaterial = MaterialModel(
-          title: titleC.text,
-          order: nextOrder,
-          blocks: [],
-        );
-
-        try {
-          await _courseRepo.saveMaterial(
-            courseId,
-            module.id!,
-            sectionId,
-            newMaterial,
-          );
-          NotificationHelper.showSuccess("Berhasil", "Materi berhasil dibuat");
-        } catch (e) {
-          NotificationHelper.showError("Gagal", "Gagal membuat materi: $e");
-        }
+  void addMaterialDirectly(String sectionId, int nextOrder) {
+    Get.toNamed(
+      Routes.ADMIN_MATERIAL_BUILDER,
+      arguments: {
+        'courseId': courseId,
+        'moduleId': module.id,
+        'sectionId': sectionId,
+        'nextOrder': nextOrder,
       },
     );
   }
@@ -147,6 +137,7 @@ class ModuleDetailController extends GetxController {
       title: "Hapus Materi",
       middleText: "Yakin hapus materi ini beserta seluruh isinya?",
       textConfirm: "Hapus",
+      textCancel: "Batal",
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
       onConfirm: () async {
@@ -159,6 +150,21 @@ class ModuleDetailController extends GetxController {
         );
       },
     );
+  }
+
+  // === EXPANSION LOGIC ===
+  final Map<String, ExpansibleController> tileControllers = {};
+
+  ExpansibleController getTileController(String sectionId) {
+    return tileControllers.putIfAbsent(sectionId, () => ExpansibleController());
+  }
+
+  void onSectionExpanded(String sectionId) {
+    tileControllers.forEach((key, controller) {
+      if (key != sectionId) {
+        controller.collapse();
+      }
+    });
   }
 
   // === REORDER MATERIAL ===
@@ -175,16 +181,15 @@ class ModuleDetailController extends GetxController {
     materials.insert(newIndex, item);
 
     for (int i = 0; i < materials.length; i++) {
-      if (materials[i].order != i + 1) {
-        materials[i].order = i + 1;
-        await _courseRepo.saveMaterial(
-          courseId,
-          module.id!,
-          sectionId,
-          materials[i],
-        );
-      }
+      materials[i].order = i + 1;
     }
+
+    await _courseRepo.reorderMaterials(
+      courseId,
+      module.id!,
+      sectionId,
+      materials,
+    );
   }
 
   void navigateToBuilder(String sectionId, MaterialModel material) {

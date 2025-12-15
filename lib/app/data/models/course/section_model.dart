@@ -6,6 +6,7 @@ class SectionModel extends BaseOrderedCourseModel {
     super.id,
     required super.title,
     required super.order,
+    super.isSynced,
   });
 
   factory SectionModel.fromSnapshot(
@@ -16,6 +17,7 @@ class SectionModel extends BaseOrderedCourseModel {
       id: doc.id,
       title: data['title'] ?? '',
       order: data['order'] ?? 0,
+      isSynced: !doc.metadata.hasPendingWrites,
     );
   }
 }

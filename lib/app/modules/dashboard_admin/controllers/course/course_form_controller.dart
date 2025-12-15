@@ -5,6 +5,7 @@ import 'package:ecocampus/app/services/upload_queue_service.dart';
 import 'package:ecocampus/app/shared/utils/app_icons.dart';
 import 'package:ecocampus/app/shared/utils/notification_helper.dart';
 import 'package:ecocampus/app/shared/widgets/icon_picker_dialog.dart';
+import 'package:ecocampus/app/shared/widgets/image_picker.dart';
 import 'package:ecocampus/app/shared/widgets/shake_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,35 +23,50 @@ class CourseFormController extends GetxController
   final titleC = TextEditingController();
 
   // === STATE VARIABLES ===
-  final heroImageUrl = ''.obs;
-  final isActive = true.obs;
+  final selectedIcon = 'school'.obs;
+  final isActive = false.obs;
   final isLoading = false.obs;
   final isUploading = false.obs;
+
+  // Banner Image State
+  final courseImagePath = ''.obs;
+  final isCourseImageRemoved = false.obs;
+
+  final techStackIcon = ''.obs;
 
   String? courseId;
   final isEditMode = false.obs;
 
   final modules = <ModuleModel>[].obs;
   final quizzes = <QuizModel>[].obs;
-  final deletedModuleIds = <String>[];
 
   @override
   void onInit() {
     super.onInit();
-    tabController = TabController(length: 3, vsync: this);
-
     final CourseModel? args = Get.arguments;
     if (args != null) {
       isEditMode.value = true;
       courseId = args.id;
       titleC.text = args.title;
-      heroImageUrl.value = args.heroImage;
+      selectedIcon.value = args.icon;
       isActive.value = args.isActive;
+
+      if (args.imageUrl != null) courseImagePath.value = args.imageUrl!;
+
+      if (args.techStackIcon != null) {
+        techStackIcon.value = args.techStackIcon!;
+      }
+
       _loadModules();
       _loadQuizzes();
     } else {
       courseId = _courseRepo.newId;
     }
+
+    tabController = TabController(
+      length: isEditMode.value ? 3 : 1,
+      vsync: this,
+    );
   }
 
   void _loadModules() {
@@ -88,34 +104,55 @@ class CourseFormController extends GetxController
 
     isLoading.value = true;
     try {
-      String finalHeroUrl = heroImageUrl.value;
-      if (finalHeroUrl.isNotEmpty && !finalHeroUrl.startsWith('http')) {}
+      String? finalCourseParamsUrl;
+      bool isNewCourseImage = false;
+
+      if (isCourseImageRemoved.value) {
+        finalCourseParamsUrl = null;
+      } else if (courseImagePath.value.isNotEmpty &&
+          !courseImagePath.value.startsWith('http')) {
+        finalCourseParamsUrl = courseImagePath.value;
+        isNewCourseImage = true;
+      } else {
+        final CourseModel? args = Get.arguments;
+        finalCourseParamsUrl = args?.imageUrl;
+      }
 
       final course = CourseModel(
         id: courseId,
         title: titleC.text,
-        heroImage: finalHeroUrl,
+        icon: selectedIcon.value,
         isActive: isActive.value,
         category: 'akademik_karir',
         totalModules: modules.length,
+        totalQuizzes: quizzes.length,
+        imageUrl: finalCourseParamsUrl,
+        techStackIcon: techStackIcon.value.isEmpty ? null : techStackIcon.value,
       );
 
-      if (isEditMode.value && deletedModuleIds.isNotEmpty) {
-        for (var id in deletedModuleIds) {
-          await _courseRepo.deleteModule(courseId!, id);
+      try {
+        await _courseRepo
+            .saveCourseWithModules(course, modules)
+            .timeout(const Duration(seconds: 3));
+
+        if (isNewCourseImage && finalCourseParamsUrl != null) {
+          _queueService.addToQueue(
+            course.id!,
+            'imageUrl',
+            finalCourseParamsUrl,
+            collection: 'Courses',
+          );
         }
-      }
 
-      await _courseRepo.saveCourseWithModules(course, modules);
-
-      if (finalHeroUrl.isNotEmpty && !finalHeroUrl.startsWith('http')) {
-        _queueService.addToQueue(
-          courseId!,
-          'heroImage',
-          finalHeroUrl,
-          collection: CourseRepository.COLLECTION,
-        );
-      }
+        final CourseModel? oldArgs = Get.arguments;
+        if (oldArgs != null) {
+          if (oldArgs.imageUrl != null &&
+              oldArgs.imageUrl != finalCourseParamsUrl &&
+              oldArgs.imageUrl!.startsWith('http')) {
+            _queueService.addDeleteToQueue(oldArgs.imageUrl!);
+          }
+        }
+      } on Exception catch (_) {}
 
       Get.back();
       NotificationHelper.showSuccess(
@@ -123,22 +160,46 @@ class CourseFormController extends GetxController
         "Data kelas berhasil disimpan",
       );
     } catch (e) {
-      NotificationHelper.showError("Error", "Gagal menyimpan: $e");
+      if (e.toString().contains("TimeoutException")) {
+        Get.back();
+        NotificationHelper.showSuccess(
+          isEditMode.value ? "Diperbarui" : "Tersimpan",
+          "Data kelas berhasil disimpan (Offline)",
+        );
+      } else {
+        NotificationHelper.showError("Error", "Gagal menyimpan: $e");
+      }
     } finally {
       isLoading.value = false;
     }
   }
 
+  final moduleTitleError = ''.obs;
+  final moduleImageError = ''.obs;
+  final quizTitleError = ''.obs;
+
   // === MODULE DIALOG ===
   void showModuleDialog({ModuleModel? existingModule}) {
+    if (!isEditMode.value) return;
+
     final titleModuleC = TextEditingController(
       text: existingModule?.title ?? '',
     );
+    final moduleImagePath = ''.obs;
+    final isImageRemoved = false.obs;
+
+    final isModuleActive = (existingModule?.isActive ?? false).obs;
+
+    moduleTitleError.value = '';
+    moduleImageError.value = '';
+
+    final titleShakeKey = GlobalKey<ShakeWidgetState>();
+    final imageShakeKey = GlobalKey<ShakeWidgetState>();
 
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -152,15 +213,72 @@ class CourseFormController extends GetxController
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: titleModuleC,
-                decoration: InputDecoration(
-                  labelText: "Nama Modul",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              ShakeWidget(
+                key: titleShakeKey,
+                child: Obx(
+                  () => TextField(
+                    controller: titleModuleC,
+                    onChanged: (_) => moduleTitleError.value = '',
+                    decoration: InputDecoration(
+                      labelText: "Nama Modul",
+                      errorText: moduleTitleError.value.isNotEmpty
+                          ? moduleTitleError.value
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                    ),
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
+                ),
+              ),
+              const SizedBox(height: 10),
+              Obx(
+                () => SwitchListTile(
+                  title: const Text("Status Aktif"),
+                  value: isModuleActive.value,
+                  onChanged: (val) => isModuleActive.value = val,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Obx(
+                () => ShakeWidget(
+                  key: imageShakeKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomImagePicker(
+                        label: "Sampul Modul",
+                        initialImageUrl: moduleImagePath.value.isNotEmpty
+                            ? moduleImagePath.value
+                            : existingModule?.imageUrl ?? '',
+                        allowDelete: false,
+                        onImagePicked: (file) {
+                          if (file != null) {
+                            moduleImagePath.value = file.path;
+                            isImageRemoved.value = false;
+                            moduleImageError.value = '';
+                          } else {
+                            moduleImagePath.value = '';
+                            isImageRemoved.value = true;
+                          }
+                        },
+                      ),
+                      if (moduleImageError.value.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8, left: 12),
+                          child: Text(
+                            moduleImageError.value,
+                            style: TextStyle(
+                              color: Colors.red[700],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -177,26 +295,100 @@ class CourseFormController extends GetxController
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () async {
-                      if (titleModuleC.text.isEmpty) return;
+                      bool isValid = true;
+
+                      if (titleModuleC.text.isEmpty) {
+                        titleShakeKey.currentState?.shake();
+                        moduleTitleError.value = "Nama modul wajib diisi";
+                        isValid = false;
+                      }
+
+                      bool hasImage = false;
+                      if (moduleImagePath.value.isNotEmpty) {
+                        hasImage = true;
+                      } else if (!isImageRemoved.value &&
+                          existingModule?.imageUrl != null &&
+                          existingModule!.imageUrl!.isNotEmpty) {
+                        hasImage = true;
+                      }
+
+                      if (!hasImage) {
+                        imageShakeKey.currentState?.shake();
+                        moduleImageError.value = "Gambar modul wajib diisi";
+                        isValid = false;
+                      }
+
+                      if (!isValid) return;
+
                       Get.back();
 
+                      String? finalImageUrl;
+                      bool isNewImage = false;
+
+                      if (isImageRemoved.value) {
+                        finalImageUrl = null;
+                      } else if (moduleImagePath.value.isNotEmpty) {
+                        finalImageUrl = moduleImagePath.value;
+                        isNewImage = true;
+                      } else if (existingModule?.imageUrl != null) {
+                        finalImageUrl = existingModule!.imageUrl;
+                      }
+
+                      ModuleModel moduleToSave;
                       if (existingModule != null) {
-                        int index = modules.indexOf(existingModule);
-                        if (index != -1) {
-                          modules[index] = ModuleModel(
-                            id: existingModule.id,
-                            title: titleModuleC.text,
-                            order: existingModule.order,
-                          );
-                          if (isEditMode.value) {}
-                        }
+                        moduleToSave = ModuleModel(
+                          id: existingModule.id,
+                          title: titleModuleC.text,
+                          order: existingModule.order,
+                          imageUrl: finalImageUrl,
+                          isActive: isModuleActive.value,
+                        );
                       } else {
-                        final newModule = ModuleModel(
-                          id: null,
+                        moduleToSave = ModuleModel(
+                          id: isEditMode.value ? _courseRepo.newId : null,
                           title: titleModuleC.text,
                           order: modules.length + 1,
+                          imageUrl: finalImageUrl,
+                          isActive: isModuleActive.value,
                         );
-                        modules.add(newModule);
+                      }
+
+                      if (courseId != null) {
+                        try {
+                          await _courseRepo.saveModule(
+                            courseId!,
+                            moduleToSave,
+                            isNew: existingModule == null,
+                          );
+
+                          if (isNewImage && finalImageUrl != null) {
+                            _queueService.addToQueue(
+                              moduleToSave.id!,
+                              'imageUrl',
+                              finalImageUrl,
+                              collection: 'Courses/$courseId/modules',
+                            );
+                          }
+
+                          if (existingModule != null &&
+                              existingModule.imageUrl != null &&
+                              existingModule.imageUrl != finalImageUrl &&
+                              existingModule.imageUrl!.startsWith('http')) {
+                            _queueService.addDeleteToQueue(
+                              existingModule.imageUrl!,
+                            );
+                          }
+
+                          NotificationHelper.showSuccess(
+                            "Tersimpan",
+                            "Modul berhasil disimpan",
+                          );
+                        } catch (e) {
+                          NotificationHelper.showError(
+                            "Error",
+                            "Gagal menyimpan modul: $e",
+                          );
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -231,15 +423,12 @@ class CourseFormController extends GetxController
       onConfirm: () async {
         Get.back();
 
-        if (isEditMode.value && module.id != null) {
+        if (module.id != null) {
           try {
-            await _courseRepo.deleteModule(courseId!, module.id!);
-            modules.remove(module);
+            await _courseRepo.deleteModule(courseId!, module);
           } catch (e) {
-            //
+            NotificationHelper.showError("Gagal", "Gagal menghapus modul: $e");
           }
-        } else {
-          modules.remove(module);
         }
 
         for (int i = 0; i < modules.length; i++) {
@@ -247,6 +436,25 @@ class CourseFormController extends GetxController
         }
       },
     );
+  }
+
+  // === REORDER MODULES ===
+  void reorderModules(int oldIndex, int newIndex) {
+    if (!isEditMode.value) return;
+
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final ModuleModel item = modules.removeAt(oldIndex);
+    modules.insert(newIndex, item);
+
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].order = i + 1;
+    }
+
+    if (courseId != null) {
+      _courseRepo.reorderModules(courseId!, modules);
+    }
   }
 
   // === NAVIGATION ===
@@ -267,7 +475,6 @@ class CourseFormController extends GetxController
     );
   }
 
-
   // === QUIZ MANAGEMENT ===
 
   IconData getIcon(String name) => AppIcons.getIcon(name);
@@ -279,6 +486,7 @@ class CourseFormController extends GetxController
     }
 
     final titleQuizC = TextEditingController(text: existingQuiz?.title ?? '');
+    quizTitleError.value = '';
 
     final selectedIcon = (existingQuiz?.icon ?? 'quiz').obs;
     final isActive = (existingQuiz?.isActive ?? false).obs;
@@ -290,11 +498,17 @@ class CourseFormController extends GetxController
         width: 300,
         child: Column(
           children: [
-            TextField(
-              controller: titleQuizC,
-              decoration: const InputDecoration(
-                labelText: "Judul Kuis / Latihan",
-                border: OutlineInputBorder(),
+            Obx(
+              () => TextField(
+                controller: titleQuizC,
+                onChanged: (_) => quizTitleError.value = '',
+                decoration: InputDecoration(
+                  labelText: "Judul Kuis / Latihan",
+                  errorText: quizTitleError.value.isNotEmpty
+                      ? quizTitleError.value
+                      : null,
+                  border: const OutlineInputBorder(),
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -362,7 +576,10 @@ class CourseFormController extends GetxController
       confirmTextColor: Colors.white,
       buttonColor: const Color(0xFF6C63FF),
       onConfirm: () async {
-        if (titleQuizC.text.isEmpty) return;
+        if (titleQuizC.text.isEmpty) {
+          quizTitleError.value = "Judul kuis wajib diisi";
+          return;
+        }
         Get.back();
 
         final quiz = QuizModel(
@@ -375,8 +592,11 @@ class CourseFormController extends GetxController
           totalQuestions: existingQuiz?.totalQuestions ?? 0,
         );
 
-        await _courseRepo.saveQuiz(courseId!, quiz);
-        quizzes.bindStream(_courseRepo.getQuizzes(courseId!));
+        await _courseRepo.saveQuiz(
+          courseId!,
+          quiz,
+          isNew: existingQuiz == null,
+        );
       },
     );
   }
@@ -387,6 +607,7 @@ class CourseFormController extends GetxController
       middleText:
           "Yakin hapus '${quiz.title}'? Semua soal di dalamnya akan hilang.",
       textConfirm: "Hapus",
+      textCancel: "Batal",
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
       onConfirm: () async {
