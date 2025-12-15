@@ -13,7 +13,11 @@ abstract class Routes {
 
   //user
   static const DASHBOARD_USER = _Paths.DASHBOARD_USER;
+  static const KALIGRAFI = _Paths.KALIGRAFI;
+  static const AKUSTIK = _Paths.AKUSTIK;
+  static const NONTONFILM = _Paths.NONTONFILM;
 
+  static const KOLABORASI_KAMPUS = _Paths.KOLABORASI_KAMPUS;
 
   //admin
   static const DASHBOARD_ADMIN = _Paths.DASHBOARD_ADMIN;
@@ -28,6 +32,7 @@ abstract class Routes {
 abstract class _Paths {
   _Paths._();
 
+  //auth
   static const LOGIN = '/login';
   static const REGISTER = '/register';
   static const FORGOT_PASSWORD = '/forgot-password';
@@ -35,6 +40,10 @@ abstract class _Paths {
 
   //user
   static const DASHBOARD_USER = '/dashboard-user';
+  static const KALIGRAFI = '/kaligrafi';
+  static const AKUSTIK = '/akustik';
+  static const NONTONFILM = '/nontonfilm';
+  static const KOLABORASI_KAMPUS = '/kolaborasi-kampus';
 
   //admin
   static const DASHBOARD_ADMIN = '/dashboard-admin';
