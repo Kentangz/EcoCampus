@@ -14,7 +14,6 @@ class DeepLinkService {
   final AppLinks _appLinks = AppLinks();
   StreamSubscription<Uri>? _subscription;
 
-  // Debounce mechanism to prevent duplicate handling
   String? _lastProcessedUri;
   DateTime? _lastProcessedTime;
 
@@ -31,7 +30,6 @@ class DeepLinkService {
   }
 
   void _handleUri(Uri uri) {
-    // Debounce: skip if same URI was processed recently
     final uriString = uri.toString();
     final now = DateTime.now();
     if (_lastProcessedUri == uriString && _lastProcessedTime != null) {
@@ -46,7 +44,6 @@ class DeepLinkService {
     String? oobCode;
     String? mode;
 
-    // Parse the URI to extract mode and oobCode
     _parseFirebaseLink(uri, (extractedMode, extractedCode) {
       mode = extractedMode;
       oobCode = extractedCode;
@@ -56,7 +53,6 @@ class DeepLinkService {
       return;
     }
 
-    // Handle different modes
     switch (mode) {
       case 'resetPassword':
         Get.toNamed(Routes.RESET_PASSWORD, arguments: oobCode);
@@ -73,8 +69,6 @@ class DeepLinkService {
     String? mode;
     String? oobCode;
 
-    // Primary format: Firebase action link /__/auth/action?mode=xxx&oobCode=xxx
-    // This is the format used when Custom Action URL is configured in Firebase Console
     if (uri.path.contains('auth/action')) {
       mode = uri.queryParameters['mode'];
       oobCode = uri.queryParameters['oobCode'];
@@ -84,23 +78,17 @@ class DeepLinkService {
   }
 
   Future<void> _handleEmailVerification(String oobCode) async {
-    // Wait for the app to be fully ready before proceeding
     await Future.delayed(const Duration(seconds: 2));
 
     try {
       final authRepo = AuthenticationRepository.instance;
       await authRepo.applyActionCode(oobCode);
 
-      // Use WidgetsBinding to safely navigate after frame is ready
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        // Wait a bit more for safety
         await Future.delayed(const Duration(milliseconds: 300));
-
-        // Navigate to user dashboard (only users go through email verification)
         Get.offAllNamed(Routes.DASHBOARD_USER);
       });
     } catch (_) {
-      // Use WidgetsBinding to safely navigate after frame is ready
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Future.delayed(const Duration(milliseconds: 300));
         Get.offAllNamed(Routes.LOGIN);

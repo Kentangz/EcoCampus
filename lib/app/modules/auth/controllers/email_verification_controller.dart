@@ -31,11 +31,9 @@ class EmailVerificationController extends GetxController {
     try {
       isLoading(true);
 
-      // Reload user to get latest email verification status
       await _authRepo.currentUser?.reload();
 
       if (_authRepo.isEmailVerified) {
-        // Move user data from PendingUsers to Users
         final uid = _authRepo.currentUser?.uid;
         if (uid != null) {
           await _authRepo.movePendingUserToVerified(uid);
@@ -46,7 +44,6 @@ class EmailVerificationController extends GetxController {
           "Email Anda sudah terverifikasi!",
         );
 
-        // Navigate to user dashboard (only users go through email verification)
         Get.offAllNamed(Routes.DASHBOARD_USER);
       } else {
         NotificationHelper.showInfo(

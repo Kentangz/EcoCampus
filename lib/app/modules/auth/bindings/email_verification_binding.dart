@@ -4,8 +4,6 @@ import 'package:ecocampus/app/modules/auth/controllers/email_verification_contro
 class EmailVerificationBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<EmailVerificationController>(
-      () => EmailVerificationController(),
-    );
+    Get.lazyPut<EmailVerificationController>(() => EmailVerificationController());
   }
 }

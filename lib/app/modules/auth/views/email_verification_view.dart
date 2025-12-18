@@ -22,7 +22,6 @@ class EmailVerificationView extends GetView<EmailVerificationController> {
             children: [
               const SizedBox(height: 60),
 
-              // Logo
               SizedBox(
                 height: 150,
                 child: Image.asset(
@@ -39,7 +38,6 @@ class EmailVerificationView extends GetView<EmailVerificationController> {
 
               const SizedBox(height: 30),
 
-              // Title
               const Text(
                 'Verifikasi Email',
                 textAlign: TextAlign.center,
@@ -53,7 +51,6 @@ class EmailVerificationView extends GetView<EmailVerificationController> {
 
               const SizedBox(height: 15),
 
-              // Description
               Text(
                 'Kami telah mengirim link verifikasi ke:',
                 textAlign: TextAlign.center,
@@ -66,7 +63,6 @@ class EmailVerificationView extends GetView<EmailVerificationController> {
 
               const SizedBox(height: 10),
 
-              // Email
               Text(
                 controller.userEmail,
                 textAlign: TextAlign.center,
@@ -80,7 +76,6 @@ class EmailVerificationView extends GetView<EmailVerificationController> {
 
               const SizedBox(height: 20),
 
-              // Instructions
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -106,7 +101,6 @@ class EmailVerificationView extends GetView<EmailVerificationController> {
 
               const SizedBox(height: 40),
 
-              // Check Verification Button
               SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -146,7 +140,6 @@ class EmailVerificationView extends GetView<EmailVerificationController> {
 
               const SizedBox(height: 15),
 
-              // Resend Button
               SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -185,7 +178,6 @@ class EmailVerificationView extends GetView<EmailVerificationController> {
 
               const SizedBox(height: 30),
 
-              // Logout link
               TextButton(
                 onPressed: controller.logout,
                 child: const Text(

@@ -51,7 +51,6 @@ class RegisterController extends GetxController {
         phoneC.text.trim(),
       );
 
-      // Send email verification
       await _authRepo.sendEmailVerification();
 
       NotificationHelper.showSuccess(
@@ -59,8 +58,6 @@ class RegisterController extends GetxController {
         "Akun berhasil dibuat. Silakan cek email untuk verifikasi.",
       );
 
-      // Navigation is handled automatically by authStateChanges listener
-      // which will redirect to EMAIL_VERIFICATION screen
     } catch (e) {
       String errorMessage;
       if (e is FirebaseAuthException) {
