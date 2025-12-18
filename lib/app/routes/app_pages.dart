@@ -1,6 +1,8 @@
 // ignore_for_file: constant_identifier_names
 import 'package:ecocampus/app/modules/auth/bindings/auth_binding.dart';
+import 'package:ecocampus/app/modules/auth/bindings/email_verification_binding.dart';
 import 'package:ecocampus/app/modules/auth/bindings/reset_password_binding.dart';
+import 'package:ecocampus/app/modules/auth/views/email_verification_view.dart';
 import 'package:ecocampus/app/modules/auth/views/forgot_password_view.dart';
 import 'package:ecocampus/app/modules/auth/views/reset_password_view.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/question_form_binding.dart';
@@ -69,6 +71,11 @@ class AppPages {
       name: _Paths.RESET_PASSWORD,
       page: () => const ResetPasswordView(),
       binding: ResetPasswordBinding(),
+    ),
+    GetPage(
+      name: _Paths.EMAIL_VERIFICATION,
+      page: () => const EmailVerificationView(),
+      binding: EmailVerificationBinding(),
     ),
 
     //user
