@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'detail_news_view.dart';
 
 class FinanceView extends StatefulWidget {
   const FinanceView({super.key});
@@ -81,11 +82,26 @@ class _FinanceViewState extends State<FinanceView> {
                   ),
                   itemBuilder: (context, index) {
                     final article = articles[index];
-                    return financeCard(
-                      title: article['title'] ?? "No Title",
-                      imageUrl: article['urlToImage'],
+
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DetailNewsView(
+                              url: article['url'],
+                              title: article['title'] ?? "Detail Berita",
+                            ),
+                          ),
+                        );
+                      },
+                      child: financeCard(
+                        title: article['title'] ?? "No Title",
+                        imageUrl: article['urlToImage'],
+                      ),
                     );
                   },
+
                 ),
         ],
       ),
