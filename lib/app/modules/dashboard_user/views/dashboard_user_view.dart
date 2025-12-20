@@ -186,6 +186,9 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
             case "Nonton Film":
               Get.toNamed(Routes.NONTONFILM);
               break;
+            case "Info Magang Startup":
+              Get.toNamed(Routes.MAGANG);
+              break;
           }
         };
 

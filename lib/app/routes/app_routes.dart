@@ -16,6 +16,8 @@ abstract class Routes {
   static const KALIGRAFI = _Paths.KALIGRAFI;
   static const AKUSTIK = _Paths.AKUSTIK;
   static const NONTONFILM = _Paths.NONTONFILM;
+  static const MAGANG = _Paths.MAGANG;
+  static const DETAILMAGANG = _Paths.DETAILMAGANG;
   static const KOLABORASI_KAMPUS = _Paths.KOLABORASI_KAMPUS;
   static const PROJECT_ANALISIS = _Paths.PROJECT_ANALISIS;
   static const PROJECT_UIUX = _Paths.PROJECT_UIUX;
@@ -50,6 +52,8 @@ abstract class _Paths {
   static const KALIGRAFI = '/kaligrafi';
   static const AKUSTIK = '/akustik';
   static const NONTONFILM = '/nontonfilm';
+  static const MAGANG = '/infomagang';
+  static const DETAILMAGANG = '/infodetailmagang';
   static const KOLABORASI_KAMPUS = '/kolaborasi-kampus';
   static const PROJECT_ANALISIS = '/project-analisis';
   static const PROJECT_UIUX = '/project-ui-ux';

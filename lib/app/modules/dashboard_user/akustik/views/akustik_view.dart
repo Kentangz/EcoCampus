@@ -50,33 +50,41 @@ class _AkustikContent extends GetView<AkustikController> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
               ),
               Obx(() {
-                final clubData = controller.clubData.value;
+                final data = controller.eventActivity.value;;
                 final contacts = controller.eventActivity.value?.contacts ?? ContactModel(email: '', whatsapp: '', instagram: '');
+                if (data == null) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 50),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
                     BannerCard(
-                      imageUrl: clubData.bannerUrl,
-                      title: 'Join ${clubData.title} Club',
+                      imageUrl: data.heroImage,
+                      title: 'Join ${data.title} Club',
                       buttonText: 'Gabung Sekarang',
-                      onTap: controller.joinClub,
+                      onTap: () {},
                       contacts: contacts,
                     ),
                     const SizedBox(height: 20),
                     AboutUsSection(
                       title: 'Tentang Kami',
-                      content: clubData.aboutUsContent,
+                      content: data.description,
                     ),
                     const SizedBox(height: 20),
                     RoutineActivitiesSection(
                       title: 'Aktivitas Rutin',
-                      activities: clubData.routineActivities,
+                      activities: data.routines,
                     ),
                     const SizedBox(height: 20),
                     GallerySection(
                       title: 'Gallery',
-                      images: clubData.galleryImages,
+                      images: data.gallery,
                     ),
                   ],
                 );
@@ -139,7 +147,13 @@ class BannerCard extends StatelessWidget {
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 30,
-                  fontWeight: FontWeight.bold
+                  fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(offset: Offset(-1.0, -1.0), color: Colors.black),
+                  Shadow(offset: Offset(1.0, -1.0), color: Colors.black),
+                  Shadow(offset: Offset(1.0, 1.0), color: Colors.black),
+                  Shadow(offset: Offset(-1.0, 1.0), color: Colors.black),
+                ],
               ),
             ),
           ),
@@ -433,7 +447,7 @@ class GallerySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
