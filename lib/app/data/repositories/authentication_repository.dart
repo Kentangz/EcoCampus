@@ -51,18 +51,19 @@ class AuthenticationRepository extends GetxController {
     if (user == null) {
       _navigateTo(Routes.LOGIN);
     } else {
+      final userModel = await getUserDetailsByUid(user.uid);
+
+      if (userModel != null && userModel.role == "admin") {
+        _navigateTo(Routes.DASHBOARD_ADMIN);
+        return;
+      }
       if (!user.emailVerified) {
         _navigateTo(Routes.EMAIL_VERIFICATION, force: true);
         return;
       }
-      final userModel = await getUserDetailsByUid(user.uid);
 
       if (userModel != null) {
-        if (userModel.role == "admin") {
-          _navigateTo(Routes.DASHBOARD_ADMIN);
-        } else {
-          _navigateTo(Routes.DASHBOARD_USER);
-        }
+        _navigateTo(Routes.DASHBOARD_USER);
       } else {
         await movePendingUserToVerified(user.uid);
         final movedUser = await getUserDetailsByUid(user.uid);
@@ -115,8 +116,7 @@ class AuthenticationRepository extends GetxController {
       if (userCredential?.user != null) {
         try {
           await userCredential!.user!.delete();
-        } catch (_) {
-        }
+        } catch (_) {}
       }
       rethrow;
     }
@@ -234,8 +234,7 @@ class AuthenticationRepository extends GetxController {
         await _db.collection("Users").doc(uid).set(pendingDoc.data()!);
         await _db.collection("PendingUsers").doc(uid).delete();
       }
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   bool get isEmailVerified {
