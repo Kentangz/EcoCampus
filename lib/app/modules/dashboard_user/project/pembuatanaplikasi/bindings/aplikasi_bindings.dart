@@ -1,9 +1,9 @@
-// import 'package:get/get.dart';
-// import '../controllers/aplikasi_controllers.dart';
+import 'package:get/get.dart';
+import '../controllers/aplikasi_controllers.dart';
 
-// class ProjectAplikasiBinding extends Bindings {
-//   @override
-//   void dependencies() {
-//     Get.lazyPut<ProjectAplikasiController>(() => ProjectAplikasiController());
-//   }
-// }
+class PembuatanAplikasiBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<PembuatanAplikasiController>(() => PembuatanAplikasiController());
+  }
+}

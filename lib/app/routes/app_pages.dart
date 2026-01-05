@@ -28,6 +28,8 @@ import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/b
 import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/views/aplikasi_views.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/bindings/project_ui_ux_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/view/project_ui_ux_view.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/risetpasarproduk/bindings/riset_bindings.dart';
+import 'package:ecocampus/app/modules/dashboard_user/project/risetpasarproduk/views/riset_views.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -40,6 +42,11 @@ import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/module_det
 import 'package:ecocampus/app/modules/dashboard_user/views/dashboard_user_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/bindings/dashboard_user_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_admin_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/project/project_form_admin.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/project/project_list_admin.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/project/project_admin_view.dart';
+import 'package:ecocampus/app/modules/project_detail/bindings/project_detail_bindings.dart';
+import 'package:ecocampus/app/modules/project_detail/views/project_detail_views.dart';
 
 part 'app_routes.dart';
 
@@ -70,7 +77,6 @@ class AppPages {
       page: () => const ResetPasswordView(),
       binding: ResetPasswordBinding(),
     ),
-
     //user
     GetPage(
       name: _Paths.DASHBOARD_USER,
@@ -107,6 +113,23 @@ class AppPages {
       page: () => const ProjectUiUxView(),
       binding: ProjectUiUxBinding(),
     ),
+    GetPage(
+      name: _Paths.RISET_PASAR,
+      page: () => const RisetPasarProdukView(),
+      binding: RisetPasarProdukBinding(),
+    ),
+    GetPage(
+      name: _Paths.PEMBUATAN_APLIKASI,
+      page: () => const PembuatanAplikasiView(),
+      binding: PembuatanAplikasiBinding(),
+    ),
+    GetPage(
+      name: Routes.PROJECT_DETAIL,
+      page: () => const ProjectDetailView(),
+      binding: ProjectDetailBinding(),
+    ),
+
+
 
     //admin
     GetPage(
@@ -167,6 +190,21 @@ class AppPages {
     GetPage(
       name: _Paths.ADMIN_NEWS_FORM,
       page: () => NewsFormAdmin(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_PROJECT,
+      page: () => const ProjectAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_PROJECT_LIST,
+      page: () => const ProjectListAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_PROJECT_FORM,
+      page: () => ProjectFormAdmin(),
       binding: DashboardAdminBinding(),
     ),
   ];

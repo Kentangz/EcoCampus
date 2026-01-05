@@ -15,7 +15,7 @@ class NewsListAdminView extends GetView<NewsAdminController> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
+      appBar: AppBar( 
         title: const Text(
           "Daftar Berita",
           style: TextStyle(

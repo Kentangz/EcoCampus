@@ -19,6 +19,10 @@ abstract class Routes {
   static const KOLABORASI_KAMPUS = _Paths.KOLABORASI_KAMPUS;
   static const PROJECT_ANALISIS = _Paths.PROJECT_ANALISIS;
   static const PROJECT_UIUX = _Paths.PROJECT_UIUX;
+  static const RISET_PASAR = _Paths.RISET_PASAR;
+  static const PEMBUATAN_APLIKASI = _Paths.PEMBUATAN_APLIKASI;
+  static const PROJECT_DETAIL = _Paths.PROJECT_DETAIL;
+
 
   //admin
   static const DASHBOARD_ADMIN = _Paths.DASHBOARD_ADMIN;
@@ -34,6 +38,9 @@ abstract class Routes {
   static const ADMIN_NEWS = _Paths.ADMIN_NEWS;
   static const ADMIN_NEWS_LIST = _Paths.ADMIN_NEWS_LIST;
   static const ADMIN_NEWS_FORM = _Paths.ADMIN_NEWS_FORM;
+  static const ADMIN_PROJECT = _Paths.ADMIN_PROJECT;
+  static const ADMIN_PROJECT_LIST = _Paths.ADMIN_PROJECT_LIST;
+  static const ADMIN_PROJECT_FORM = _Paths.ADMIN_PROJECT_FORM;
 }
 
 abstract class _Paths {
@@ -53,6 +60,9 @@ abstract class _Paths {
   static const KOLABORASI_KAMPUS = '/kolaborasi-kampus';
   static const PROJECT_ANALISIS = '/project-analisis';
   static const PROJECT_UIUX = '/project-ui-ux';
+  static const RISET_PASAR = '/project-riset-pasar';
+  static const PEMBUATAN_APLIKASI = '/project-pembuatan-aplikasi';
+  static const PROJECT_DETAIL = '/project-detail';
 
   //admin
   static const DASHBOARD_ADMIN = '/dashboard-admin';
@@ -68,4 +78,7 @@ abstract class _Paths {
   static const ADMIN_NEWS = '/admin-news';
   static const ADMIN_NEWS_LIST = '/admin-news-list';
   static const ADMIN_NEWS_FORM =  '/admin-news-form';
+  static const ADMIN_PROJECT = '/admin-project' ;
+  static const ADMIN_PROJECT_LIST = '/admin-project-list';
+  static const ADMIN_PROJECT_FORM = '/admin-project-form';
 }

@@ -11,11 +11,10 @@ class AnalisisView extends GetView<ProjectAnalisisDataController> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FAFF),
+      backgroundColor: const Color(0xFFEFF7F7),
       appBar: AppBar(
-        // jika project belum ada, tampilkan judul default
         title: Obx(() => Text(ctrl.project.value?.title ?? 'Analisis Data Penjualan')),
-        backgroundColor: const Color(0xFF2B7A78),
+        backgroundColor: const Color(0xFF71B4AD),
         elevation: 0,
       ),
       body: Obx(() {
@@ -29,154 +28,141 @@ class AnalisisView extends GetView<ProjectAnalisisDataController> {
 
         final project = ctrl.project.value;
         if (project == null) {
-          return Center(child: Text('Project tidak tersedia.'));
+          return const Center(child: Text('Project tidak tersedia.'));
         }
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // banner image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: SizedBox(
                 width: double.infinity,
-                height: width > 600 ? 260 : 180,
-                child: Image.asset(
-                  project.imageAsset,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stack) {
-                    return Container(
-                      color: Colors.grey.shade300,
-                      child: const Center(child: Icon(Icons.image, size: 48)),
-                    );
-                  },
+                height: width > 600 ? 300 : 200,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      project.imageAsset,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stack) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: const Center(child: Icon(Icons.image, size: 48)),
+                        );
+                      },
+                    ),
+
+                    // overlay gelap tipis agar teks kontras
+                    Container(
+                      color: Colors.black.withOpacity(0.2),
+                    ),
+
+                    // teks dari controller
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          project.title,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 6,
+                                color: Colors.black54,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-
-            // title & duration
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    project.title,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.teal.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(project.duration, style: const TextStyle(fontSize: 13)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // description
-            Text(ctrl.description.value, style: const TextStyle(fontSize: 14, height: 1.5)),
             const SizedBox(height: 16),
 
-            // quick metrics placeholder
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _metricCard('Total Revenue', '—'),
-                _metricCard('Total Transaksi', '—'),
-                _metricCard('Avg Order', '—'),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            const Text('Langkah Pengerjaan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-
-            // steps
-            Column(
-              children: ctrl.steps.map((s) => _stepCard(s)).toList(),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Buttons row — disable saat loading
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: ctrl.isLoading.value ? null : ctrl.downloadDataset,
-                    icon: const Icon(Icons.download_outlined),
-                    label: const Text('Download Dataset'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: ctrl.isLoading.value ? null : () => ctrl.startWork(),
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Mulai Pengerjaan'),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2B7A78)),
-                  ),
-                ),
-              ],
-            ),
-
+            Text(project.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
 
-            ElevatedButton(
-              onPressed: ctrl.isLoading.value ? null : ctrl.joinProject,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-              child: const Text('Gabung Proyek', style: TextStyle(color: Colors.black87)),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4AB8B6),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
+                Text('Deskripsi Proyek',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
+                SizedBox(height: 8),
+                Text(
+                  'Proyek ini berfokus pada analisis data penjualan untuk menemukan pola, tren, dan insight bisnis yang dapat digunakan dalam pengambilan keputusan.',
+                  style: TextStyle(fontSize: 14, height: 1.4, color: Colors.black),
+                ),
+                SizedBox(height: 16),
+                Text('Deliverables',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
+                SizedBox(height: 8),
+                _Bullet(text: 'Dataset cleaning & preprocessing'),
+                _Bullet(text: 'Exploratory Data Analysis (EDA)'),
+                _Bullet(text: 'Dashboard visualisasi penjualan'),
+                _Bullet(text: 'Insight & rekomendasi bisnis'),
+                SizedBox(height: 16),
+                Text('Kontak',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
+                SizedBox(height: 8),
+                Text('Email : data@company.id', style: TextStyle(fontSize: 14, color: Colors.black)),
+              ]),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 32),
+
+            Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEFF7F7),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: Colors.black, // warna garis
+                    width: 1.5,          // tebal garis
+                  ),
+                ),
+                child: TextButton(
+                  onPressed: () => Get.back(),
+                  style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14)),
+                  child: const Text('Kembali',
+                      style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 32),
           ]),
         );
       }),
     );
   }
+}
 
-  Widget _metricCard(String label, String value) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(color: Colors.black12.withOpacity(0.02), blurRadius: 6, offset: const Offset(0, 3)),
-          ],
-        ),
-        child: Column(
-          children: [
-            Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 6),
-            Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
-          ],
-        ),
-      ),
-    );
-  }
+class _Bullet extends StatelessWidget {
+  final String text;
+  const _Bullet({required this.text});
 
-  Widget _stepCard(String title) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(10),
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.check_circle_outline, size: 18),
-          const SizedBox(width: 10),
-          Expanded(child: Text(title, style: const TextStyle(fontSize: 14))),
+          const Icon(Icons.check_circle_outline, size: 18, color: Colors.black),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 14, color: Colors.black))),
         ],
       ),
     );

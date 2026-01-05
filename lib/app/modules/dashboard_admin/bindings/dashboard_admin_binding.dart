@@ -1,7 +1,9 @@
 import 'package:ecocampus/app/data/repositories/activity_repository.dart';
 import 'package:ecocampus/app/data/repositories/news_repository.dart';
+import 'package:ecocampus/app/data/repositories/project_repository.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/activity_admin_controller.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/news_admin_controller.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/controllers/project_admin_controller.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/controllers/dashboard_admin_controller.dart';
 
@@ -14,5 +16,7 @@ class DashboardAdminBinding extends Bindings {
     Get.lazyPut<ActivityAdminController>(() => ActivityAdminController());
     Get.lazyPut<NewsAdminController>(() => NewsAdminController());
     Get.lazyPut<NewsRepository  >(() => NewsRepository());
+    Get.lazyPut<ProjectAdminController>(() => ProjectAdminController());
+    Get.lazyPut<ProjectRepository>(() => ProjectRepository.instance);
   }
 }

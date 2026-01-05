@@ -26,102 +26,126 @@ class ProjectUiUxView extends GetView<ProjectUiUxController> {
             child: SizedBox(
               width: double.infinity,
               height: width > 600 ? 300 : 200,
-              child: Image.asset(
-                project.imageAsset,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stack) {
-                  return Container(
-                    color: Colors.grey[300],
-                    child: const Center(child: Icon(Icons.image, size: 48)),
-                  );
-                },
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    project.imageAsset,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stack) {
+                      return Container(
+                        color: Colors.grey[300],
+                        child: const Center(child: Icon(Icons.image, size: 48)),
+                      );
+                    },
+                  ),
+
+                  // overlay gelap tipis agar teks kontras
+                  Container(
+                    color: Colors.black.withOpacity(0.2),
+                  ),
+
+                  // teks dari controller
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        project.title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 6,
+                              color: Colors.black54,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
+
           const SizedBox(height: 16),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Expanded(
-              child: Text(project.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: const Color(0xFF9BD8D3), borderRadius: BorderRadius.circular(8)),
-              child: Text(project.duration, style: const TextStyle(fontSize: 13)),
-            ),
-          ]),
+
+          Text(project.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-          const Text('Deskripsi Proyek', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Text(
-            'Proyek "Design UI/UX" bertujuan merancang antarmuka pengguna yang intuitif dan estetik untuk aplikasi EcoCampus. '
-                'Lingkup: riset pengguna, wireframe, prototyping, dan usability testing.',
-            style: const TextStyle(fontSize: 14, height: 1.4),
+
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4AB8B6),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Deskripsi Proyek',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Proyek "Design UI/UX" bertujuan merancang antarmuka pengguna yang intuitif dan estetik untuk aplikasi EcoCampus.',
+                  style: TextStyle(fontSize: 14, height: 1.4, color: Colors.black),
+                ),
+
+                SizedBox(height: 16),
+                Text(
+                  'Deliverables',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black),
+                ),
+                SizedBox(height: 8),
+                _Bullet(text: 'User research & persona'),
+                _Bullet(text: 'Low & high-fidelity wireframes'),
+                _Bullet(text: 'Interactive prototype (Figma)'),
+                _Bullet(text: 'Style guide & component library'),
+                _Bullet(text: 'Usability testing report'),
+
+                SizedBox(height: 16),
+                Text(
+                  'Kontak',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black),
+                ),
+                SizedBox(height: 8),
+                Text('Email : project@ecocampus.id', style: TextStyle(fontSize: 14, color: Colors.black)),
+                SizedBox(height: 4),
+                Text('No HP : 0812-3456-7890', style: TextStyle(fontSize: 14, color: Colors.black)),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          const Text('Deliverables', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-            _Bullet(text: 'User research & persona'),
-            _Bullet(text: 'Low & high-fidelity wireframes'),
-            _Bullet(text: 'Interactive prototype (Figma)'),
-            _Bullet(text: 'Style guide & component library'),
-            _Bullet(text: 'Usability testing report'),
-          ]),
-          const SizedBox(height: 16),
-          const Text('Timeline', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Row(children: [
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-                Text('Minggu 1-2', style: TextStyle(fontWeight: FontWeight.w600)),
-                SizedBox(height: 4),
-                Text('Riset & pengumpulan kebutuhan', style: TextStyle(fontSize: 13)),
-              ]),
-            ),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-                Text('Minggu 3-6', style: TextStyle(fontWeight: FontWeight.w600)),
-                SizedBox(height: 4),
-                Text('Wireframe & prototyping', style: TextStyle(fontSize: 13)),
-              ]),
-            ),
-          ]),
-          const SizedBox(height: 16),
-          const Text('Tim yang dibutuhkan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Wrap(spacing: 8, runSpacing: 8, children: const [
-            _RoleChip(role: 'Product Owner'),
-            _RoleChip(role: 'UX Researcher'),
-            _RoleChip(role: 'UI Designer'),
-            _RoleChip(role: 'Frontend Dev'),
-            _RoleChip(role: 'Tester'),
-          ]),
-          const SizedBox(height: 24),
-          Row(children: [
-            Expanded(
-              child: OutlinedButton(
+          const SizedBox(height: 32),
+
+          Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF7F7),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: Colors.black, // warna garis
+                  width: 1.5,          // tebal garis
+                ),
+              ),
+              child: TextButton(
                 onPressed: () => Get.back(),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.black12),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: Colors.white,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                 ),
-                child: const Text('Kembali'),
+                child: const Text(
+                  'Kembali',
+                  style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: controller.joinProject,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF71B4AD),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: const Text('Gabung Proyek', style: TextStyle(color: Colors.black87)),
-              ),
-            ),
-          ]),
+          ),
+
           const SizedBox(height: 32),
         ]),
       ),
@@ -138,25 +162,10 @@ class _Bullet extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const SizedBox(width: 6),
         const Icon(Icons.check_circle_outline, size: 18),
         const SizedBox(width: 8),
         Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
       ]),
-    );
-  }
-}
-
-class _RoleChip extends StatelessWidget {
-  final String role;
-  const _RoleChip({required this.role});
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      label: Text(role),
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 }

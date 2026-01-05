@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/aplikasi_controllers.dart';
+import '../controllers/project_detail_controller.dart';
 
-class PembuatanAplikasiView extends GetView<PembuatanAplikasiController> {
-  const PembuatanAplikasiView({super.key});
+class ProjectDetailView extends GetView<ProjectDetailController> {
+  const ProjectDetailView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +16,16 @@ class PembuatanAplikasiView extends GetView<PembuatanAplikasiController> {
         backgroundColor: const Color(0xFF71B4AD),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
-        title: Text(project.title, style: const TextStyle(color: Colors.black87)),
+        title: Text(
+          project.title,
+          style: const TextStyle(color: Colors.black87),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+
+          // ================= HERO IMAGE =================
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: SizedBox(
@@ -29,23 +34,23 @@ class PembuatanAplikasiView extends GetView<PembuatanAplikasiController> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
-                    project.imageAsset,
+                  Image.network(
+                    project.imageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stack) {
                       return Container(
                         color: Colors.grey[300],
-                        child: const Center(child: Icon(Icons.image, size: 48)),
+                        child: const Center(
+                          child: Icon(Icons.image, size: 48),
+                        ),
                       );
                     },
                   ),
 
-                  // overlay gelap tipis agar teks kontras
-                  Container(
-                    color: Colors.black.withOpacity(0.2),
-                  ),
+                  // overlay
+                  Container(color: Colors.black.withOpacity(0.2)),
 
-                  // teks dari controller
+                  // title overlay
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -74,10 +79,14 @@ class PembuatanAplikasiView extends GetView<PembuatanAplikasiController> {
 
           const SizedBox(height: 16),
 
-          Text(project.title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          // ================= TITLE =================
+          Text(
+            project.title,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 12),
 
+          // ================= CONTENT CARD =================
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -88,62 +97,76 @@ class PembuatanAplikasiView extends GetView<PembuatanAplikasiController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                // DESCRIPTION
                 const Text(
                   'Deskripsi Proyek',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  project.description ??
-                      'Deskripsi belum tersedia untuk proyek ini.',
+                  project.description?.isNotEmpty == true
+                      ? project.description!
+                      : 'Deskripsi belum tersedia untuk proyek ini.',
                   style: const TextStyle(fontSize: 14, height: 1.4),
                 ),
 
                 const SizedBox(height: 16),
+
+                // DELIVERABLES
                 const Text(
                   'Deliverables',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
-                const _Bullet(text: 'Dokumen requirement (PRD / SRS)'),
-                const _Bullet(text: 'Arsitektur sistem & database design'),
-                const _Bullet(text: 'Implementasi frontend & backend'),
-                const _Bullet(text: 'Testing (unit, integration, UAT)'),
-                const _Bullet(text: 'Deployment & dokumentasi teknis'),
+
+                if (project.deliverables.isEmpty)
+                  const Text('- Tidak ada deliverables')
+                else
+                  ...project.deliverables
+                      .map((d) => _Bullet(text: d))
+                      .toList(),
 
                 const SizedBox(height: 16),
+
+                // CONTACT
                 const Text(
                   'Kontak',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
-                const Text('Email : dev@ecocampus.id'),
+                Text('Email : ${project.email ?? '-'}'),
                 const SizedBox(height: 4),
-                const Text('No HP : 0812-3456-7890'),
+                Text('No HP : ${project.phone ?? '-'}'),
               ],
             ),
           ),
+
           const SizedBox(height: 32),
 
+          // ================= BACK BUTTON =================
           Center(
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFEFF7F7),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.black, // warna garis
-                  width: 1.5,          // tebal garis
-                ),
+                border: Border.all(color: Colors.black, width: 1.5),
               ),
               child: TextButton(
                 onPressed: () => Get.back(),
                 style: TextButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 14,
+                  ),
                 ),
                 child: const Text(
                   'Kembali',
-                  style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -154,6 +177,7 @@ class PembuatanAplikasiView extends GetView<PembuatanAplikasiController> {
   }
 }
 
+// ================= BULLET =================
 class _Bullet extends StatelessWidget {
   final String text;
   const _Bullet({required this.text});
@@ -162,11 +186,11 @@ class _Bullet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Icon(Icons.check_circle_outline, size: 18),
-        const SizedBox(width: 8),
-        Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
-      ]),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 14),
+      ),
     );
   }
 }
+

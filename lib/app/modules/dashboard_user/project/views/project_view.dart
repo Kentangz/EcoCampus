@@ -1,27 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../controllers/project_controller.dart';
 
-class ProjectView extends GetView<ProjectController> {
+class ProjectView extends StatelessWidget {
   const ProjectView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Get.put(ProjectController());
+    final ProjectController controller =
+        Get.put(ProjectController());
 
     return Scaffold(
       backgroundColor: const Color(0xFFEFF7F7),
-
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF2B7A78),
-        child: const Icon(Icons.add, size: 30, color: Colors.white),
-        onPressed: () => Get.toNamed('/dashboard/add-project'),
-      ),
-
       body: SafeArea(
         child: Column(
           children: [
-            // HEADER
+            // ================= HEADER =================
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
@@ -38,7 +33,7 @@ class ProjectView extends GetView<ProjectController> {
               ),
             ),
 
-            // BANNER
+            // ================= BANNER =================
             Container(
               width: double.infinity,
               margin: const EdgeInsets.symmetric(horizontal: 1),
@@ -55,58 +50,79 @@ class ProjectView extends GetView<ProjectController> {
 
             const SizedBox(height: 25),
 
-            // TITLE
+            // ================= TITLE =================
             Container(
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: const Text(
                 'Rekomendasi Proyek',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
 
             const SizedBox(height: 20),
 
+            // ================= GRID =================
             Expanded(
               child: Obx(() {
-                final projects = controller.projects;
+                if (controller.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (controller.projects.isEmpty) {
+                  return const Center(
+                    child: Text('Belum ada proyek tersedia'),
+                  );
+                }
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 19),
                   child: GridView.builder(
-                    itemCount: projects.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    itemCount: controller.projects.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      mainAxisExtent: 180,
+                      mainAxisExtent: 190,
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 20,
                     ),
                     itemBuilder: (context, index) {
-                      final p = projects[index];
+                      final p = controller.projects[index];
+
                       return GestureDetector(
                         onTap: () => controller.onTapProject(index),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
+                            boxShadow: const [
                               BoxShadow(
                                 color: Colors.black12,
                                 blurRadius: 4,
-                                offset: const Offset(0, 2),
+                                offset: Offset(0, 2),
                               )
                             ],
                           ),
                           child: Column(
                             children: [
+                              // ================= IMAGE =================
                               ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(14),
+                                ),
                                 child: SizedBox(
                                   height: 100,
                                   width: double.infinity,
-                                  child: Image.asset(
-                                    p.imageAsset,
+                                  child: Image.network(
+                                    p.imageUrl,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
+                                    errorBuilder:
+                                        (context, error, stackTrace) {
                                       return Container(
                                         color: Colors.grey[300],
                                         child: const Center(
@@ -118,13 +134,19 @@ class ProjectView extends GetView<ProjectController> {
                                 ),
                               ),
 
+                              // ================= CONTENT =================
                               Expanded(
                                 child: Container(
                                   width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 8,
+                                  ),
                                   decoration: const BoxDecoration(
-                                    color: Color(0xFF9BD8D3),
-                                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(14)),
+                                    color: Color(0xFF71B4AD),
+                                    borderRadius: BorderRadius.vertical(
+                                      bottom: Radius.circular(14),
+                                    ),
                                   ),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,11 +156,14 @@ class ProjectView extends GetView<ProjectController> {
                                         p.title,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                       const SizedBox(height: 6),
                                       Text(
-                                        p.duration,
+                                        '${p.deliverables.length} Deliverables',
                                         style: const TextStyle(fontSize: 12),
                                       ),
                                     ],

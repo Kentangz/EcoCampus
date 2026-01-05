@@ -42,15 +42,6 @@ class ProjectUiUxController extends GetxController {
       'Proyek "Design UI/UX" bertujuan merancang antarmuka pengguna yang intuitif dan estetik untuk aplikasi EcoCampus.',
     );
   }
-
-  // contoh action saat user menekan tombol "Gabung"
-  void joinProject() {
-    Get.snackbar(
-      'Gabung Proyek',
-      'Permintaan bergabung untuk "${project.title}" dikirim.',
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
 }
 
 class ProjectModel {
