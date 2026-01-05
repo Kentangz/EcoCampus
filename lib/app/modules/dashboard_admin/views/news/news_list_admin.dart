@@ -15,7 +15,7 @@ class NewsListAdminView extends GetView<NewsAdminController> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
+      appBar: AppBar( 
         title: const Text(
           "Daftar Berita",
           style: TextStyle(
@@ -219,7 +219,7 @@ class NewsListAdminView extends GetView<NewsAdminController> {
                   // PUBLISH SWITCH
                   Switch(
                     value: news.isPublished,
-                    activeColor: Colors.green,
+                    activeThumbColor: Colors.green,
                     onChanged: (value) {
                       controller.togglePublishById(news.id, value);
                     },

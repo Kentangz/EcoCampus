@@ -22,14 +22,8 @@ import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/bindings/kaligraf
 import 'package:ecocampus/app/modules/dashboard_user/kaligrafi/views/kaligrafi_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/bindings/nonton_film_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/nonton%20film/views/nonton_film_view.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penjualan/bindings/analis_data_penjualan_binding.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penjualan/views/analisis_data_penjualan_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/bindings/project_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/views/project_view.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/bindings/aplikasi_bindings.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/views/aplikasi_views.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/bindings/project_ui_ux_binding.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/view/project_ui_ux_view.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/modules/auth/views/login_view.dart';
 import 'package:ecocampus/app/modules/auth/views/register_view.dart';
@@ -42,6 +36,16 @@ import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/module_det
 import 'package:ecocampus/app/modules/dashboard_user/views/dashboard_user_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/bindings/dashboard_user_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_admin_view.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/project/project_form_admin.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/project/project_list_admin.dart';
+import 'package:ecocampus/app/modules/dashboard_admin/views/project/project_admin_view.dart';
+import 'package:ecocampus/app/modules/project_detail/bindings/project_detail_bindings.dart';
+import 'package:ecocampus/app/modules/project_detail/views/project_detail_views.dart';
+
+import '../modules/dashboard_user/magang/bindings/detail_magang_binding.dart';
+import '../modules/dashboard_user/magang/bindings/magang_binding.dart';
+import '../modules/dashboard_user/magang/views/detail_magang_view.dart';
+import '../modules/dashboard_user/magang/views/magang_view.dart';
 
 part 'app_routes.dart';
 
@@ -100,19 +104,25 @@ class AppPages {
       binding: NontonFilmBinding(),
     ),
     GetPage(
+      name: _Paths.MAGANG,
+      page: () => const MagangView(),
+      binding: MagangBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAILMAGANG,
+      page: () => const DetailMagangView(),
+      binding: DetailMagangBinding(),
+    ),
+
+    GetPage(
       name: _Paths.KOLABORASI_KAMPUS,
       page: () => const ProjectView(),
       binding: KolaborasiKampusBinding(),
     ),
     GetPage(
-      name: _Paths.PROJECT_ANALISIS,
-      page: () => const AnalisisView(),
-      binding: ProjectAnalisisDataBinding(),
-    ),
-    GetPage(
-      name: _Paths.PROJECT_UIUX,
-      page: () => const ProjectUiUxView(),
-      binding: ProjectUiUxBinding(),
+      name: Routes.PROJECT_DETAIL,
+      page: () => const ProjectDetailView(),
+      binding: ProjectDetailBinding(),
     ),
 
     //admin
@@ -174,6 +184,21 @@ class AppPages {
     GetPage(
       name: _Paths.ADMIN_NEWS_FORM,
       page: () => NewsFormAdmin(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_PROJECT,
+      page: () => const ProjectAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_PROJECT_LIST,
+      page: () => const ProjectListAdminView(),
+      binding: DashboardAdminBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_PROJECT_FORM,
+      page: () => ProjectFormAdmin(),
       binding: DashboardAdminBinding(),
     ),
   ];

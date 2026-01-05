@@ -94,6 +94,19 @@ class AdminSidebar extends GetView<DashboardAdminController> {
                   isActive: Get.currentRoute == Routes.ADMIN_NEWS,
                   primaryColor: primaryPurple,
                 ),
+                _buildDrawerItem(
+                  icon: Icons.book,
+                  text: 'Project',
+                  onTap: () {
+                    if (Get.currentRoute == Routes.ADMIN_PROJECT) {
+                      Get.back();
+                    } else {
+                      Get.toNamed(Routes.ADMIN_PROJECT);
+                    }
+                  },
+                  isActive: Get.currentRoute == Routes.ADMIN_PROJECT,
+                  primaryColor: primaryPurple,
+                ),
               ],
             ),
           ),

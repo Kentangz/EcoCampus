@@ -1,42 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/data/models/activity/activity_model.dart';
-import 'package:ecocampus/app/data/repositories/activity_repository.dart';
-
-class ClubData {
-  final String title;
-  final String bannerUrl;
-  final String aboutUsContent;
-  final List<RoutineModel> routineActivities;
-  final List<String> galleryImages;
-
-  ClubData({
-    required this.title,
-    required this.bannerUrl,
-    required this.aboutUsContent,
-    required this.routineActivities,
-    required this.galleryImages,
-  });
-}
 
 class NontonFilmController extends GetxController {
-  final _activityRepo = ActivityRepository.instance;
-  final eventActivity = Rx<EventActivity?>(null);
-  final clubData = ClubData(
-      title:'',
-      bannerUrl: '',
-      aboutUsContent: 'Memuat...',
-      routineActivities: const [],
-      galleryImages: const []
-  ).obs;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  final isLoading = true.obs;
+  final eventActivity = Rx<EventActivity?>(null);
+
   final isActivitiesExpanded = false.obs;
   final selectedIndex = 0.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   @override
   void onReady() {
@@ -46,44 +18,26 @@ class NontonFilmController extends GetxController {
 
   Future<void> fetchClubDataByTitle(String clubTitle) async {
     try {
-      isLoading.value = true;
+      final snapshot = await _db
+          .collection('Activities')
+          .where('title', isEqualTo: clubTitle)
+          .limit(1)
+          .get();
 
-      final data = await _activityRepo.getActivityByTitle(clubTitle);
-
-      if (data != null && data is EventActivity) {
+      if (snapshot.docs.isNotEmpty) {
+        final doc = snapshot.docs.first;
+        final data = EventActivity.fromSnapshot(doc);
         eventActivity.value = data;
-        clubData.value = ClubData(
-          title: data.title,
-          bannerUrl: data.heroImage,
-          aboutUsContent: data.description,
-          routineActivities: data.routines,
-          galleryImages: data.gallery,
-        );
       } else {
-        clubData.value = ClubData(
-          title: clubTitle,
-          bannerUrl: '',
-          aboutUsContent: 'Data klub "$clubTitle" tidak ditemukan.',
-          routineActivities: const [],
-          galleryImages: const [],
-        );
+        // print("Data klub '$clubTitle' tidak ditemukan di database.");
       }
     } catch (e) {
       Get.snackbar("Error", "Gagal memuat data klub: $e");
-    } finally {
-      isLoading.value = false;
     }
   }
 
   void toggleActivitiesExpansion() {
     isActivitiesExpanded.value = !isActivitiesExpanded.value;
-  }
-
-  void joinClub() {
-    final contacts = eventActivity.value?.contacts;
-    if (contacts != null) {
-      print('Kontak klub: ${contacts.whatsapp}, ${contacts.email}');
-    }
   }
 
   void changeTab(int index) {
