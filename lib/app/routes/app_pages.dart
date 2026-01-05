@@ -24,8 +24,6 @@ import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penju
 import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penjualan/views/analisis_data_penjualan_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/bindings/project_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/views/project_view.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/bindings/aplikasi_bindings.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/views/aplikasi_views.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/bindings/project_ui_ux_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/view/project_ui_ux_view.dart';
 import 'package:get/get.dart';
@@ -40,6 +38,11 @@ import 'package:ecocampus/app/modules/dashboard_admin/bindings/course/module_det
 import 'package:ecocampus/app/modules/dashboard_user/views/dashboard_user_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/bindings/dashboard_user_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/news/news_admin_view.dart';
+
+import '../modules/dashboard_user/magang/bindings/detail_magang_binding.dart';
+import '../modules/dashboard_user/magang/bindings/magang_binding.dart';
+import '../modules/dashboard_user/magang/views/detail_magang_view.dart';
+import '../modules/dashboard_user/magang/views/magang_view.dart';
 
 part 'app_routes.dart';
 
@@ -92,6 +95,17 @@ class AppPages {
       page: () => const NontonFilmView(),
       binding: NontonFilmBinding(),
     ),
+    GetPage(
+      name: _Paths.MAGANG,
+      page: () => const MagangView(),
+      binding: MagangBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAILMAGANG,
+      page: () => const DetailMagangView(),
+      binding: DetailMagangBinding(),
+    ),
+
     GetPage(
       name: _Paths.KOLABORASI_KAMPUS,
       page: () => const ProjectView(),
