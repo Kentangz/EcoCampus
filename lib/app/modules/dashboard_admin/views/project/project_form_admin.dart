@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ecocampus/app/modules/dashboard_admin/controllers/news_admin_controller.dart';
 import 'package:image_picker/image_picker.dart';
 
-class NewsFormAdmin extends StatelessWidget {
-  final NewsAdminController c = Get.find<NewsAdminController>();
+import 'package:ecocampus/app/modules/dashboard_admin/controllers/project_admin_controller.dart';
 
-  NewsFormAdmin({super.key});
+class ProjectFormAdmin extends StatelessWidget {
+  final ProjectAdminController c = Get.find<ProjectAdminController>();
+
+  ProjectFormAdmin({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,20 +17,18 @@ class NewsFormAdmin extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? "Edit Berita" : "Tambah Berita"),
+        title: Text(isEdit ? "Edit Project" : "Tambah Project"),
         actions: [
-          // Toggle publish hanya muncul saat edit
           if (isEdit)
             Obx(() => Switch(
-                  value: c.editingItem!.isPublished,
+                  value: c.isPublished.value,
                   onChanged: (value) async {
+                    c.isPublished.value = value;
                     await c.togglePublishById(c.editingItem!.id, value);
-                    c.editingItem!.isPublished = value;
                   },
                 )),
         ],
       ),
-
       body: Obx(() {
         return Stack(
           children: [
@@ -43,31 +42,80 @@ class NewsFormAdmin extends StatelessWidget {
                   // ==========================
                   TextField(
                     controller: c.titleC,
-                    decoration: InputDecoration(
-                      labelText: "Judul Berita",
+                    decoration: const InputDecoration(
+                      labelText: "Judul Project",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 20),
 
                   // ==========================
-                  // CONTENT
+                  // DESCRIPTION
                   // ==========================
                   TextField(
-                    controller: c.contentC,
-                    maxLines: 6,
-                    decoration: InputDecoration(
-                      labelText: "Isi Berita",
+                    controller: c.descriptionC,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      labelText: "Deskripsi Project",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // ==========================
+                  // DELIVERABLES
+                  // ==========================
+                  const Text(
+                    "Deliverables",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+
+                  TextField(
+                    controller: c.deliverablesC,
+                    maxLines: 4,
+                    decoration: const InputDecoration(
+                      hintText:
+                          "Contoh:\n- Laporan PDF\n- Aplikasi Mobile\n- Dashboard Admin",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ==========================
+                  // CONTACT
+                  // ==========================
+                  const Text(
+                    "Kontak",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+
+                  TextField(
+                    controller: c.emailC,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: "Email",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: c.phoneC,
+                    keyboardType: TextInputType.phone,
+                    decoration: const InputDecoration(
+                      labelText: "No HP / WhatsApp",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
                   // ==========================
                   // IMAGE PICKER
                   // ==========================
-                  Text(
-                    "Gambar",
+                  const Text(
+                    "Gambar Project",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
@@ -78,7 +126,6 @@ class NewsFormAdmin extends StatelessWidget {
 
                     return Column(
                       children: [
-                        // Preview gambar
                         Container(
                           height: 180,
                           width: double.infinity,
@@ -89,7 +136,8 @@ class NewsFormAdmin extends StatelessWidget {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: _buildImagePreview(localImg, networkImg),
+                            child:
+                                _buildImagePreview(localImg, networkImg),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -109,14 +157,15 @@ class NewsFormAdmin extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        c.saveNews();
-                      },
+                      onPressed: c.saveProject,
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: Text(
-                        isEdit ? "Simpan Perubahan" : "Tambah Berita",
+                        isEdit
+                            ? "Simpan Perubahan"
+                            : "Tambah Project",
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
@@ -125,11 +174,14 @@ class NewsFormAdmin extends StatelessWidget {
               ),
             ),
 
-            // Loading Overlay
+            // ==========================
+            // LOADING OVERLAY
+            // ==========================
             if (c.isLoading.value)
               Container(
                 color: Colors.black.withValues(alpha: 0.2),
-                child: const Center(child: CircularProgressIndicator()),
+                child:
+                    const Center(child: CircularProgressIndicator()),
               ),
           ],
         );
@@ -139,11 +191,17 @@ class NewsFormAdmin extends StatelessWidget {
 
   Widget _buildImagePreview(XFile? localImg, String networkImg) {
     if (localImg != null) {
-      return Image.file(File(localImg.path), fit: BoxFit.cover);
+      return Image.file(
+        File(localImg.path),
+        fit: BoxFit.cover,
+      );
     }
 
     if (networkImg.isNotEmpty) {
-      return Image.network(networkImg, fit: BoxFit.cover);
+      return Image.network(
+        networkImg,
+        fit: BoxFit.cover,
+      );
     }
 
     return const Center(child: Text("Belum ada gambar"));
