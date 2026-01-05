@@ -50,8 +50,14 @@ class RegisterController extends GetxController {
         fullNameC.text.trim(),
         phoneC.text.trim(),
       );
-      NotificationHelper.showSuccess("Berhasil", "Akun berhasil dibuat");
-      Get.back();
+
+      await _authRepo.sendEmailVerification();
+
+      NotificationHelper.showSuccess(
+        "Berhasil",
+        "Akun berhasil dibuat. Silakan cek email untuk verifikasi.",
+      );
+
     } catch (e) {
       String errorMessage;
       if (e is FirebaseAuthException) {

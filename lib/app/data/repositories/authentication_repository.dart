@@ -53,14 +53,25 @@ class AuthenticationRepository extends GetxController {
     } else {
       final userModel = await getUserDetailsByUid(user.uid);
 
+      if (userModel != null && userModel.role == "admin") {
+        _navigateTo(Routes.DASHBOARD_ADMIN);
+        return;
+      }
+      if (!user.emailVerified) {
+        _navigateTo(Routes.EMAIL_VERIFICATION, force: true);
+        return;
+      }
+
       if (userModel != null) {
-        if (userModel.role == "admin") {
-          _navigateTo(Routes.DASHBOARD_ADMIN);
-        } else {
-          _navigateTo(Routes.DASHBOARD_USER);
-        }
+        _navigateTo(Routes.DASHBOARD_USER);
       } else {
-        _navigateTo(Routes.LOGIN);
+        await movePendingUserToVerified(user.uid);
+        final movedUser = await getUserDetailsByUid(user.uid);
+        if (movedUser != null) {
+          _navigateTo(Routes.DASHBOARD_USER);
+        } else {
+          _navigateTo(Routes.LOGIN);
+        }
       }
     }
   }
@@ -75,9 +86,12 @@ class AuthenticationRepository extends GetxController {
     String fullName,
     String phone,
   ) async {
+    UserCredential? userCredential;
     try {
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       final newUser = UserModel(
         id: userCredential.user!.uid,
@@ -87,11 +101,24 @@ class AuthenticationRepository extends GetxController {
         role: "user",
       );
 
-      await _db.collection("Users").doc(newUser.id).set(newUser.toJson());
+      try {
+        await _db
+            .collection("PendingUsers")
+            .doc(newUser.id)
+            .set(newUser.toJson());
+      } catch (firestoreError) {
+        await userCredential.user?.delete();
+        throw "Gagal menyimpan data. Silakan coba lagi.";
+      }
     } on FirebaseAuthException {
       rethrow;
     } catch (e) {
-      throw "Sesuatu salah. Coba lagi.";
+      if (userCredential?.user != null) {
+        try {
+          await userCredential!.user!.delete();
+        } catch (_) {}
+      }
+      rethrow;
     }
   }
 
@@ -159,5 +186,58 @@ class AuthenticationRepository extends GetxController {
     } catch (_) {
       throw "Gagal mereset password. Coba lagi.";
     }
+  }
+
+  Future<void> sendEmailVerification() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw "User tidak ditemukan. Silakan login terlebih dahulu.";
+      }
+
+      var acs = ActionCodeSettings(
+        url: 'https://ecocampus-app.site/emailVerified',
+        handleCodeInApp: true,
+        iOSBundleId: 'com.example.ecocampus',
+        androidPackageName: 'com.example.ecocampus',
+        androidInstallApp: true,
+        androidMinimumVersion: '12',
+      );
+
+      await user.sendEmailVerification(acs);
+    } on FirebaseAuthException {
+      rethrow;
+    } catch (e) {
+      throw "Gagal mengirim email verifikasi. Coba lagi.";
+    }
+  }
+
+  Future<void> applyActionCode(String code) async {
+    try {
+      await _auth.applyActionCode(code);
+      await _auth.currentUser?.reload();
+      final uid = _auth.currentUser?.uid;
+      if (uid != null) {
+        await movePendingUserToVerified(uid);
+      }
+    } on FirebaseAuthException catch (_) {
+      rethrow;
+    } catch (_) {
+      throw "Gagal memverifikasi email. Coba lagi.";
+    }
+  }
+
+  Future<void> movePendingUserToVerified(String uid) async {
+    try {
+      final pendingDoc = await _db.collection("PendingUsers").doc(uid).get();
+      if (pendingDoc.exists) {
+        await _db.collection("Users").doc(uid).set(pendingDoc.data()!);
+        await _db.collection("PendingUsers").doc(uid).delete();
+      }
+    } catch (_) {}
+  }
+
+  bool get isEmailVerified {
+    return _auth.currentUser?.emailVerified ?? false;
   }
 }
