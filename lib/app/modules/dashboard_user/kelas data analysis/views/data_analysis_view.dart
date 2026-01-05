@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ecocampus/app/shared/utils/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,7 @@ import '../../project/views/project_view.dart';
 import '../controllers/data_analysis_controller.dart';
 
 class DataAnalysisClassView extends GetView<DataAnalysisClassController> {
-  const DataAnalysisClassView({Key? key}) : super(key: key);
+  const DataAnalysisClassView({super.key});
 
   final List<Widget> _pages = const [
     DataAnalysisClassContent(),
@@ -24,9 +25,7 @@ class DataAnalysisClassView extends GetView<DataAnalysisClassController> {
       backgroundColor: const Color(0xffe8f6ff),
 
       body: Obx(() {
-        return SafeArea(
-          child: _pages[controller.selectedIndex.value],
-        );
+        return SafeArea(child: _pages[controller.selectedIndex.value]);
       }),
 
       bottomNavigationBar: _BottomNavBar(controller: controller),
@@ -35,7 +34,7 @@ class DataAnalysisClassView extends GetView<DataAnalysisClassController> {
 }
 
 class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
-  const DataAnalysisClassContent({Key? key}) : super(key: key);
+  const DataAnalysisClassContent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +56,10 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
               const SizedBox(height: 20),
               Obx(() {
                 if (controller.courses.isEmpty) {
-                  return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
+                  return const SizedBox(
+                    height: 200,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
                 }
                 return _buildBanner(controller.courses[0]);
               }),
@@ -82,12 +84,14 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: itemCount,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 1.0, // Sesuaikan kembali tingginya
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio:
+                                0.8, // Sesuaikan kembali tingginya
+                          ),
                       itemBuilder: (context, index) {
                         return _buildProgressCard(allItems[index]);
                       },
@@ -105,14 +109,15 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
                               Text(
                                 isExpanded ? 'See less' : 'See more',
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 12
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  fontSize: 12,
                                 ),
                               ),
                               Icon(
-                                isExpanded ? Icons.keyboard_arrow_up : Icons
-                                    .keyboard_arrow_down,
+                                isExpanded
+                                    ? Icons.keyboard_arrow_up
+                                    : Icons.keyboard_arrow_down,
                                 color: Colors.black,
                                 size: 18,
                               ),
@@ -136,7 +141,7 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
                 // Tampilkan 2 item di awal, atau semua jika sudah di-expand
                 int itemCount = isExpanded
                     ? allQuizzes.length
-                    : (allQuizzes.length > 2 ? 2 :allQuizzes.length);
+                    : (allQuizzes.length > 2 ? 2 : allQuizzes.length);
 
                 return Column(
                   children: [
@@ -144,12 +149,13 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: itemCount,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 1.0, // Rasio kotak kategori
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.8, // Rasio kotak kategori
+                          ),
                       itemBuilder: (context, index) {
                         // PERBAIKAN 3: Ambil data kuis berdasarkan index yang benar
                         final quiz = allQuizzes[index];
@@ -169,14 +175,15 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
                               Text(
                                 isExpanded ? 'See less' : 'See more',
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 12
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  fontSize: 12,
                                 ),
                               ),
                               Icon(
-                                isExpanded ? Icons.keyboard_arrow_up : Icons
-                                    .keyboard_arrow_down,
+                                isExpanded
+                                    ? Icons.keyboard_arrow_up
+                                    : Icons.keyboard_arrow_down,
                                 color: Colors.black,
                                 size: 18,
                               ),
@@ -215,14 +222,10 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.black, width: 1),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 5,
-            offset: Offset(0, 4),
-          ),
+          BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 4)),
         ],
-        image:  DecorationImage(
-          image: NetworkImage(item.imageUrl?? ''),
+        image: DecorationImage(
+          image: NetworkImage(item.imageUrl ?? ''),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
             Color.fromRGBO(0, 0, 0, 0.3),
@@ -241,14 +244,10 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
                 shadows: [
-                  Shadow(offset: Offset(-1.0, -1.0),
-                      color: Colors.black),
-                  Shadow(offset: Offset(1.0, -1.0),
-                      color: Colors.black),
-                  Shadow(offset: Offset(1.0, 1.0),
-                      color: Colors.black),
-                  Shadow(offset: Offset(-1.0, 1.0),
-                      color: Colors.black),
+                  Shadow(offset: Offset(-1.0, -1.0), color: Colors.black),
+                  Shadow(offset: Offset(1.0, -1.0), color: Colors.black),
+                  Shadow(offset: Offset(1.0, 1.0), color: Colors.black),
+                  Shadow(offset: Offset(-1.0, 1.0), color: Colors.black),
                 ],
               ),
             ),
@@ -267,11 +266,12 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
                 ),
               ),
               child: Icon(
-                  TechStackIcons.getIcon(item.techStackIcon ?? "Pandas"),
-                  color: TechStackIcons.getColor(item.techStackIcon ?? "Pandas"),
-                  size: 70),
+                TechStackIcons.getIcon(item.techStackIcon ?? "Pandas"),
+                color: TechStackIcons.getColor(item.techStackIcon ?? "Pandas"),
+                size: 70,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -286,11 +286,7 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
         borderRadius: BorderRadius.circular(10),
         // Opsional: Tambahkan elevation sederhana
         boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 5,
-            offset: Offset(0, 4),
-          ),
+          BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -300,11 +296,14 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  item.imageUrl ?? '', // Mengambil URL dari Firestore
+                child: CachedNetworkImage(
+                  imageUrl: item.imageUrl ?? '',
                   height: 90,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
               Positioned(
@@ -312,7 +311,9 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
                 left: 5,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 2),
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -322,9 +323,11 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
                     ),
                   ),
                   child: Text(
-                      "0%",
-                      style: const TextStyle(
-                          fontSize: 10, fontWeight: FontWeight.bold)
+                    "0%",
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -350,21 +353,27 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
               width: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.toNamed(Routes.DATA_ANALYSIS_MODULE, arguments: {
-                    'title': item.title,
-                    'courseId': controller.courses[0].id
-                  });
+                  Get.toNamed(
+                    Routes.DATA_ANALYSIS_MODULE,
+                    arguments: {
+                      'title': item.title,
+                      'courseId': controller.courses[0].id,
+                    },
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
                   side: const BorderSide(color: Colors.black),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                 ),
-                child: const Text("Detail", style: TextStyle(
-                    fontSize: 10, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  "Detail",
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ),
@@ -379,12 +388,14 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
         onTap: () {
-          Get.toNamed(Routes.DATA_ANALYSIS_QUIZ, arguments: {
-            "courseId": controller.courses[0].id,
-            "courseTitle": controller.courses[0].title,
-            "quizId": item.id,
-            "quiz": item,
-          },
+          Get.toNamed(
+            Routes.DATA_ANALYSIS_QUIZ,
+            arguments: {
+              "courseId": controller.courses[0].id,
+              "courseTitle": controller.courses[0].title,
+              "quizId": item.id,
+              "quiz": item,
+            },
           );
         },
         child: Container(
@@ -403,24 +414,25 @@ class DataAnalysisClassContent extends GetView<DataAnalysisClassController> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                  padding: const EdgeInsets.all(8),
-                  // Jarak antara ikon dan border
-                  decoration: BoxDecoration(
-                    color: Colors.transparent, // Background transparan
-                    shape: BoxShape.circle, // Membuat bentuk bulat
-                    border: Border.all(
-                      color: Colors.white, // Warna border putih
-                      width: 1, // Ketebalan border
-                    ),
+                padding: const EdgeInsets.all(8),
+                // Jarak antara ikon dan border
+                decoration: BoxDecoration(
+                  color: Colors.transparent, // Background transparan
+                  shape: BoxShape.circle, // Membuat bentuk bulat
+                  border: Border.all(
+                    color: Colors.white, // Warna border putih
+                    width: 1, // Ketebalan border
                   ),
-                  child: Icon(
-                      AppIcons.getIcon(item.icon), color: Colors.white)
+                ),
+                child: Icon(AppIcons.getIcon(item.icon), color: Colors.white),
               ),
               const SizedBox(height: 10),
               Text(
                 item.title,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               Text(
@@ -445,7 +457,7 @@ class _BottomNavBar extends StatelessWidget {
   static const Color _unselectedColor = Colors.black;
   static const Color _barBgColor = Color(0xffe8f6ff);
 
-  Widget _NavTabItem({
+  Widget _navTabItem({
     required IconData icon,
     required String label,
     required int index,
@@ -485,9 +497,9 @@ class _BottomNavBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: isSelected
                   ? BoxDecoration(
-                color: _selectedBgColor,
-                borderRadius: BorderRadius.circular(30),
-              )
+                      color: _selectedBgColor,
+                      borderRadius: BorderRadius.circular(30),
+                    )
                   : null,
               child: content,
             ),
@@ -518,21 +530,21 @@ class _BottomNavBar extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.home_outlined,
               label: "Home",
               index: 0,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(0),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.menu_book,
               label: "Project",
               index: 1,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(1),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.monetization_on_outlined,
               label: "Finance",
               index: 2,

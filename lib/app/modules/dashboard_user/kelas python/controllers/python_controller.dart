@@ -24,8 +24,8 @@ class PythonClassController extends GetxController {
 
   Future<void> fetchCoursesByTitle(String courseTitle) async {
     try {
-
-      final courseSnapshot = await _db.collection('Courses')
+      final courseSnapshot = await _db
+          .collection('Courses')
           .where('title', isEqualTo: courseTitle)
           .get();
 
@@ -35,21 +35,19 @@ class PythonClassController extends GetxController {
             .toList();
 
         String courseId = courseSnapshot.docs.first.id;
-        await Future.wait([
-          fetchQuizzes(courseId),
-          fetchModules(courseId),
-        ]);
+        await Future.wait([fetchQuizzes(courseId), fetchModules(courseId)]);
       } else {
-        print("Course dengan judul $courseTitle tidak ditemukan");
+        // print("Course dengan judul $courseTitle tidak ditemukan");
       }
     } catch (e) {
-      print("Error Load Data: $e");
+      // print("Error Load Data: $e");
     }
   }
 
   Future<void> fetchModules(String courseId) async {
     try {
-      final snapshot = await _db.collection('Courses')
+      final snapshot = await _db
+          .collection('Courses')
           .doc(courseId)
           .collection('modules')
           .orderBy('order')
@@ -60,20 +58,21 @@ class PythonClassController extends GetxController {
           .where((activity) => activity.isActive == true)
           .toList();
     } catch (e) {
-      print("Error Fetching Modules: $e");
+      // print("Error Fetching Modules: $e");
     }
   }
 
   Future<void> fetchQuizzes(String courseId) async {
     try {
-
-      final snapshot = await _db.collection('Courses')
+      final snapshot = await _db
+          .collection('Courses')
           .doc(courseId)
           .collection('quizzes')
           .orderBy('order')
           .get();
 
-      quizzes.value = snapshot.docs.map((doc) => QuizModel.fromSnapshot(doc))
+      quizzes.value = snapshot.docs
+          .map((doc) => QuizModel.fromSnapshot(doc))
           .where((activity) => activity.isActive == true)
           .toList();
     } catch (e) {

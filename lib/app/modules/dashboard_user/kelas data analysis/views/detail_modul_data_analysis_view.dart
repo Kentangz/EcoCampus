@@ -12,8 +12,9 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../controllers/detail_modul_data_analysis_controller.dart';
 
-class DataAnalysisDetailModuleView extends GetView<DataAnalysisDetailModuleController> {
-  const DataAnalysisDetailModuleView({Key? key}) : super(key: key);
+class DataAnalysisDetailModuleView
+    extends GetView<DataAnalysisDetailModuleController> {
+  const DataAnalysisDetailModuleView({super.key});
 
   final List<Widget> _pages = const [
     DataAnalysisDetailModuleContent(),
@@ -27,9 +28,7 @@ class DataAnalysisDetailModuleView extends GetView<DataAnalysisDetailModuleContr
       backgroundColor: const Color(0xffe8f6ff),
 
       body: Obx(() {
-        return SafeArea(
-          child: _pages[controller.selectedIndex.value],
-        );
+        return SafeArea(child: _pages[controller.selectedIndex.value]);
       }),
 
       bottomNavigationBar: _BottomNavBar(controller: controller),
@@ -37,8 +36,9 @@ class DataAnalysisDetailModuleView extends GetView<DataAnalysisDetailModuleContr
   }
 }
 
-class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleController> {
-  const DataAnalysisDetailModuleContent({Key? key}) : super(key: key);
+class DataAnalysisDetailModuleContent
+    extends GetView<DataAnalysisDetailModuleController> {
+  const DataAnalysisDetailModuleContent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,9 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
           // Tampilkan loading jika data sedang di-fetch
           if (controller.materials.isEmpty) {
             return const SizedBox(
-                height: 200, child: Center(child: CircularProgressIndicator()));
+              height: 200,
+              child: Center(child: CircularProgressIndicator()),
+            );
           }
           // 1. Konten Utama
           return SingleChildScrollView(
@@ -77,14 +79,19 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         shadows: [
-                          Shadow(offset: Offset(-1.0, -1.0),
-                              color: Colors.black),
-                          Shadow(offset: Offset(1.0, -1.0),
-                              color: Colors.black),
-                          Shadow(offset: Offset(1.0, 1.0),
-                              color: Colors.black),
-                          Shadow(offset: Offset(-1.0, 1.0),
-                              color: Colors.black),
+                          Shadow(
+                            offset: Offset(-1.0, -1.0),
+                            color: Colors.black,
+                          ),
+                          Shadow(
+                            offset: Offset(1.0, -1.0),
+                            color: Colors.black,
+                          ),
+                          Shadow(offset: Offset(1.0, 1.0), color: Colors.black),
+                          Shadow(
+                            offset: Offset(-1.0, 1.0),
+                            color: Colors.black,
+                          ),
                         ],
                       ),
                     ),
@@ -96,7 +103,11 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
                         // Warna background gelap agar ikon kuning terlihat kontras
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Icon(FontAwesomeIcons.chartSimple, color: Colors.blue, size: 50),
+                      child: const Icon(
+                        FontAwesomeIcons.chartSimple,
+                        color: Colors.blue,
+                        size: 50,
+                      ),
                     ),
                   ],
                 ),
@@ -104,30 +115,34 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
                 _buildCourseStatus(),
                 const SizedBox(height: 20),
                 _buildModuleHeader(
-                    controller.currentSection.value?.title ?? "Materi"),
-                Obx(() =>
-                    _buildSubChapterHeader(
-                        controller.materials.isNotEmpty
-                            ? controller.materials.first.title
-                            : "Konten"
-                    )),
-                Obx(() =>
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(20),
-                      decoration: const BoxDecoration(color: Colors.white10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: controller.materials.expand((material) {
-                          // Kita ambil blocks dari SEMUA material dan gabungkan jadi satu list
-                          return material.blocks.map((block) =>
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 20),
-                                child: _renderSingleBlock(block),
-                              ));
-                        }).toList(),
-                      ),
-                    )),
+                  controller.currentSection.value?.title ?? "Materi",
+                ),
+                Obx(
+                  () => _buildSubChapterHeader(
+                    controller.materials.isNotEmpty
+                        ? controller.materials.first.title
+                        : "Konten",
+                  ),
+                ),
+                Obx(
+                  () => Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: const BoxDecoration(color: Colors.white10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: controller.materials.expand((material) {
+                        // Kita ambil blocks dari SEMUA material dan gabungkan jadi satu list
+                        return material.blocks.map(
+                          (block) => Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: _renderSingleBlock(block),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -152,18 +167,24 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Data Analysis",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(
+            "Data Analysis",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 controller.moduletitle.value,
                 style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 16),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
-              Text("0%",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              Text(
+                "0%",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
             ],
           ),
         ],
@@ -180,37 +201,42 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.black, width: 1.5),
       ),
-      child: Text(title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+      child: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+      ),
     );
   }
 
   Widget _buildSubChapterHeader(String title) {
     return Center(
-        child: Container(
-          width: 340,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: const Color(0xFF58B9FF), // Warna biru lebih gelap sedikit
-            border: const Border(
-              left: BorderSide(color: Colors.black, width: 1),
-              right: BorderSide(color: Colors.black, width: 1),
-              bottom: BorderSide(color: Colors.black, width: 1),
-            ),
-            borderRadius: const BorderRadius.only(
-              bottomRight: Radius.circular(
-                  27), // Hanya lengkungan di pojok kanan bawah
-            ),
+      child: Container(
+        width: 340,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF58B9FF), // Warna biru lebih gelap sedikit
+          border: const Border(
+            left: BorderSide(color: Colors.black, width: 1),
+            right: BorderSide(color: Colors.black, width: 1),
+            bottom: BorderSide(color: Colors.black, width: 1),
           ),
-          child: Row(
-            children: [
-              Icon(Icons.menu_book, size: 16, color: Colors.black),
-              const SizedBox(width: 10),
-              Text(title, style: const TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.w500)),
-            ],
+          borderRadius: const BorderRadius.only(
+            bottomRight: Radius.circular(
+              27,
+            ), // Hanya lengkungan di pojok kanan bawah
           ),
-        )
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.menu_book, size: 16, color: Colors.black),
+            const SizedBox(width: 10),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -241,7 +267,7 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
                     block.content,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.broken_image, size: 50),
+                        const Icon(Icons.broken_image, size: 50),
                   ),
                 ),
               ),
@@ -260,9 +286,6 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
       case BlockType.video:
         final String? videoCaption = block.attributes['description'];
         return _buildVideoCard(block.content, videoCaption);
-
-      default:
-        return const SizedBox();
     }
   }
 
@@ -272,7 +295,7 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
     // 1. LOGIKA YOUTUBE (Variabel: _ytController)
     if (url.contains('youtube.com') || url.contains('youtu.be')) {
       final videoId = YoutubePlayer.convertUrlToId(url);
-      final YoutubePlayerController _ytController = YoutubePlayerController(
+      final YoutubePlayerController ytController = YoutubePlayerController(
         initialVideoId: videoId ?? "",
         flags: const YoutubePlayerFlags(autoPlay: false),
       );
@@ -284,7 +307,7 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(13),
-          child: YoutubePlayer(controller: _ytController),
+          child: YoutubePlayer(controller: ytController),
         ),
       );
     }
@@ -323,7 +346,7 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
 
 class LocalVideoPlayer extends StatefulWidget {
   final String url;
-  const LocalVideoPlayer({Key? key, required this.url}) : super(key: key);
+  const LocalVideoPlayer({super.key, required this.url});
 
   @override
   State<LocalVideoPlayer> createState() => _LocalVideoPlayerState();
@@ -364,24 +387,26 @@ class _LocalVideoPlayerState extends State<LocalVideoPlayer> {
                   alignment: Alignment.center,
                   children: [
                     VideoPlayer(_videoController),
-                    StatefulBuilder(builder: (context, setState) {
-                      return IconButton(
-                        icon: Icon(
-                          _videoController.value.isPlaying
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_filled,
-                          color: Colors.white,
-                          size: 50,
-                        ),
-                        onPressed: () {
-                          setState(() {
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        return IconButton(
+                          icon: Icon(
                             _videoController.value.isPlaying
-                                ? _videoController.pause()
-                                : _videoController.play();
-                          });
-                        },
-                      );
-                    }),
+                                ? Icons.pause_circle_filled
+                                : Icons.play_circle_filled,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _videoController.value.isPlaying
+                                  ? _videoController.pause()
+                                  : _videoController.play();
+                            });
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -389,7 +414,10 @@ class _LocalVideoPlayerState extends State<LocalVideoPlayer> {
             ],
           );
         }
-        return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
+        return const SizedBox(
+          height: 200,
+          child: Center(child: CircularProgressIndicator()),
+        );
       },
     );
   }
@@ -405,7 +433,7 @@ class _BottomNavBar extends StatelessWidget {
   static const Color _unselectedColor = Colors.black;
   static const Color _barBgColor = Color(0xffe8f6ff);
 
-  Widget _NavTabItem({
+  Widget _navTabItem({
     required IconData icon,
     required String label,
     required int index,
@@ -445,9 +473,9 @@ class _BottomNavBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: isSelected
                   ? BoxDecoration(
-                color: _selectedBgColor,
-                borderRadius: BorderRadius.circular(30),
-              )
+                      color: _selectedBgColor,
+                      borderRadius: BorderRadius.circular(30),
+                    )
                   : null,
               child: content,
             ),
@@ -478,21 +506,21 @@ class _BottomNavBar extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.home_outlined,
               label: "Home",
               index: 0,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(0),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.menu_book,
               label: "Project",
               index: 1,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(1),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.monetization_on_outlined,
               label: "Finance",
               index: 2,

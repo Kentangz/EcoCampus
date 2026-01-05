@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../../../../data/models/course/question_model.dart';
 import '../../../../data/models/course/quiz_model.dart';
 
-
 class DataAnalysisQuizController extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -32,14 +31,13 @@ class DataAnalysisQuizController extends GetxController {
       if (courseId != null && quizId != null) {
         fetchQuestionsByTitle(courseId, quizId);
       } else {
-        print("Error: ID Course atau Quiz null");
+        // print("Error: ID Course atau Quiz null");
       }
     }
   }
 
   Future<void> fetchQuestionsByTitle(String courseId, String quizId) async {
     try {
-
       final snapshot = await _db
           .collection('Courses')
           .doc(courseId)
@@ -56,7 +54,7 @@ class DataAnalysisQuizController extends GetxController {
         questions.sort((a, b) => a.order.compareTo(b.order));
       }
     } catch (e) {
-      print("ERROR: $e");
+      // print("ERROR: $e");
     }
   }
 

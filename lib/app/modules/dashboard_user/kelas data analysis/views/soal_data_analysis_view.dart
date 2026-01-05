@@ -4,14 +4,13 @@ import 'package:get/get.dart';
 
 import '../../../../data/models/course/question_model.dart';
 import '../../../../data/models/course/quiz_model.dart';
-import '../../../../shared/utils/tech_stack_icons.dart';
+
 import '../../finance/views/finance_view.dart';
 import '../../project/views/project_view.dart';
 import '../controllers/soal_data_analysis_controller.dart';
 
-
 class DataAnalysisQuizView extends GetView<DataAnalysisQuizController> {
-  const DataAnalysisQuizView({Key? key}) : super(key: key);
+  const DataAnalysisQuizView({super.key});
 
   final List<Widget> _pages = const [
     DataAnalysisQuizContent(),
@@ -25,9 +24,7 @@ class DataAnalysisQuizView extends GetView<DataAnalysisQuizController> {
       backgroundColor: const Color(0xffe8f6ff),
 
       body: Obx(() {
-        return SafeArea(
-          child: _pages[controller.selectedIndex.value],
-        );
+        return SafeArea(child: _pages[controller.selectedIndex.value]);
       }),
 
       bottomNavigationBar: _BottomNavBar(controller: controller),
@@ -36,7 +33,7 @@ class DataAnalysisQuizView extends GetView<DataAnalysisQuizController> {
 }
 
 class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
-  const DataAnalysisQuizContent({Key? key}) : super(key: key);
+  const DataAnalysisQuizContent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +59,8 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
                   return const SizedBox.shrink(); // Jangan tampilkan apa-apa jika belum ada data
                 }
 
-                // 2. Ambil soal pertama sebagai referensi ikon tech stack
-                final Question = controller.questions[0];
+                // 2. Ambil soal pertama sebagai referensi ikon tech stack (UNUSED)
+                // final question = controller.questions[0];
 
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -77,14 +74,19 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         shadows: [
-                          Shadow(offset: Offset(-1.0, -1.0),
-                              color: Colors.black),
-                          Shadow(offset: Offset(1.0, -1.0),
-                              color: Colors.black),
-                          Shadow(offset: Offset(1.0, 1.0),
-                              color: Colors.black),
-                          Shadow(offset: Offset(-1.0, 1.0),
-                              color: Colors.black),
+                          Shadow(
+                            offset: Offset(-1.0, -1.0),
+                            color: Colors.black,
+                          ),
+                          Shadow(
+                            offset: Offset(1.0, -1.0),
+                            color: Colors.black,
+                          ),
+                          Shadow(offset: Offset(1.0, 1.0), color: Colors.black),
+                          Shadow(
+                            offset: Offset(-1.0, 1.0),
+                            color: Colors.black,
+                          ),
                         ],
                       ),
                     ),
@@ -96,7 +98,11 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
                         // Warna background gelap agar ikon kuning terlihat kontras
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Icon(FontAwesomeIcons.chartSimple, color: Colors.blue, size: 50),
+                      child: const Icon(
+                        FontAwesomeIcons.chartSimple,
+                        color: Colors.blue,
+                        size: 50,
+                      ),
                     ),
                   ],
                 );
@@ -118,8 +124,8 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
                 if (controller.questions.isEmpty) {
                   return const Center(
                     child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Center(child: CircularProgressIndicator())
+                      padding: EdgeInsets.all(20),
+                      child: Center(child: CircularProgressIndicator()),
                     ),
                   );
                 }
@@ -157,23 +163,22 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: const Color(0xFFFEAA7C),
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.grey,
-              blurRadius: 5,
-              offset: Offset(0, 4),
-            ),
-          ]
+        color: const Color(0xFFFEAA7C),
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: const [
+          BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 4)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Latihan Soal ${quiz.title}",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          Text(
+            "Latihan Soal ${quiz.title}",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
           const SizedBox(height: 10),
-          Text("Peraturan dan Tata Cara Pengerjaan:",
+          Text(
+            "Peraturan dan Tata Cara Pengerjaan:",
             style: TextStyle(
               fontWeight: FontWeight.bold, // Tetap bold jika ingin menonjol
               decoration: TextDecoration.underline, // Menambahkan garis bawah
@@ -189,9 +194,12 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
               String ruleText = entry.value;
               return Padding(
                 padding: const EdgeInsets.only(bottom: 4),
-                child: Text("${idx + 1}. $ruleText", style: const TextStyle(fontSize: 13)),
+                child: Text(
+                  "${idx + 1}. $ruleText",
+                  style: const TextStyle(fontSize: 13),
+                ),
               );
-            }).toList(),
+            }),
         ],
       ),
     );
@@ -215,8 +223,10 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("${question.order}. ${question.question}",
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            "${question.order}. ${question.question}",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 10),
           if (question.description != null) ...[
             Text(question.description!, style: const TextStyle(fontSize: 12)),
@@ -235,14 +245,16 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
                     child: CircularProgressIndicator(
                       value: loadingProgress.expectedTotalBytes != null
                           ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
+                                loadingProgress.expectedTotalBytes!
                           : null,
                     ),
                   );
                 },
                 errorBuilder: (context, error, stackTrace) => const Center(
-                  child: Text("Gagal memuat gambar",
-                      style: TextStyle(color: Colors.red, fontSize: 12)),
+                  child: Text(
+                    "Gagal memuat gambar",
+                    style: TextStyle(color: Colors.red, fontSize: 12),
+                  ),
                 ),
               ),
             ),
@@ -254,11 +266,15 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
             children: List.generate(question.options.length, (optionIndex) {
               return Obx(() {
                 // Status apakah opsi ini yang diklik user
-                bool isSelected = controller.selectedOptions[questionIndex] == optionIndex;
+                bool isSelected =
+                    controller.selectedOptions[questionIndex] == optionIndex;
                 // Status apakah opsi ini adalah jawaban yang benar menurut database
-                bool isCorrectChoice = optionIndex == question.correctAnswerIndex;
+                bool isCorrectChoice =
+                    optionIndex == question.correctAnswerIndex;
                 // Status apakah user sudah menjawab soal ini
-                bool hasAnswered = controller.selectedOptions.containsKey(questionIndex);
+                bool hasAnswered = controller.selectedOptions.containsKey(
+                  questionIndex,
+                );
 
                 return GestureDetector(
                   onTap: () {
@@ -269,23 +285,40 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
                   },
                   child: Container(
                     margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 12,
+                    ),
                     decoration: BoxDecoration(
                       // --- LOGIKA WARNA BACKGROUND ---
                       color: hasAnswered
                           ? (isCorrectChoice
-                          ? Colors.green.withOpacity(0.1) // Hijau jika ini jawaban benar
-                          : (isSelected ? Colors.red.withOpacity(0.1) : Colors.transparent)) // Merah jika user salah pilih
-                          : (isSelected ? Colors.blue.withOpacity(0.1) : Colors.transparent),
+                                ? Colors.green.withValues(
+                                    alpha: 0.1,
+                                  ) // Hijau jika ini jawaban benar
+                                : (isSelected
+                                      ? Colors.red.withValues(alpha: 0.1)
+                                      : Colors
+                                            .transparent)) // Merah jika user salah pilih
+                          : (isSelected
+                                ? Colors.blue.withValues(alpha: 0.1)
+                                : Colors.transparent),
 
                       // --- LOGIKA WARNA BORDER ---
                       border: Border.all(
                         color: hasAnswered
                             ? (isCorrectChoice
-                            ? Colors.green  // Border hijau untuk jawaban benar
-                            : (isSelected ? Colors.red : Colors.grey.shade300)) // Border merah untuk pilihan salah
+                                  ? Colors
+                                        .green // Border hijau untuk jawaban benar
+                                  : (isSelected
+                                        ? Colors.red
+                                        : Colors
+                                              .grey
+                                              .shade300)) // Border merah untuk pilihan salah
                             : (isSelected ? Colors.blue : Colors.grey.shade300),
-                        width: (isSelected || (hasAnswered && isCorrectChoice)) ? 2 : 1,
+                        width: (isSelected || (hasAnswered && isCorrectChoice))
+                            ? 2
+                            : 1,
                       ),
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -296,7 +329,11 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: hasAnswered
-                                ? (isCorrectChoice ? Colors.green : (isSelected ? Colors.red : Colors.black))
+                                ? (isCorrectChoice
+                                      ? Colors.green
+                                      : (isSelected
+                                            ? Colors.red
+                                            : Colors.black))
                                 : (isSelected ? Colors.blue : Colors.black),
                           ),
                         ),
@@ -306,14 +343,22 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
                             question.options[optionIndex],
                             style: TextStyle(
                               color: hasAnswered
-                                  ? (isCorrectChoice ? Colors.green.shade900 : (isSelected ? Colors.red.shade900 : Colors.black))
+                                  ? (isCorrectChoice
+                                        ? Colors.green.shade900
+                                        : (isSelected
+                                              ? Colors.red.shade900
+                                              : Colors.black))
                                   : Colors.black,
                             ),
                           ),
                         ),
                         // --- IKON STATUS ---
                         if (hasAnswered && isCorrectChoice)
-                          const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                          const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 20,
+                          ),
                         if (hasAnswered && isSelected && !isCorrectChoice)
                           const Icon(Icons.cancel, color: Colors.red, size: 20),
                       ],
@@ -338,10 +383,14 @@ class DataAnalysisQuizContent extends GetView<DataAnalysisQuizController> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children:  [
-                    Text("Penjelasan Jawaban:",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.black)),
+                  children: [
+                    Text(
+                      "Penjelasan Jawaban:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
                     Text(
                       question.explanation.isEmpty
                           ? "Tidak ada penjelasan untuk soal ini."
@@ -370,7 +419,7 @@ class _BottomNavBar extends StatelessWidget {
   static const Color _unselectedColor = Colors.black;
   static const Color _barBgColor = Color(0xffe8f6ff);
 
-  Widget _NavTabItem({
+  Widget _navTabItem({
     required IconData icon,
     required String label,
     required int index,
@@ -410,9 +459,9 @@ class _BottomNavBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: isSelected
                   ? BoxDecoration(
-                color: _selectedBgColor,
-                borderRadius: BorderRadius.circular(30),
-              )
+                      color: _selectedBgColor,
+                      borderRadius: BorderRadius.circular(30),
+                    )
                   : null,
               child: content,
             ),
@@ -443,21 +492,21 @@ class _BottomNavBar extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.home_outlined,
               label: "Home",
               index: 0,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(0),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.menu_book,
               label: "Project",
               index: 1,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(1),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.monetization_on_outlined,
               label: "Finance",
               index: 2,

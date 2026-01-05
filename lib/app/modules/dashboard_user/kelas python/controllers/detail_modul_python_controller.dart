@@ -21,15 +21,21 @@ class PythonDetailModuleController extends GetxController {
       moduletitle.value = Get.arguments['moduleTitle'] ?? "";
       final String courseId = Get.arguments['courseId'];
       final String moduleTitle = Get.arguments['moduleTitle'];
-      final String sectionId = Get.arguments['sectionId']; // Kita pakai ID sekarang
+      final String sectionId =
+          Get.arguments['sectionId']; // Kita pakai ID sekarang
       final String materialTitle = Get.arguments['sectionTitle'];
 
       fetchMaterials(courseId, moduleTitle, sectionId, materialTitle);
-      }
     }
+  }
 
   // LOGIKA: Cari Section berdasarkan Title -> Stream Sub-koleksi Materials
-  Future<void> fetchMaterials(String courseId, String moduleTitle, String sectionId, String materialTitle) async {
+  Future<void> fetchMaterials(
+    String courseId,
+    String moduleTitle,
+    String sectionId,
+    String materialTitle,
+  ) async {
     try {
       // 1. Cari Modul ID
       final moduleQuery = await _firestore
@@ -37,7 +43,8 @@ class PythonDetailModuleController extends GetxController {
           .doc(courseId)
           .collection('modules')
           .where('title', isEqualTo: moduleTitle)
-          .limit(1).get();
+          .limit(1)
+          .get();
 
       if (moduleQuery.docs.isEmpty) return;
       final String moduleId = moduleQuery.docs.first.id;
@@ -51,17 +58,19 @@ class PythonDetailModuleController extends GetxController {
           .collection('sections')
           .doc(sectionId) // Menggunakan ID dokumen, bukan judul
           .collection('materials')
-          .where('title', isEqualTo: materialTitle) // Filter agar hanya muncul 1 sub-bab
+          .where(
+            'title',
+            isEqualTo: materialTitle,
+          ) // Filter agar hanya muncul 1 sub-bab
           .snapshots()
           .listen((snapshot) {
-        materials.value = snapshot.docs
-            .map((doc) => MaterialModel.fromSnapshot(doc))
-            .toList();
-      });
-
+            materials.value = snapshot.docs
+                .map((doc) => MaterialModel.fromSnapshot(doc))
+                .toList();
+          });
     } catch (e) {
       // Ini adalah blok catch yang tadi hilang/error
-      print("Error: $e");
+      // print("Error: $e");
       Get.snackbar("Error", "Gagal memuat materi: $e");
     }
   }

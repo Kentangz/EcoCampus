@@ -9,7 +9,7 @@ import '../../project/views/project_view.dart';
 import '../controllers/modul_python_controller.dart';
 
 class PythonModuleView extends GetView<PythonModuleController> {
-  const PythonModuleView({Key? key}) : super(key: key);
+  const PythonModuleView({super.key});
 
   final List<Widget> _pages = const [
     PythonModuleContent(),
@@ -23,9 +23,7 @@ class PythonModuleView extends GetView<PythonModuleController> {
       backgroundColor: const Color(0xffe8f6ff),
 
       body: Obx(() {
-        return SafeArea(
-          child: _pages[controller.selectedIndex.value],
-        );
+        return SafeArea(child: _pages[controller.selectedIndex.value]);
       }),
 
       bottomNavigationBar: _BottomNavBar(controller: controller),
@@ -34,7 +32,7 @@ class PythonModuleView extends GetView<PythonModuleController> {
 }
 
 class PythonModuleContent extends GetView<PythonModuleController> {
-  const PythonModuleContent({Key? key}) : super(key: key);
+  const PythonModuleContent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +41,10 @@ class PythonModuleContent extends GetView<PythonModuleController> {
         Obx(() {
           // Menampilkan loading jika data masih diambil dari Firestore
           if (controller.sections.isEmpty) {
-            return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
+            return const SizedBox(
+              height: 200,
+              child: Center(child: CircularProgressIndicator()),
+            );
           }
           // 1. Konten Utama
           return SingleChildScrollView(
@@ -72,14 +73,19 @@ class PythonModuleContent extends GetView<PythonModuleController> {
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         shadows: [
-                          Shadow(offset: Offset(-1.0, -1.0),
-                              color: Colors.black),
-                          Shadow(offset: Offset(1.0, -1.0),
-                              color: Colors.black),
-                          Shadow(offset: Offset(1.0, 1.0),
-                              color: Colors.black),
-                          Shadow(offset: Offset(-1.0, 1.0),
-                              color: Colors.black),
+                          Shadow(
+                            offset: Offset(-1.0, -1.0),
+                            color: Colors.black,
+                          ),
+                          Shadow(
+                            offset: Offset(1.0, -1.0),
+                            color: Colors.black,
+                          ),
+                          Shadow(offset: Offset(1.0, 1.0), color: Colors.black),
+                          Shadow(
+                            offset: Offset(-1.0, 1.0),
+                            color: Colors.black,
+                          ),
                         ],
                       ),
                     ),
@@ -91,7 +97,11 @@ class PythonModuleContent extends GetView<PythonModuleController> {
                         // Warna background gelap agar ikon kuning terlihat kontras
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Icon(FontAwesomeIcons.python, color: Colors.blue, size: 50),
+                      child: const Icon(
+                        FontAwesomeIcons.python,
+                        color: Colors.blue,
+                        size: 50,
+                      ),
                     ),
                   ],
                 ),
@@ -99,56 +109,59 @@ class PythonModuleContent extends GetView<PythonModuleController> {
                 _buildCourseStatus(),
                 const SizedBox(height: 20),
                 _buildModuleList(),
-                ],
-              ),
-            );
-          }),
-
-          // 2. Tombol Back Melayang
-          Positioned(
-            top: 30,
-            left: -5,
-            child: IconButton(
-              onPressed: () => Get.back(),
-              padding: EdgeInsets.zero,
-              icon: const Icon(Icons.arrow_circle_left_outlined),
-              color: Colors.black,
+              ],
             ),
+          );
+        }),
+
+        // 2. Tombol Back Melayang
+        Positioned(
+          top: 30,
+          left: -5,
+          child: IconButton(
+            onPressed: () => Get.back(),
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.arrow_circle_left_outlined),
+            color: Colors.black,
           ),
+        ),
       ], // Penutup Children Stack
     ); // Penutup Stack
   }
 
   Widget _buildCourseStatus() {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         // Menampilkan judul dari ModuleModel secara dinamis
-          Text("Python Dasar",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(
+          "Python Dasar",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-          Text(
+            Text(
               controller.moduleTitle.value,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("0%",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(
+                  "0%",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
               ],
             ),
           ],
         ), // Penutup Row pertama
-        ], // Penutup children Column
-      ); // Penutup Column
+      ], // Penutup children Column
+    ); // Penutup Column
   }
 
   Widget _buildModuleList() {
     return Obx(() {
-
       final allSections = controller.sections; // Menggunakan SectionModel
       final isExpanded = controller.isExpanded.value;
 
@@ -165,7 +178,8 @@ class PythonModuleContent extends GetView<PythonModuleController> {
             itemCount: itemCount,
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
-              final section = allSections[index]; // Mengambil objek SectionModel
+              final section =
+                  allSections[index]; // Mengambil objek SectionModel
               return _buildModuleWithSubSections(section, index);
             },
           ),
@@ -181,13 +195,15 @@ class PythonModuleContent extends GetView<PythonModuleController> {
                     Text(
                       isExpanded ? 'See less' : 'See more',
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontSize: 12),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: 12,
+                      ),
                     ),
                     Icon(
-                      isExpanded ? Icons.keyboard_arrow_up : Icons
-                          .keyboard_arrow_down,
+                      isExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
                       color: Colors.black,
                       size: 18,
                     ),
@@ -214,12 +230,15 @@ class PythonModuleContent extends GetView<PythonModuleController> {
                 controller.toggleSubModule(index);
               } else {
                 // Jika tidak ada sub bab, mungkin langsung navigasi ke detail?
-                Get.toNamed(Routes.PYTHON_DETAIL_MODULE, arguments: {
-                  'courseId': Get.arguments['courseId'],
-                  'moduleTitle': controller.moduleTitle.value,
-                  'sectionId': section.id, // ID Section (Bab Utama)
-                  'sectionTitle': section.title, // Judul Materi
-                });
+                Get.toNamed(
+                  Routes.PYTHON_DETAIL_MODULE,
+                  arguments: {
+                    'courseId': Get.arguments['courseId'],
+                    'moduleTitle': controller.moduleTitle.value,
+                    'sectionId': section.id, // ID Section (Bab Utama)
+                    'sectionTitle': section.title, // Judul Materi
+                  },
+                );
               }
             },
             child: Container(
@@ -235,12 +254,16 @@ class PythonModuleContent extends GetView<PythonModuleController> {
                     child: Text(
                       "${index + 1}. ${section.title}",
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 14),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                   if (hasSubBab)
                     Icon(
-                      isOpen ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                      isOpen
+                          ? Icons.keyboard_arrow_down
+                          : Icons.keyboard_arrow_right,
                       color: Colors.black,
                     ),
                 ],
@@ -250,13 +273,20 @@ class PythonModuleContent extends GetView<PythonModuleController> {
           // Sub-bab langsung muncul di bawah tanpa Padding/SizedBox
           if (isOpen && hasSubBab)
             Obx(() {
-              final List<String> titles = controller.sectionMaterials[section.id] ?? [];
+              final List<String> titles =
+                  controller.sectionMaterials[section.id] ?? [];
               return Column(
-                children: titles.map((mTitle) => _buildSubItem(
-                  icon: Icons.menu_book,
-                  label: mTitle,        // Judul sub-bab (Contoh: "Sub Bab 1")
-                  sectionId: section.id ?? '',// Tetap kirim section title untuk filter di halaman detail
-                )).toList(),
+                children: titles
+                    .map(
+                      (mTitle) => _buildSubItem(
+                        icon: Icons.menu_book,
+                        label: mTitle, // Judul sub-bab (Contoh: "Sub Bab 1")
+                        sectionId:
+                            section.id ??
+                            '', // Tetap kirim section title untuk filter di halaman detail
+                      ),
+                    )
+                    .toList(),
               );
             }),
         ],
@@ -264,15 +294,22 @@ class PythonModuleContent extends GetView<PythonModuleController> {
     });
   }
 
-  Widget _buildSubItem({required IconData icon, required String label, required String sectionId}) {
+  Widget _buildSubItem({
+    required IconData icon,
+    required String label,
+    required String sectionId,
+  }) {
     return GestureDetector(
       onTap: () {
-        Get.toNamed(Routes.PYTHON_DETAIL_MODULE, arguments: {
-          'courseId': Get.arguments['courseId'],
-          'moduleTitle': controller.moduleTitle.value,
-          'sectionId': sectionId, // Ini yang tadi error 'section' undefined
-          'sectionTitle': label,
-        });
+        Get.toNamed(
+          Routes.PYTHON_DETAIL_MODULE,
+          arguments: {
+            'courseId': Get.arguments['courseId'],
+            'moduleTitle': controller.moduleTitle.value,
+            'sectionId': sectionId, // Ini yang tadi error 'section' undefined
+            'sectionTitle': label,
+          },
+        );
       },
       child: Container(
         width: 340,
@@ -287,15 +324,18 @@ class PythonModuleContent extends GetView<PythonModuleController> {
           ),
           borderRadius: const BorderRadius.only(
             bottomRight: Radius.circular(
-                27), // Hanya lengkungan di pojok kanan bawah
+              27,
+            ), // Hanya lengkungan di pojok kanan bawah
           ),
         ),
         child: Row(
           children: [
             Icon(icon, size: 16, color: Colors.black),
             const SizedBox(width: 10),
-            Text(label, style: const TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w500)),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+            ),
           ],
         ),
       ),
@@ -313,7 +353,7 @@ class _BottomNavBar extends StatelessWidget {
   static const Color _unselectedColor = Colors.black;
   static const Color _barBgColor = Color(0xffe8f6ff);
 
-  Widget _NavTabItem({
+  Widget _navTabItem({
     required IconData icon,
     required String label,
     required int index,
@@ -353,9 +393,9 @@ class _BottomNavBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: isSelected
                   ? BoxDecoration(
-                color: _selectedBgColor,
-                borderRadius: BorderRadius.circular(30),
-              )
+                      color: _selectedBgColor,
+                      borderRadius: BorderRadius.circular(30),
+                    )
                   : null,
               child: content,
             ),
@@ -386,21 +426,21 @@ class _BottomNavBar extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.home_outlined,
               label: "Home",
               index: 0,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(0),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.menu_book,
               label: "Project",
               index: 1,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(1),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.monetization_on_outlined,
               label: "Finance",
               index: 2,

@@ -22,7 +22,8 @@ class DataAnalysisModuleController extends GetxController {
 
     if (Get.arguments != null && Get.arguments is Map) {
       moduleTitle.value = Get.arguments['title'] ?? "";
-      final String? courseId = Get.arguments['courseId']; // Ambil ID Course Utama
+      final String? courseId =
+          Get.arguments['courseId']; // Ambil ID Course Utama
 
       if (moduleTitle.value.isNotEmpty && courseId != null) {
         fetchSectionsByTitle(courseId, moduleTitle.value);
@@ -54,31 +55,33 @@ class DataAnalysisModuleController extends GetxController {
             .orderBy('order')
             .snapshots()
             .listen((snapshot) async {
+              sections.value = snapshot.docs
+                  .map((doc) => SectionModel.fromSnapshot(doc))
+                  .toList();
 
-          sections.value = snapshot.docs
-              .map((doc) => SectionModel.fromSnapshot(doc))
-              .toList();
-
-          for (var doc in snapshot.docs) {
-            final QuerySnapshot materialSnapshot = await _firestore
-                .collection('Courses')
-                .doc(courseId)
-                .collection('modules')
-                .doc(moduleId)
-                .collection('sections')
-                .doc(doc.id)
-                .collection('materials')
-                .orderBy('order')
-                .get();
-            sectionHasContent[doc.id] = materialSnapshot.docs.isNotEmpty;
-            // Jika ada minimal 1 dokumen di materials, maka hasSubBab = true
-            sectionMaterials[doc.id] = materialSnapshot.docs
-                .map((m) => (m.data() as Map<String, dynamic>)['title'] as String)
-                .toList();
-          }
-        });
+              for (var doc in snapshot.docs) {
+                final QuerySnapshot materialSnapshot = await _firestore
+                    .collection('Courses')
+                    .doc(courseId)
+                    .collection('modules')
+                    .doc(moduleId)
+                    .collection('sections')
+                    .doc(doc.id)
+                    .collection('materials')
+                    .orderBy('order')
+                    .get();
+                sectionHasContent[doc.id] = materialSnapshot.docs.isNotEmpty;
+                // Jika ada minimal 1 dokumen di materials, maka hasSubBab = true
+                sectionMaterials[doc.id] = materialSnapshot.docs
+                    .map(
+                      (m) =>
+                          (m.data() as Map<String, dynamic>)['title'] as String,
+                    )
+                    .toList();
+              }
+            });
       } else {
-        print("Modul tidak ditemukan");
+        // print("Modul tidak ditemukan");
       }
     } catch (e) {
       Get.snackbar("Error", "Gagal fetching data: $e");
