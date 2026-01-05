@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:ecocampus/app/data/models/course/question_model.dart';
+import 'package:ecocampus/app/data/repositories/authentication_repository.dart';
 import 'package:ecocampus/app/data/models/course/quiz_model.dart';
 import 'package:ecocampus/app/data/repositories/course_repository.dart';
 import 'package:ecocampus/app/modules/dashboard_admin/views/course/question_form_view.dart';
@@ -122,6 +124,7 @@ class QuestionFormController extends GetxController {
     optionC.dispose();
     optionD.dispose();
     searchController.dispose();
+    _questionSub?.cancel();
     super.onClose();
   }
 
@@ -129,9 +132,26 @@ class QuestionFormController extends GetxController {
   final currentQuiz = Rxn<QuizModel>();
   final isLoadingQuiz = true.obs;
 
+  StreamSubscription<List<QuestionModel>>? _questionSub;
+
   void _loadQuestions() {
-    questions.bindStream(_courseRepo.getQuestions(courseId, quizId));
+    // questions.bindStream(_courseRepo.getQuestions(courseId, quizId));
+    _bindQuestionStream();
     _loadQuizTags();
+  }
+
+  void _bindQuestionStream() {
+    _questionSub = _courseRepo
+        .getQuestions(courseId, quizId)
+        .listen(
+          (data) {
+            questions.assignAll(data);
+          },
+          onError: (e) {
+            if (AuthenticationRepository.instance.currentUser == null) return;
+            NotificationHelper.showError("Error", "Gagal memuat soal: $e");
+          },
+        );
   }
 
   void _loadQuizTags() async {

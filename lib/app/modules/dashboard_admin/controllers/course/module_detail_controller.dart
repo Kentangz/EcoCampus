@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:ecocampus/app/data/models/course/course_model.dart';
+import 'package:ecocampus/app/data/repositories/authentication_repository.dart';
 
 import 'package:ecocampus/app/data/repositories/course_repository.dart';
 import 'package:ecocampus/app/routes/app_pages.dart';
@@ -31,6 +33,8 @@ class ModuleDetailController extends GetxController {
     await _courseRepo.reorderSections(courseId, module.id!, sections);
   }
 
+  StreamSubscription<List<SectionModel>>? _sectionSub;
+
   @override
   void onInit() {
     super.onInit();
@@ -43,8 +47,31 @@ class ModuleDetailController extends GetxController {
         Get.back();
         return;
       }
-      sections.bindStream(_courseRepo.getSections(courseId, module.id!));
+      _bindSectionStream();
     }
+  }
+
+  @override
+  void onClose() {
+    _sectionSub?.cancel();
+    super.onClose();
+  }
+
+  void _bindSectionStream() {
+    isLoading.value = true;
+    _sectionSub = _courseRepo
+        .getSections(courseId, module.id!)
+        .listen(
+          (data) {
+            sections.assignAll(data);
+            isLoading.value = false;
+          },
+          onError: (e) {
+            if (AuthenticationRepository.instance.currentUser == null) return;
+            isLoading.value = false;
+            NotificationHelper.showError("Error", "Gagal memuat section: $e");
+          },
+        );
   }
 
   // === SECTION MANAGEMENT ===

@@ -1,4 +1,3 @@
-import 'package:ecocampus/app/data/models/activity/internship_activity_model.dart';
 import 'package:ecocampus/app/shared/widgets/filter_chip.dart';
 import 'package:ecocampus/app/shared/widgets/search_bar.dart';
 import 'package:ecocampus/app/shared/widgets/smart_image.dart';
