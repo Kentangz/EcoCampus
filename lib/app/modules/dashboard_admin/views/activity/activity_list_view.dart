@@ -1,5 +1,7 @@
+import 'package:ecocampus/app/data/models/activity/internship_activity_model.dart';
 import 'package:ecocampus/app/shared/widgets/filter_chip.dart';
 import 'package:ecocampus/app/shared/widgets/search_bar.dart';
+import 'package:ecocampus/app/shared/widgets/smart_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/data/models/activity/activity_model.dart';
@@ -164,17 +166,7 @@ class ActivityListView extends GetView<ActivityAdminController> {
                 horizontal: 16,
                 vertical: 8,
               ),
-              leading: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  controller.getIconData(activity.icon),
-                  color: const Color(0xFF6C63FF),
-                ),
-              ),
+              leading: _buildLeadingWidget(activity),
               title: Text(
                 activity.title,
                 style: TextStyle(
@@ -208,10 +200,12 @@ class ActivityListView extends GetView<ActivityAdminController> {
                     onPressed: () =>
                         controller.navigateToForm(activity: activity),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () => controller.confirmDeleteActivity(activity),
-                  ),
+                  if (activity.isSynced)
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      onPressed: () =>
+                          controller.confirmDeleteActivity(activity),
+                    ),
                 ],
               ),
             ),
@@ -241,6 +235,39 @@ class ActivityListView extends GetView<ActivityAdminController> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLeadingWidget(BaseActivity activity) {
+    if (activity is InternshipActivity && activity.companyLogo.isNotEmpty) {
+      return Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: ClipOval(
+          child: SmartImage(
+            activity.companyLogo,
+            fit: BoxFit.cover,
+            width: 48,
+            height: 48,
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        controller.getIconData(activity.icon),
+        color: const Color(0xFF6C63FF),
       ),
     );
   }
