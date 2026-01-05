@@ -30,7 +30,7 @@ class DetailMagangController extends GetxController {
       if (snapshot.docs.isNotEmpty) {
         internshipData.value = InternshipActivity.fromSnapshot(snapshot.docs.first);
       } else {
-        print("Data dengan title $title tidak ditemukan.");
+        // print("Data dengan title $title tidak ditemukan.");
       }
     } catch (e) {
       Get.snackbar("Error", "Gagal memuat detail: $e");

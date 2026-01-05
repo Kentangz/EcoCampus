@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:ecocampus/app/data/models/activity/activity_model.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -120,8 +119,8 @@ class BannerCard extends StatelessWidget {
     required this.buttonText,
     required this.onTap,
     required this.contacts,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +130,7 @@ class BannerCard extends StatelessWidget {
       image: DecorationImage(
         image: NetworkImage(imageUrl),
         fit: BoxFit.cover,
-        colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
+        colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.3), BlendMode.darken),
       ),
     );
     return Container(
@@ -290,7 +289,7 @@ Widget _buildContactRow({required IconData icon, required String text}) {
 class AboutUsSection extends StatelessWidget {
   final String title;
   final String content;
-  const AboutUsSection({required this.title, required this.content, Key? key}) : super(key: key);
+  const AboutUsSection({required this.title, required this.content, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -308,7 +307,11 @@ class AboutUsSection extends StatelessWidget {
 class RoutineActivitiesSection extends GetView<KaligrafiController> {
   final String title;
   final List<RoutineModel> activities;
-  const RoutineActivitiesSection({required this.title, required this.activities, Key? key}) : super(key: key);
+  const RoutineActivitiesSection({
+    required this.title,
+    required this.activities,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -375,7 +378,7 @@ class RoutineActivitiesSection extends GetView<KaligrafiController> {
 
 class ActivityCard extends StatelessWidget {
   final RoutineModel activity;
-  const ActivityCard({required this.activity, Key? key}) : super(key: key);
+  const ActivityCard({required this.activity, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -442,7 +445,7 @@ class ActivityCard extends StatelessWidget {
 class GallerySection extends StatelessWidget {
   final String title;
   final List<String> images;
-  const GallerySection({required this.title, required this.images, Key? key}) : super(key: key);
+  const GallerySection({required this.title, required this.images, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -486,7 +489,7 @@ class _BottomNavBar extends StatelessWidget {
   static const Color _unselectedColor = Colors.black;
   static const Color _barBgColor = Color(0xffe8f6ff);
 
-  Widget _NavTabItem({
+  Widget _navTabItem({
     required IconData icon,
     required String label,
     required int index,
@@ -559,21 +562,21 @@ class _BottomNavBar extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.home_outlined,
               label: "Home",
               index: 0,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(0),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.menu_book,
               label: "Project",
               index: 1,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(1),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.monetization_on_outlined,
               label: "Finance",
               index: 2,
