@@ -129,9 +129,7 @@ class NewsFormAdmin extends StatelessWidget {
             if (c.isLoading.value)
               Container(
                 color: Colors.black.withOpacity(0.2),
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                child: const Center(child: CircularProgressIndicator()),
               ),
           ],
         );
@@ -141,21 +139,13 @@ class NewsFormAdmin extends StatelessWidget {
 
   Widget _buildImagePreview(XFile? localImg, String networkImg) {
     if (localImg != null) {
-      return Image.file(
-        File(localImg.path),
-        fit: BoxFit.cover,
-      );
+      return Image.file(File(localImg.path), fit: BoxFit.cover);
     }
 
     if (networkImg.isNotEmpty) {
-      return Image.network(
-        networkImg,
-        fit: BoxFit.cover,
-      );
+      return Image.network(networkImg, fit: BoxFit.cover);
     }
 
-    return const Center(
-      child: Text("Belum ada gambar"),
-    );
+    return const Center(child: Text("Belum ada gambar"));
   }
 }

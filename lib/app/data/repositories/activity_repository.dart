@@ -61,23 +61,6 @@ class ActivityRepository extends GetxController {
         .set(activity.toJson(), SetOptions(merge: true));
   }
 
-  Future<EventActivity?> getActivityByTitle(String title) async {
-    try {
-      final snapshot = await _db
-          .collection('Activities')
-          .where('title', isEqualTo: title)
-          .limit(1)
-          .get();
-
-      if (snapshot.docs.isNotEmpty) {
-        return EventActivity.fromSnapshot(snapshot.docs.first);
-      }
-      return null;
-    } catch (e) {
-      print("Error fetching activity by title: $e");
-      return null;
-    }
-  }
 
   Future<BaseActivity?> getActivityById(String id) async {
     try {

@@ -40,6 +40,11 @@ import 'package:ecocampus/app/modules/dashboard_admin/views/project/project_admi
 import 'package:ecocampus/app/modules/project_detail/bindings/project_detail_bindings.dart';
 import 'package:ecocampus/app/modules/project_detail/views/project_detail_views.dart';
 
+import '../modules/dashboard_user/magang/bindings/detail_magang_binding.dart';
+import '../modules/dashboard_user/magang/bindings/magang_binding.dart';
+import '../modules/dashboard_user/magang/views/detail_magang_view.dart';
+import '../modules/dashboard_user/magang/views/magang_view.dart';
+
 part 'app_routes.dart';
 
 class AppPages {
@@ -90,6 +95,17 @@ class AppPages {
       page: () => const NontonFilmView(),
       binding: NontonFilmBinding(),
     ),
+    GetPage(
+      name: _Paths.MAGANG,
+      page: () => const MagangView(),
+      binding: MagangBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAILMAGANG,
+      page: () => const DetailMagangView(),
+      binding: DetailMagangBinding(),
+    ),
+
     GetPage(
       name: _Paths.KOLABORASI_KAMPUS,
       page: () => const ProjectView(),

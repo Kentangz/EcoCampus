@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:ecocampus/app/data/models/activity/activity_model.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -50,33 +49,41 @@ class _AkustikContent extends GetView<AkustikController> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
               ),
               Obx(() {
-                final clubData = controller.clubData.value;
+                final data = controller.eventActivity.value;
                 final contacts = controller.eventActivity.value?.contacts ?? ContactModel(email: '', whatsapp: '', instagram: '');
+                if (data == null) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 50),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
                     BannerCard(
-                      imageUrl: clubData.bannerUrl,
-                      title: 'Join ${clubData.title} Club',
+                      imageUrl: data.heroImage,
+                      title: 'Join ${data.title} Club',
                       buttonText: 'Gabung Sekarang',
-                      onTap: controller.joinClub,
+                      onTap: () {},
                       contacts: contacts,
                     ),
                     const SizedBox(height: 20),
                     AboutUsSection(
                       title: 'Tentang Kami',
-                      content: clubData.aboutUsContent,
+                      content: data.description,
                     ),
                     const SizedBox(height: 20),
                     RoutineActivitiesSection(
                       title: 'Aktivitas Rutin',
-                      activities: clubData.routineActivities,
+                      activities: data.routines,
                     ),
                     const SizedBox(height: 20),
                     GallerySection(
                       title: 'Gallery',
-                      images: clubData.galleryImages,
+                      images: data.gallery,
                     ),
                   ],
                 );
@@ -112,20 +119,23 @@ class BannerCard extends StatelessWidget {
     required this.buttonText,
     required this.onTap,
     required this.contacts,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     final BoxDecoration combinedDecoration = _cardDecoration(
         const Color(0xffa5dff5)
     ).copyWith(
-      image: DecorationImage(
-        image: NetworkImage(imageUrl),
-        fit: BoxFit.cover,
-        colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
-      ),
-    );
+          image: DecorationImage(
+            image: NetworkImage(imageUrl),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withValues(alpha: 0.3),
+              BlendMode.darken,
+            ),
+          ),
+        );
     return Container(
       height: 200,
       decoration: combinedDecoration,
@@ -139,7 +149,13 @@ class BannerCard extends StatelessWidget {
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 30,
-                  fontWeight: FontWeight.bold
+                  fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(offset: Offset(-1.0, -1.0), color: Colors.black),
+                  Shadow(offset: Offset(1.0, -1.0), color: Colors.black),
+                  Shadow(offset: Offset(1.0, 1.0), color: Colors.black),
+                  Shadow(offset: Offset(-1.0, 1.0), color: Colors.black),
+                ],
               ),
             ),
           ),
@@ -276,7 +292,7 @@ Widget _buildContactRow({required IconData icon, required String text}) {
 class AboutUsSection extends StatelessWidget {
   final String title;
   final String content;
-  const AboutUsSection({required this.title, required this.content, Key? key}) : super(key: key);
+  const AboutUsSection({required this.title, required this.content, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +310,11 @@ class AboutUsSection extends StatelessWidget {
 class RoutineActivitiesSection extends GetView<AkustikController> {
   final String title;
   final List<RoutineModel> activities;
-  const RoutineActivitiesSection({required this.title, required this.activities, Key? key}) : super(key: key);
+  const RoutineActivitiesSection({
+    required this.title,
+    required this.activities,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -361,7 +381,7 @@ class RoutineActivitiesSection extends GetView<AkustikController> {
 
 class ActivityCard extends StatelessWidget {
   final RoutineModel activity;
-  const ActivityCard({required this.activity, Key? key}) : super(key: key);
+  const ActivityCard({required this.activity, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -428,12 +448,12 @@ class ActivityCard extends StatelessWidget {
 class GallerySection extends StatelessWidget {
   final String title;
   final List<String> images;
-  const GallerySection({required this.title, required this.images, Key? key}) : super(key: key);
+  const GallerySection({required this.title, required this.images, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
@@ -472,7 +492,7 @@ class _BottomNavBar extends StatelessWidget {
   static const Color _unselectedColor = Colors.black;
   static const Color _barBgColor = Color(0xffe8f6ff);
 
-  Widget _NavTabItem({
+  Widget _navTabItem({
     required IconData icon,
     required String label,
     required int index,
@@ -545,21 +565,21 @@ class _BottomNavBar extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.home_outlined,
               label: "Home",
               index: 0,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(0),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.menu_book,
               label: "Project",
               index: 1,
               selectedIndex: selectedIndex,
               onTap: () => controller.changeTab(1),
             ),
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.monetization_on_outlined,
               label: "Finance",
               index: 2,
