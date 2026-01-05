@@ -93,48 +93,10 @@ class MagangContent extends GetView<MagangController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Lowongan",
+                            "Lowongan\nMagang\ninternship",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              shadows: [
-                                Shadow(offset: Offset(-1.0, -1.0),
-                                    color: Colors.black),
-                                Shadow(offset: Offset(1.0, -1.0),
-                                    color: Colors.black),
-                                Shadow(offset: Offset(1.0, 1.0),
-                                    color: Colors.black),
-                                Shadow(offset: Offset(-1.0, 1.0),
-                                    color: Colors.black),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            "Magang",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              shadows: [
-                                Shadow(offset: Offset(-1.0, -1.0),
-                                    color: Colors.black),
-                                Shadow(offset: Offset(1.0, -1.0),
-                                    color: Colors.black),
-                                Shadow(offset: Offset(1.0, 1.0),
-                                    color: Colors.black),
-                                Shadow(offset: Offset(-1.0, 1.0),
-                                    color: Colors.black),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            "Internship",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
+                              fontSize: 40,
                               fontWeight: FontWeight.bold,
                               shadows: [
                                 Shadow(offset: Offset(-1.0, -1.0),
@@ -162,23 +124,71 @@ class MagangContent extends GetView<MagangController> {
                 ),
               ),
               Obx(() {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: controller.lowonganList.length,
-                  itemBuilder: (context, index) {
-                    final item = controller.lowonganList[index];
-                    return _buildJobCard(
-                      id: item.id ?? "",
-                      companyLogo: item.companyLogo,
-                      posisi: item.position,
-                      perusahaan: item.title,
-                      lokasi: item.location,
-                      item: item,
-                    );
-                  },
+                int totalData = controller.lowonganList.length;
+                int totalPages = (totalData / controller.itemsPerPage).ceil();
+                int startIndex = (controller.currentPage.value - 1) * controller.itemsPerPage;
+                int endIndex = startIndex + controller.itemsPerPage;
+                if (endIndex > totalData) endIndex = totalData;
+                final listToShow = controller.lowonganList.sublist(startIndex, endIndex);
+                return Column(
+                  children: [
+                    ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: controller.itemsPerPage * 135.0,
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: listToShow.length,
+                          itemBuilder: (context, index) {
+                            final item = listToShow[index];
+                            return _buildJobCard(
+                              id: item.id ?? "",
+                              companyLogo: item.companyLogo,
+                              posisi: item.position,
+                              perusahaan: item.title,
+                              lokasi: item.location,
+                              item: item,
+                            );
+                          },
+                        ),
+                    ),
+                    const SizedBox(height: 10),
+                    if (totalPages > 1)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(totalPages, (index) {
+                          int pageNum = index + 1;
+                          bool isActive = controller.currentPage.value == pageNum;
+                          return GestureDetector(
+                            onTap: () => controller.goToPage(pageNum),
+                            child: Container(
+                              width: 35,
+                              height: 35,
+                              margin: const EdgeInsets.symmetric(horizontal: 5),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: isActive ? const Color(0xFF4AB8B6) : Colors.white,
+                                border: Border.all(color: Colors.black),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "$pageNum",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: isActive ? Colors.white : Colors.black,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                  ],
                 );
-              }),
+              })
             ],
           ),
         ),
@@ -227,13 +237,8 @@ class MagangContent extends GetView<MagangController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                Text(
-                  "Posisi : $posisi",
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-                Text("Perusahaan : $perusahaan",
-                    style: const TextStyle(fontSize: 13)),
+                Text("Posisi : $posisi", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                Text("Perusahaan : $perusahaan", style: const TextStyle(fontSize: 13)),
                 Text("Lokasi : $lokasi", style: const TextStyle(fontSize: 13)),
                 const SizedBox(height: 10),
                 Align(
@@ -242,7 +247,7 @@ class MagangContent extends GetView<MagangController> {
                     height: 25,
                     child: ElevatedButton(
                       onPressed: () {
-                        Get.toNamed(Routes.DETAILMAGANG, arguments: item.title);
+                        Get.toNamed(Routes.DETAIL_MAGANG, arguments: item.title);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,

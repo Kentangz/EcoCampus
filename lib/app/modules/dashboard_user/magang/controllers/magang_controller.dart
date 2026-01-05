@@ -6,6 +6,8 @@ class MagangController extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   var lowonganList = <InternshipActivity>[].obs;
+  var currentPage = 1.obs;
+  final int itemsPerPage = 3;
   final selectedIndex = 0.obs;
 
   @override
@@ -28,6 +30,10 @@ class MagangController extends GetxController {
     } catch (e) {
       Get.snackbar("Error", "Gagal memuat data magang: $e");
     }
+  }
+
+  void goToPage(int page) {
+    currentPage.value = page;
   }
 
   void changeTab(int index) {
