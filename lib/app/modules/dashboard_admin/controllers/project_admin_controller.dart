@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:ecocampus/app/data/models/project/project_model.dart';
 import 'package:ecocampus/app/data/repositories/project_repository.dart';
 import 'package:ecocampus/app/services/cloudinary_service.dart';
+import 'package:ecocampus/app/data/repositories/authentication_repository.dart';
 import 'package:ecocampus/app/shared/utils/notification_helper.dart';
 
 class ProjectAdminController extends GetxController {
@@ -85,6 +86,10 @@ class ProjectAdminController extends GetxController {
         isLoading.value = false;
       },
       onError: (e) {
+        if (AuthenticationRepository.instance.currentUser == null) {
+          return;
+        }
+
         isLoading.value = false;
         NotificationHelper.showError(
           "Error",

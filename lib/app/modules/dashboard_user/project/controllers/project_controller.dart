@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:ecocampus/app/data/models/project/project_model.dart';
 import 'package:ecocampus/app/data/repositories/project_repository.dart';
+import 'package:ecocampus/app/data/repositories/authentication_repository.dart';
 import 'package:ecocampus/app/shared/utils/notification_helper.dart';
 import 'package:ecocampus/app/routes/app_pages.dart';
 
@@ -48,6 +49,10 @@ class ProjectController extends GetxController {
         isLoading.value = false;
       },
       onError: (e) {
+        if (AuthenticationRepository.instance.currentUser == null) {
+          return;
+        }
+
         isLoading.value = false;
         NotificationHelper.showError(
           'Error',
