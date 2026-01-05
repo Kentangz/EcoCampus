@@ -22,9 +22,7 @@ class AkustikView extends GetView<AkustikController> {
       backgroundColor: const Color(0xffe8f6ff),
 
       body: Obx(() {
-        return SafeArea(
-          child: _pages[controller.selectedIndex.value],
-        );
+        return SafeArea(child: _pages[controller.selectedIndex.value]);
       }),
 
       bottomNavigationBar: _BottomNavBar(controller: controller),
@@ -45,12 +43,14 @@ class _AkustikContent extends GetView<AkustikController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                  "EcoCampus",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
+                "EcoCampus",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               Obx(() {
                 final data = controller.eventActivity.value;
-                final contacts = controller.eventActivity.value?.contacts ?? ContactModel(email: '', whatsapp: '', instagram: '');
+                final contacts =
+                    controller.eventActivity.value?.contacts ??
+                    ContactModel(email: '', whatsapp: '', instagram: '');
                 if (data == null) {
                   return const Center(
                     child: Padding(
@@ -65,7 +65,7 @@ class _AkustikContent extends GetView<AkustikController> {
                     const SizedBox(height: 20),
                     BannerCard(
                       imageUrl: data.heroImage,
-                      title: 'Join ${data.title} \Club',
+                      title: 'Join ${data.title} Club',
                       buttonText: 'Gabung Sekarang',
                       onTap: () {},
                       contacts: contacts,
@@ -81,13 +81,10 @@ class _AkustikContent extends GetView<AkustikController> {
                       activities: data.routines,
                     ),
                     const SizedBox(height: 20),
-                    GallerySection(
-                      title: 'Gallery',
-                      images: data.gallery,
-                    ),
+                    GallerySection(title: 'Gallery', images: data.gallery),
                   ],
                 );
-              })
+              }),
             ],
           ),
         ),
@@ -124,9 +121,8 @@ class BannerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BoxDecoration combinedDecoration = _cardDecoration(
-        const Color(0xffa5dff5)
-    ).copyWith(
+    final BoxDecoration combinedDecoration =
+        _cardDecoration(const Color(0xffa5dff5)).copyWith(
           image: DecorationImage(
             image: NetworkImage(imageUrl),
             fit: BoxFit.cover,
@@ -147,9 +143,9 @@ class BannerCard extends StatelessWidget {
             child: Text(
               title,
               style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
                 shadows: [
                   Shadow(offset: Offset(-1.0, -1.0), color: Colors.black),
                   Shadow(offset: Offset(1.0, -1.0), color: Colors.black),
@@ -170,11 +166,16 @@ class BannerCard extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFA5C2F5),
                 foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
               child: Text(
-                  buttonText,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)
+                buttonText,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -190,11 +191,7 @@ BoxDecoration _cardDecoration(Color color) {
     borderRadius: BorderRadius.circular(20),
     border: Border.all(color: Colors.black, width: 1),
     boxShadow: const [
-      BoxShadow(
-        color: Colors.grey,
-        blurRadius: 5,
-        offset: Offset(0, 4),
-      ),
+      BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 4)),
     ],
   );
 }
@@ -224,7 +221,10 @@ void showContactDialog(BuildContext context, ContactModel contacts) {
                   top: -11,
                   right: -11,
                   child: IconButton(
-                    icon: const Icon(Icons.cancel_outlined, color: Color(0xFFA40000)),
+                    icon: const Icon(
+                      Icons.cancel_outlined,
+                      color: Color(0xFFA40000),
+                    ),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -246,18 +246,18 @@ void showContactDialog(BuildContext context, ContactModel contacts) {
                       ),
                     ),
                     _buildContactRow(
-                        icon: Icons.mail_outline,
-                        text: contacts.email
+                      icon: Icons.mail_outline,
+                      text: contacts.email,
                     ),
                     const SizedBox(height: 15),
                     _buildContactRow(
-                        icon: FontAwesomeIcons.whatsapp,
-                        text: contacts.whatsapp
+                      icon: FontAwesomeIcons.whatsapp,
+                      text: contacts.whatsapp,
                     ),
                     const SizedBox(height: 15),
                     _buildContactRow(
-                        icon: FontAwesomeIcons.instagram,
-                        text: contacts.instagram
+                      icon: FontAwesomeIcons.instagram,
+                      text: contacts.instagram,
                     ),
                   ],
                 ),
@@ -299,7 +299,10 @@ class AboutUsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         Text(content, style: const TextStyle(fontSize: 14)),
       ],
@@ -322,7 +325,10 @@ class RoutineActivitiesSection extends GetView<AkustikController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 10),
         Obx(() {
           int itemCount = 0;
@@ -365,7 +371,9 @@ class RoutineActivitiesSection extends GetView<AkustikController> {
                       ),
                     ),
                     Icon(
-                      isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                      isExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
                       size: 20,
                       color: Colors.black,
                     ),
@@ -396,48 +404,56 @@ class ActivityCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         child: SizedBox(
           child: LayoutBuilder(
-              builder: (context, constraints) {
-                final double cardWidth = constraints.maxWidth;
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Image.network(
-                        activity.imageUrl,
+            builder: (context, constraints) {
+              final double cardWidth = constraints.maxWidth;
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Image.network(
+                      activity.imageUrl,
+                      width: cardWidth,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
                         width: cardWidth,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          width: cardWidth,
-                          color: Colors.grey,
-                          child: const Center(child: Text("Img", style: TextStyle(color: Colors.white))),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        width: cardWidth,
-                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                        color: Colors.white,
-                        child: Text(
-                          activity.activityName,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                        child: const Center(
+                          child: Text(
+                            "Img",
+                            style: TextStyle(color: Colors.white),
                           ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
-                  ],
-                );
-              }
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: cardWidth,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 4,
+                      ),
+                      color: Colors.white,
+                      child: Text(
+                        activity.activityName,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -455,7 +471,10 @@ class GallerySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 10),
         GridView.builder(
           shrinkWrap: true,
@@ -472,7 +491,8 @@ class GallerySection extends StatelessWidget {
                 images[index],
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.green[200], child: const Center(child: Text("Gallery Image")),
+                  color: Colors.green[200],
+                  child: const Center(child: Text("Gallery Image")),
                 ),
               ),
             );
@@ -532,9 +552,9 @@ class _BottomNavBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: isSelected
                   ? BoxDecoration(
-                color: _selectedBgColor,
-                borderRadius: BorderRadius.circular(30),
-              )
+                      color: _selectedBgColor,
+                      borderRadius: BorderRadius.circular(30),
+                    )
                   : null,
               child: content,
             ),
