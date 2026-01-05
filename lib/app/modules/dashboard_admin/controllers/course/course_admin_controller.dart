@@ -1,5 +1,7 @@
 import 'package:ecocampus/app/data/models/course/course_model.dart';
 import 'package:ecocampus/app/data/repositories/course_repository.dart';
+import 'dart:async';
+import 'package:ecocampus/app/data/repositories/authentication_repository.dart';
 import 'package:ecocampus/app/routes/app_pages.dart';
 import 'package:ecocampus/app/shared/utils/notification_helper.dart';
 import 'package:flutter/material.dart';
@@ -57,21 +59,39 @@ class CourseAdminController extends GetxController {
     return list;
   }
 
+  StreamSubscription<List<CourseModel>>? _streamSub;
+
   // === LIFECYCLE ===
   @override
   void onInit() {
     super.onInit();
-    courses.bindStream(_courseRepo.getAllCourses());
-    courses.listen((event) {
-      isLoading.value = false;
-    });
+    _bindStream();
     searchController.addListener(() => courses.refresh());
   }
 
   @override
   void onClose() {
     searchController.dispose();
+    _streamSub?.cancel();
     super.onClose();
+  }
+
+  void _bindStream() {
+    isLoading.value = true;
+    _streamSub = _courseRepo.getAllCourses().listen(
+      (list) {
+        courses.assignAll(list);
+        isLoading.value = false;
+      },
+      onError: (e) {
+        if (AuthenticationRepository.instance.currentUser == null) {
+          return;
+        }
+
+        isLoading.value = false;
+        NotificationHelper.showError("Error", "Gagal memuat kelas: $e");
+      },
+    );
   }
 
   // === NAVIGATION ===

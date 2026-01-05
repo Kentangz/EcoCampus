@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:ecocampus/app/data/models/course/course_model.dart';
+import 'package:ecocampus/app/data/repositories/authentication_repository.dart';
 import 'package:ecocampus/app/data/repositories/course_repository.dart';
 import 'package:ecocampus/app/routes/app_pages.dart';
 import 'package:ecocampus/app/services/upload_queue_service.dart';
@@ -40,6 +42,9 @@ class CourseFormController extends GetxController
   final modules = <ModuleModel>[].obs;
   final quizzes = <QuizModel>[].obs;
 
+  StreamSubscription<List<ModuleModel>>? _moduleSub;
+  StreamSubscription<List<QuizModel>>? _quizSub;
+
   @override
   void onInit() {
     super.onInit();
@@ -71,26 +76,44 @@ class CourseFormController extends GetxController
 
   void _loadModules() {
     if (courseId == null) return;
-    _courseRepo.getModules(courseId!).listen((data) {
-      if (isEditMode.value) {
-        modules.assignAll(data);
-      }
-    });
+    _moduleSub = _courseRepo
+        .getModules(courseId!)
+        .listen(
+          (data) {
+            if (isEditMode.value) {
+              modules.assignAll(data);
+            }
+          },
+          onError: (e) {
+            if (AuthenticationRepository.instance.currentUser == null) return;
+            NotificationHelper.showError("Error", "Gagal memuat modul: $e");
+          },
+        );
   }
 
   void _loadQuizzes() {
     if (courseId == null) return;
-    _courseRepo.getQuizzes(courseId!).listen((data) {
-      if (isEditMode.value) {
-        quizzes.assignAll(data);
-      }
-    });
+    _quizSub = _courseRepo
+        .getQuizzes(courseId!)
+        .listen(
+          (data) {
+            if (isEditMode.value) {
+              quizzes.assignAll(data);
+            }
+          },
+          onError: (e) {
+            if (AuthenticationRepository.instance.currentUser == null) return;
+            NotificationHelper.showError("Error", "Gagal memuat kuis: $e");
+          },
+        );
   }
 
   @override
   void onClose() {
     titleC.dispose();
     tabController.dispose();
+    _moduleSub?.cancel();
+    _quizSub?.cancel();
     super.onClose();
   }
 
