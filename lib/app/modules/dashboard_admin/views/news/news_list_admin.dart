@@ -219,7 +219,7 @@ class NewsListAdminView extends GetView<NewsAdminController> {
                   // PUBLISH SWITCH
                   Switch(
                     value: news.isPublished,
-                    activeColor: Colors.green,
+                    activeThumbColor: Colors.green,
                     onChanged: (value) {
                       controller.togglePublishById(news.id, value);
                     },
