@@ -51,6 +51,7 @@ class ModuleDetailController extends GetxController {
     }
   }
 
+  @override
   void onClose() {
     _sectionSub?.cancel();
     super.onClose();
