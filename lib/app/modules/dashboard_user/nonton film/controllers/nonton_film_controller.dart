@@ -21,19 +21,15 @@ class NontonFilmController extends GetxController {
       final snapshot = await _db
           .collection('Activities')
           .where('title', isEqualTo: clubTitle)
+          .limit(1)
           .get();
 
-      final result = snapshot.docs
-          .map((doc) => EventActivity.fromSnapshot(doc))
-          .where((activity) => activity.isActive == true)
-          .toList();
-
-      if (result.isNotEmpty) {
-        eventActivity.value = result.first;
-        print("Data ditemukan dan aktif");
+      if (snapshot.docs.isNotEmpty) {
+        final doc = snapshot.docs.first;
+        final data = EventActivity.fromSnapshot(doc);
+        eventActivity.value = data;
       } else {
-        eventActivity.value = null;
-        print("Data tidak ditemukan atau status isActive = false");
+        print("Data klub '$clubTitle' tidak ditemukan di database.");
       }
     } catch (e) {
       Get.snackbar("Error", "Gagal memuat data klub: $e");

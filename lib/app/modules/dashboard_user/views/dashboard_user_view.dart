@@ -175,7 +175,7 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
       childAspectRatio: 1,
       children: activities.map((activity) {
         final String title = activity['title'] as String;
-        VoidCallback? onTapValue = () {
+        void onTapValue() {
           switch (title) {
             case "Kaligrafi":
               Get.toNamed(Routes.KALIGRAFI);
@@ -196,7 +196,7 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
               Get.toNamed(Routes.DATA_ANALYSIS);
               break;
           }
-        };
+        }
 
         return _activityCard(
           icon: activity['icon'] as IconData,
@@ -269,7 +269,7 @@ class _BottomNavBar extends StatelessWidget {
   static const Color _unselectedColor = Colors.black;
   static const Color _barBgColor = Color(0xffe8f6ff);
 
-  Widget _NavTabItem({
+  Widget _navTabItem({
     required IconData icon,
     required String label,
     required int index,
@@ -342,7 +342,7 @@ class _BottomNavBar extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.home_outlined,
               label: "Home",
               index: 0,
@@ -350,7 +350,7 @@ class _BottomNavBar extends StatelessWidget {
               onTap: () => controller.changeTab(0),
             ),
 
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.menu_book,
               label: "Project",
               index: 1,
@@ -358,7 +358,7 @@ class _BottomNavBar extends StatelessWidget {
               onTap: () => controller.changeTab(1),
             ),
 
-            _NavTabItem(
+            _navTabItem(
               icon: Icons.monetization_on_outlined,
               label: "Finance",
               index: 2,

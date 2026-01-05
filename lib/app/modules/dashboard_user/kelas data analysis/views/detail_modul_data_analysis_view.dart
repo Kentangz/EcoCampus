@@ -259,7 +259,6 @@ class DataAnalysisDetailModuleContent extends GetView<DataAnalysisDetailModuleCo
 
       case BlockType.video:
         final String? videoCaption = block.attributes['description'];
-        print("ISI BLOCK LENGKAP: ${block.toJson()}");
         return _buildVideoCard(block.content, videoCaption);
 
       default:

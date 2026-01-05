@@ -24,8 +24,6 @@ import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penju
 import 'package:ecocampus/app/modules/dashboard_user/project/analisis_data_penjualan/views/analisis_data_penjualan_view.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/bindings/project_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/views/project_view.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/bindings/aplikasi_bindings.dart';
-import 'package:ecocampus/app/modules/dashboard_user/project/pembuatanaplikasi/views/aplikasi_views.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/bindings/project_ui_ux_binding.dart';
 import 'package:ecocampus/app/modules/dashboard_user/project/project_ui_ux/view/project_ui_ux_view.dart';
 import 'package:get/get.dart';
