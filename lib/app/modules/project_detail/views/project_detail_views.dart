@@ -48,7 +48,7 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                   ),
 
                   // overlay
-                  Container(color: Colors.black.withOpacity(0.2)),
+                  Container(color: Colors.black.withValues(alpha: 0.2)),
 
                   // title overlay
                   Center(
@@ -105,8 +105,8 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  project.description?.isNotEmpty == true
-                      ? project.description!
+                  project.description.isNotEmpty == true
+                      ? project.description
                       : 'Deskripsi belum tersedia untuk proyek ini.',
                   style: const TextStyle(fontSize: 14, height: 1.4),
                 ),
@@ -125,7 +125,7 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                 else
                   ...project.deliverables
                       .map((d) => _Bullet(text: d))
-                      .toList(),
+                      ,
 
                 const SizedBox(height: 16),
 
@@ -135,9 +135,9 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
-                Text('Email : ${project.email ?? '-'}'),
+                Text('Email : ${project.email}'),
                 const SizedBox(height: 4),
-                Text('No HP : ${project.phone ?? '-'}'),
+                Text('No HP : ${project.phone}'),
               ],
             ),
           ),
