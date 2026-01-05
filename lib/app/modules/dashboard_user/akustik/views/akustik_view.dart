@@ -65,7 +65,7 @@ class _AkustikContent extends GetView<AkustikController> {
                     const SizedBox(height: 20),
                     BannerCard(
                       imageUrl: data.heroImage,
-                      title: 'Join ${data.title} Club',
+                      title: 'Join ${data.title} \Club',
                       buttonText: 'Gabung Sekarang',
                       onTap: () {},
                       contacts: contacts,
@@ -148,7 +148,7 @@ class BannerCard extends StatelessWidget {
               title,
               style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 30,
+                  fontSize: 40,
                   fontWeight: FontWeight.bold,
                 shadows: [
                   Shadow(offset: Offset(-1.0, -1.0), color: Colors.black),

@@ -16,9 +16,17 @@ abstract class Routes {
   static const DASHBOARD_USER = _Paths.DASHBOARD_USER;
   static const KALIGRAFI = _Paths.KALIGRAFI;
   static const AKUSTIK = _Paths.AKUSTIK;
-  static const NONTONFILM = _Paths.NONTONFILM;
+  static const NONTON_FILM = _Paths.NONTON_FILM;
   static const MAGANG = _Paths.MAGANG;
-  static const DETAILMAGANG = _Paths.DETAILMAGANG;
+  static const DETAIL_MAGANG = _Paths.DETAIL_MAGANG;
+  static const DATA_ANALYSIS = _Paths.DATA_ANALYSIS;
+  static const DATA_ANALYSIS_QUIZ = _Paths.DATA_ANALYSIS_QUIZ;
+  static const DATA_ANALYSIS_MODULE = _Paths.DATA_ANALYSIS_MODULE;
+  static const DATA_ANALYSIS_DETAIL_MODULE = _Paths.DATA_ANALYSIS_DETAIL_MODULE;
+  static const PYTHON = _Paths.PYTHON;
+  static const PYTHON_MODULE = _Paths.PYTHON_MODULE;
+  static const PYTHON_DETAIL_MODULE = _Paths.PYTHON_DETAIL_MODULE;
+  static const PYTHON_QUIZ = _Paths.PYTHON_QUIZ;
   static const KOLABORASI_KAMPUS = _Paths.KOLABORASI_KAMPUS;
   static const PROJECT_DETAIL = _Paths.PROJECT_DETAIL;
 
@@ -55,9 +63,17 @@ abstract class _Paths {
   static const DASHBOARD_USER = '/dashboard-user';
   static const KALIGRAFI = '/kaligrafi';
   static const AKUSTIK = '/akustik';
-  static const NONTONFILM = '/nontonfilm';
+  static const NONTON_FILM = '/nontonfilm';
   static const MAGANG = '/infomagang';
-  static const DETAILMAGANG = '/infodetailmagang';
+  static const DETAIL_MAGANG = '/infodetailmagang';
+  static const DATA_ANALYSIS = '/dataanalysis';
+  static const DATA_ANALYSIS_MODULE = '/moduldataanalysis';
+  static const DATA_ANALYSIS_DETAIL_MODULE = '/detailmoduldataanalysis';
+  static const DATA_ANALYSIS_QUIZ = '/latihansoaldataanalysis';
+  static const PYTHON = '/python';
+  static const PYTHON_MODULE = '/modulpython';
+  static const PYTHON_DETAIL_MODULE = '/detailmodulpython';
+  static const PYTHON_QUIZ = '/latihansoalpython';
   static const KOLABORASI_KAMPUS = '/kolaborasi-kampus';
   static const PROJECT_DETAIL = '/project-detail';
 

@@ -29,7 +29,7 @@ class KaligrafiController extends GetxController {
         final data = EventActivity.fromSnapshot(doc);
         eventActivity.value = data;
       } else {
-        // print("Data klub '$clubTitle' tidak ditemukan di database.");
+        print("Data klub '$clubTitle' tidak ditemukan di database.");
       }
     } catch (e) {
       Get.snackbar("Error", "Gagal memuat data klub: $e");

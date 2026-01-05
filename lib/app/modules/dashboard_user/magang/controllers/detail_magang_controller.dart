@@ -24,7 +24,6 @@ class DetailMagangController extends GetxController {
       final snapshot = await _db
           .collection('Activities')
           .where('title', isEqualTo: title)
-          .limit(1)
           .get();
 
       if (snapshot.docs.isNotEmpty) {
@@ -36,6 +35,7 @@ class DetailMagangController extends GetxController {
       Get.snackbar("Error", "Gagal memuat detail: $e");
     }
   }
+
   void toggleQualificationExpansion() {
     isQualificationExpanded.value = !isQualificationExpanded.value;
   }

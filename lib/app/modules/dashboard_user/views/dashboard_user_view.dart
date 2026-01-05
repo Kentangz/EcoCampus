@@ -184,10 +184,16 @@ class _DashboardHomeContent extends GetView<DashboardUserController> {
               Get.toNamed(Routes.AKUSTIK);
               break;
             case "Nonton Film":
-              Get.toNamed(Routes.NONTONFILM);
+              Get.toNamed(Routes.NONTON_FILM);
               break;
             case "Info Magang Startup":
               Get.toNamed(Routes.MAGANG);
+              break;
+            case "Kelas Python":
+              Get.toNamed(Routes.PYTHON);
+              break;
+            case "Kelas Data Analisis":
+              Get.toNamed(Routes.DATA_ANALYSIS);
               break;
           }
         }

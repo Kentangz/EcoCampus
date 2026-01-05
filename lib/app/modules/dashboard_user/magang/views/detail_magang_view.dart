@@ -48,7 +48,6 @@ class DetailMagangContent extends GetView<DetailMagangController> {
       }
       return Stack(
         children: [
-          // Konten Utama
           SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
@@ -80,6 +79,10 @@ class DetailMagangContent extends GetView<DetailMagangController> {
                   image: const DecorationImage(
                     image: AssetImage("assets/images/banner_magang.png"),
                     fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Color.fromRGBO(0, 0, 0, 0.3),
+                      BlendMode.darken,
+                      ),
                   ),
                 ),
                 child: Stack(
@@ -91,7 +94,7 @@ class DetailMagangContent extends GetView<DetailMagangController> {
                         "Detail Lowongan",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 30,
+                          fontSize: 40,
                           fontWeight: FontWeight.bold,
                           shadows: [
                             Shadow(offset: Offset(-1.0, -1.0), color: Colors.black),
@@ -125,10 +128,7 @@ class DetailMagangContent extends GetView<DetailMagangController> {
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                   data.position,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                                  ),
+                                  Text(data.position, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                                   const SizedBox(height: 5),
                                   Text(data.title, style: const TextStyle(fontSize: 12)),
                                   Text(data.location, style: const TextStyle(fontSize: 12)),

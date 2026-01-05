@@ -58,6 +58,7 @@ dependencies:
   font_awesome_flutter: ^10.12.0
   webview_flutter: ^4.13.0
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

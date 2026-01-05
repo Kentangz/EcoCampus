@@ -42,6 +42,22 @@ import 'package:ecocampus/app/modules/dashboard_admin/views/project/project_admi
 import 'package:ecocampus/app/modules/project_detail/bindings/project_detail_bindings.dart';
 import 'package:ecocampus/app/modules/project_detail/views/project_detail_views.dart';
 
+import '../modules/dashboard_user/kelas data analysis/bindings/data_analysis_binding.dart';
+import '../modules/dashboard_user/kelas data analysis/bindings/detail_modul_data_analysis_binding.dart';
+import '../modules/dashboard_user/kelas data analysis/bindings/modul_data_analysis_binding.dart';
+import '../modules/dashboard_user/kelas data analysis/bindings/soal_data_analysis_binding.dart';
+import '../modules/dashboard_user/kelas data analysis/views/data_analysis_view.dart';
+import '../modules/dashboard_user/kelas data analysis/views/detail_modul_data_analysis_view.dart';
+import '../modules/dashboard_user/kelas data analysis/views/modul_data_analysis_view.dart';
+import '../modules/dashboard_user/kelas data analysis/views/soal_data_analysis_view.dart';
+import '../modules/dashboard_user/kelas python/bindings/detail_modul_python_binding.dart';
+import '../modules/dashboard_user/kelas python/bindings/modul_python_binding.dart';
+import '../modules/dashboard_user/kelas python/bindings/python_binding.dart';
+import '../modules/dashboard_user/kelas python/bindings/soal_python_binding.dart';
+import '../modules/dashboard_user/kelas python/views/detail_modul_python_view.dart';
+import '../modules/dashboard_user/kelas python/views/modul_python_view.dart';
+import '../modules/dashboard_user/kelas python/views/python_views.dart';
+import '../modules/dashboard_user/kelas python/views/soal_python_view.dart';
 import '../modules/dashboard_user/magang/bindings/detail_magang_binding.dart';
 import '../modules/dashboard_user/magang/bindings/magang_binding.dart';
 import '../modules/dashboard_user/magang/views/detail_magang_view.dart';
@@ -99,7 +115,7 @@ class AppPages {
       binding: AkustikBinding(),
     ),
     GetPage(
-      name: _Paths.NONTONFILM,
+      name: _Paths.NONTON_FILM,
       page: () => const NontonFilmView(),
       binding: NontonFilmBinding(),
     ),
@@ -109,9 +125,49 @@ class AppPages {
       binding: MagangBinding(),
     ),
     GetPage(
-      name: _Paths.DETAILMAGANG,
+      name: _Paths.DETAIL_MAGANG,
       page: () => const DetailMagangView(),
       binding: DetailMagangBinding(),
+    ),
+    GetPage(
+      name: _Paths.DATA_ANALYSIS,
+      page: () => const DataAnalysisClassView(),
+      binding: DataAnalysisClassBinding(),
+    ),
+    GetPage(
+      name: _Paths.DATA_ANALYSIS_MODULE,
+      page: () => const DataAnalysisModuleView(),
+      binding: DataAnalysisModuleBinding(),
+    ),
+    GetPage(
+      name: _Paths.DATA_ANALYSIS_DETAIL_MODULE,
+      page: () => const DataAnalysisDetailModuleView(),
+      binding: DataAnalysisDetailModuleBinding(),
+    ),
+    GetPage(
+      name: _Paths.DATA_ANALYSIS_QUIZ,
+      page: () => const DataAnalysisQuizView(),
+      binding: DataAnalysisQuizBinding(),
+    ),
+    GetPage(
+      name: _Paths.PYTHON,
+      page: () => const PythonClassView(),
+      binding: PythonClassBinding(),
+    ),
+    GetPage(
+      name: _Paths.PYTHON_MODULE,
+      page: () => const PythonModuleView(),
+      binding: PythonModuleBinding(),
+    ),
+    GetPage(
+      name: _Paths.PYTHON_DETAIL_MODULE,
+      page: () => const PythonDetailModuleView(),
+      binding: PythonDetailModuleBinding(),
+    ),
+    GetPage(
+      name: _Paths.PYTHON_QUIZ,
+      page: () => const PythonQuizView(),
+      binding: PythonQuizBinding(),
     ),
 
     GetPage(
